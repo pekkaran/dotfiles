@@ -1,0 +1,87 @@
+# OPTIONS=IBMGraphics
+OPTIONS=DECgraphics
+OPTIONS=color,menucolors
+OPTIONS=scores:10 top/2 around/own
+
+#OPTIONS=name:Janet,role:Valkyrie,race:Human,gender:female,align:lawful
+#OPTIONS=dogname:Fido,catname:Morris,fruit:guava
+#OPTIONS=horsename:Silver
+#OPTIONS=autopickup,pickup_types:$"=/!?+
+#OPTIONS=packorder:")[%?+/=!(*0_`
+#OPTIONS=nolegacy,noverbose
+#OPTIONS=menustyle:traditional
+
+# OPTIONS=number_pad:2
+OPTIONS=name:player
+OPTIONS=time,showexp,lit_corridor,showrace,sparkle
+OPTIONS=altmeta,suppress_alert:3.3.1
+OPTIONS=msg_window:reversed
+OPTIONS=msghistory:60
+#OPTIONS=rest_on_space
+# OPTIONS=map_mode:tiles,scroll_margin:5
+OPTIONS=hilite_pet
+OPTIONS=boulder:0
+# OPTIONS=autodig
+OPTIONS=player_selection:prompts
+#OPTIONS=!splash_screen
+OPTIONS=autopickup
+OPTIONS=pickup_types:$?!
+OPTIONS=pickup_burden:unencumbered
+
+
+# Status/message window colors
+# Possible color options include:
+# six digit hexadecimal RGB color value ("#8F8F8F"), black, red, green, brown,
+# blue, magenta, cyan, gray (or grey), orange, brightgreen, yellow, brightblue,
+# brightmagenta, brightcyan, white, trueblack, purple, silver, maroon, fuchsia,
+# lime, olive, navy, teal, aqua, activeborder, activecaption, appworkspace,
+# background, btnface, btnshadow, btntext, captiontext, graytext, highlight,
+# highlighttext, inactiveborder, inactivecaption, menu, menutext, scrollbar,
+# window, windowframe, windowtext.
+#OPTIONS=windowcolors:status windowtext/window message windowtext/window
+OPTIONS=!use_darkgray
+
+MENUCOLOR=" blessed "=green
+MENUCOLOR=" holy "=green
+MENUCOLOR=" cursed "=red
+MENUCOLOR=" unholy "=red
+MENUCOLOR=" cursed .* (being worn)"=orange&underline
+
+# Finnish keyboards might need these modifications uncommented.
+# For  \, @, $, [, |
+#OPTIONS=subkeyvalue:171/92
+#OPTIONS=subkeyvalue:178/64
+#OPTIONS=subkeyvalue:180/36
+#OPTIONS=subkeyvalue:184/91
+#OPTIONS=subkeyvalue:188/124
+
+# <https://nethackwiki.com/wiki/MSGTYPE>
+# delayed instadeaths
+MSGTYPE=stop "The .* (grabs|swings itself around) you!"
+MSGTYPE=stop "You don't feel very well."
+MSGTYPE=stop "You are turning a little green."
+MSGTYPE=stop "Your limbs are getting oozy."
+MSGTYPE=stop "Your skin begins to peel away."
+MSGTYPE=stop "You are turning into a green slime."
+MSGTYPE=stop "You are slowing down."
+MSGTYPE=stop "Your limbs are stiffening."
+MSGTYPE=stop "It constricts your throat!"
+MSGTYPE=stop "You find it hard to breathe."
+MSGTYPE=stop "You're gasping for air."
+MSGTYPE=stop "Your blood is having trouble reaching your brain."
+MSGTYPE=stop "You can no longer breathe."
+MSGTYPE=stop "You're turning blue."
+MSGTYPE=stop "Your consciousness is fading."
+MSGTYPE=stop "You feel deathly sick."
+MSGTYPE=stop "You feel (much|even) worse."
+
+# displacing pets
+MSGTYPE=hide "You swap places with .*"
+
+OPTIONS=statushilites:10
+#OPTIONS=hilite_status:hitpoints/100%/brightgreen
+#OPTIONS=hilite_status:hitpoints/<100%/green
+OPTIONS=hilite_status:hitpoints/<60%/yellow
+OPTIONS=hilite_status:hitpoints/<40%/red
+
+OPTIONS=hilite_status:carrying-capacity/burdened/yellow/stressed/orange
