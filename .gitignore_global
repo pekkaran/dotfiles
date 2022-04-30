@@ -1,0 +1,9 @@
+# Global .gitignore file.
+# Setup with `git config --global core.excludesfile ~/dotfiles/.gitignore_global`
+
+Session.vim
+.DS_Store
+*.tags
+.errorlines
+**/target
+.wall.sh
