@@ -1,0 +1,10 @@
+partial modifier_keys
+xkb_symbols "additional_leftwin" {
+    replace key <RWIN>  { [ Super_L ] };
+};
+
+partial modifier_keys
+xkb_symbols "menu_as_compose" {
+    replace key <MENU>  { [ Multi_key ] };
+};
+

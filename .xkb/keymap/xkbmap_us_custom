@@ -1,0 +1,45 @@
+// See `/usr/share/X11/xkb/` for the included files.
+// `+` is same as doing `include` for each part separately.
+// `include` statements do not end in semicolon, others do.
+xkb_keymap {
+  xkb_keycodes {
+    include "evdev+aliases(qwerty)"
+  };
+
+  xkb_types {
+    include "complete"
+  };
+
+  xkb_compat {
+    include "complete"
+  };
+
+  xkb_symbols {
+    include "pc"
+    include "us(altgr-intl)"
+    include "inet(evdev)"
+    // include "capslock(ctrl_modifier)"
+    include "capslock(escape)"
+    // include "xkbsymbols(additional_leftwin)"
+
+    // us(altgr-intl) defines these:
+    // key <AD01> { [q, Q, adiaeresis, Adiaeresis ] };
+    // key <AD02> { [w, W, aring, Aring ] };
+
+    // The ö vowel. In altgr-intl these are on the `p` key, which I found hard to use.
+    key <AD03> { [e, E, odiaeresis, Odiaeresis] };
+    // The “” quote symbols.
+    key <AC01> { [a, A, leftdoublequotemark, aacute ] };
+    key <AC02> { [s, S, rightdoublequotemark, section ] };
+    // The dashes — –.
+    key <AC03> { [d, D, emdash, endash ] };
+    // The ellipsis ….
+    key <AC04> { [f, F, ellipsis, F ] };
+    // Bullet •. Middle dot ·.
+    key <AC05> { [g, G, U2022, U00B7 ] };
+  };
+
+  xkb_geometry {
+    include "pc(pc104)"
+  };
+};
