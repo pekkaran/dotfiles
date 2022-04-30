@@ -91,11 +91,10 @@ setopt magic_equal_subst
 # setopt chase_links
 
 # Own Bash/zsh helpers.
-# TODO
-sources=(public personal)
+sources=(shell.sh)
 for x in ${sources[@]}; do
-  if [[ -s "$HOME/dotfiles/shell/$x.sh" ]]; then
-    source "$HOME/dotfiles/shell/$x.sh"
+  if [[ -s "$HOME/dotfiles/$x" ]]; then
+    source "$HOME/dotfiles/$x"
   fi
 done
 

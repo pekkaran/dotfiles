@@ -1,0 +1,308 @@
+#!/bin/bash
+#
+# Zsh/bash aliases, exports, and functions.
+
+# Coreutils and their replacements.
+if type exa > /dev/null 2>&1; then
+  # These might be available in future versions (currently in git master):
+  # --no-permissions --no-filesize --no-user --no-time
+  alias la='exa -la --group-directories-first'
+  alias lat='exa -la -snew --group-directories-first'
+  alias lar='exa -laR --group-directories-first'
+  alias lag='exa -la --group-directories-first | \rg -i'
+else
+  alias ls='\ls --color=auto --group-directories-first'
+  alias la='\ls -lahF --color=auto --group-directories-first'
+  alias lat='\ls -lahFtr --color=auto --group-directories-first' # sort by time (reverse)
+  alias lar='\ls -lahFR --color=auto --group-directories-first' # recursive
+  alias lag='\ls -lahF --color=auto --group-directories-first | \rg -i'
+fi
+alias cp='\cp -i' # prompt before overwriting
+alias mv='\mv -i' # prompt before overwriting
+alias chx='chmod +x'
+alias filesize='du -shD' # size of file or folder. s:summarize, h:human_readable, D=dereference_links
+alias df='df -hT'
+alias lf='du -shx * | sort -h' # find large directories/files in current folder. Btw, if /var is filling /, then you probably forgot to run `pacman -Sc` for a year.
+
+# Searching.
+alias ag='\ag -if --hidden' # ignore case, follow symlinks, search hidden files
+alias agi='\ag -f --hidden' # not --ignore-case
+alias rg='\rg -i --hidden'
+alias rgi='\rg --hidden'
+alias fd='\fd -H' # -H include hidden files
+alias fdi='\fd -H -I' # -I do not skip ignore files
+
+# Misc
+alias en='LANG=en_EN.UTF-8' # Prefix commands with this to use the English locale.
+alias ssha='ssh-add -t 150000 $(find ~/.ssh | grep id | grep -v pub)'
+alias info='\info --vi-keys'
+alias uusb='devmon -u' # unmount everything mounted by devmon (included in udevil)
+if type nvim > /dev/null 2>&1; then
+  alias vim='nvim'
+fi
+
+# Media
+alias za='zathura'
+alias feh='feh -FZx' # full screen, auto-zoom, borderless
+alias ncmpc='\ncmpc -C' # no color
+alias mpv_fix_mono='mpv --audio-channels=1'
+# TODO Copy changes to these from the old repository.
+alias ims='sxiv $(find . -maxdepth 1 | grep -E "png|jpg|jpeg" | sort)'
+alias ims2='sxiv $(find . -maxdepth 2 | grep -E "png|jpg|jpeg" | sort)'
+alias ims3='sxiv $(find . -maxdepth 3 | grep -E "png|jpg|jpeg" | sort)'
+alias vids='mpv $(find . -maxdepth 1 | grep -E "mkv|mp4|avi|mov" | sort)'
+alias vids2='mpv $(find . -maxdepth 2 | grep -E "mkv|mp4|avi|mov" | sort)'
+alias vids3='mpv $(find . -maxdepth 3 | grep -E "mkv|mp4|avi|mov" | sort)'
+
+# Git
+#   Git has its own alias functionality but I don't want to type the "git " prefix to use it.
+#   You can use `git commit --amend --reset-author` to fix local commit after running `anongit`.
+alias add='git add'
+alias branch='git branch -v'
+# TODO Start use the new `switch` and `restore` commands instead of `checkout`:
+# <https://www.banterly.net/2021/07/31/new-in-git-switch-and-restore/>
+alias ch='git checkout'
+alias chb='git checkout -b'
+# alias cs='git switch' # Same as eg `git checkout old-branch`
+# alias csc='git switch -c' # Same as eg `git checkout -b new-branch`
+# alias cre='git restore` # Same as eg `git checkout -- file`. I think `restore` doesn't need `--`.
+alias cherry-pick='git cherry-pick'
+alias clone='git clone'
+alias commit='git commit'
+alias fe='git fetch --tags --prune'
+# Setting $GIT_PAGER like that seems to fix an issue where few lines at top of the log are "invisible" until I scroll down and up (or press g).
+alias log='GIT_PAGER="less" git log --graph --pretty=format:"%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset" --abbrev-commit'
+alias  lo='GIT_PAGER="less" git log         --pretty=format:"%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset" --abbrev-commit'
+alias merge='git merge'
+alias pull='git pull'
+alias push='git push'
+alias pushh='git push --set-upstream origin $(git branch --show-current)'
+alias rebase='git rebase -i'
+alias rom='git rebase -i origin/master'
+alias remote='git remote'
+alias revert='git revert'
+alias show='git show'
+for i in $(seq 0 9); do
+  alias show$i="git show HEAD~$i"
+done
+alias stash='git stash'
+alias status='git status'
+alias s='git status -sb'
+alias tag='git tag'
+alias sm='git submodule'
+alias sma='git submodule add'
+alias sms='git submodule sync'
+alias smu='git submodule update'
+alias smuir='git submodule update --init --recursive'
+alias reflog='git reflog'
+# -v: verbose, shows the diff in the commit message editor. This can also be set as git config option.
+alias c='git commit -v'
+alias ca='git commit -v -a'
+alias cam='git commit -v --amend'
+alias d='git diff'
+alias dc='git diff --cached'
+# Like `git diff` but for untracked files.
+function dt() {
+  for file in $(git ls-files --others --exclude-standard); do
+    git --no-pager diff --no-index /dev/null $file
+  done
+}
+function ce() {
+  cd "$(git rev-parse --show-toplevel)"
+  git add .
+  git commit -a -m "e"
+}
+# List branches recently committed to.
+alias recent='git for-each-ref --sort=-committerdate refs/heads/ | head'
+
+## Pacman
+# Use the English locale in case of something goes wrong. Capital first letter indicates sudo use.
+alias PSyu='sudo LANG=C pacman -Syu' # The usual update all command.
+alias PSyy='sudo LANG=C pacman -Syy' # Just sync. DO NOT run this before -S without -Syu because it may cause "partial update", see the arch wiki.
+alias PS='sudo LANG=C pacman -S' # Install specific package(s).
+alias PUx='sudo LANG=C pacman -U *pkg.tar.xz' # Install a just-built AUR package in the pwd.
+alias PUz='sudo LANG=C pacman -U *pkg.tar.zst' # Install a just-built AUR package in the pwd.
+alias PR='sudo LANG=C pacman -R' # Remove the specified package(s), retaining its configuration(s) and required dependencies
+alias PRs='sudo LANG=C pacman -Rs' # Also remove dependencies of the packages, but not recursively so.
+alias PSc="sudo LANG=C pacman -Sc" # Clean cache - delete all not currently installed package files.
+alias Pclean="sudo LANG=C pacman -Sc" # Clean cache - delete all not currently installed package files.
+alias pQ='LANG=C pacman -Q' # List all installed packages.
+alias pfiles="LANG=C pacman -Ql" # List all files installed by a given package.
+alias porphan="LANG=C pacman -Qdtq" # List all packages which are orphaned.
+
+## Rust
+alias cb='cargo build'
+# --watch: Watch git root instead of $PWD because of my project crate organization.
+alias cww='cargo watch --clear --watch "$(git rev-parse --show-toplevel)"'
+
+alias cr='cargo run --'
+# --tests: Do not run doc tests etc.
+# --nocapture: Show prints from tests.
+alias ct='cargo test --tests -- --nocapture'
+alias cbr='cargo build --release'
+alias crr='cargo run --release --'
+# `cargo install cargo-deps`. `dot` is in the graphviz package.
+alias depgraph='cargo deps --all-deps | dot -Tpng > graph.png'
+alias depgraph1='cargo deps --all-deps --depth 1 | dot -Tpng > graph.png'
+alias depgraph2='cargo deps --all-deps --depth 2 | dot -Tpng > graph.png'
+# <https://github.com/kbknapp/cargo-outdated>
+alias outdated='cargo outdated -R'
+
+# Docker
+alias dk='docker'
+alias dkc='docker container'
+alias dkls='docker container ls --all'
+alias dkps='docker ps -a'
+alias dki='docker image'
+alias dkr='docker run'
+alias dkri='docker run -it' # interactive, tty
+
+# Not exactly to my taste, but I use GTK so rarely I didn't investigate options.
+export GTK_THEME=Adwaita:dark
+
+# Common linux environment variables
+export CC=/usr/bin/clang
+export CXX=/usr/bin/clang++
+export EDITOR="vim"
+export PAGER="less"
+export VISUAL="vim"
+export BROWSER="firefox"
+
+# zsh and bash history size in lines.
+export HISTSIZE=10000
+export SAVEHIST=10000
+
+# less
+export LESS='-i -n -w  -z-4 -g -M -X -F -R'
+export LESS_TERMCAP_mb=$'\E[01;31m'
+export LESS_TERMCAP_md=$'\E[01;31m'
+export LESS_TERMCAP_me=$'\E[0m'
+export LESS_TERMCAP_se=$'\E[0m'
+#export LESS_TERMCAP_so=$'\E[01;44;33m'
+export LESS_TERMCAP_so=$'\E[01;31;31m'
+export LESS_TERMCAP_ue=$'\E[0m'
+export LESS_TERMCAP_us=$'\E[01;32m'
+
+# “Note that an empty entry is interpreted as the current directory, because that's how POSIX
+# defined PATH, and POSIX hates you. This means that these variables must not begin or end
+# with :, and must not contain :: anywhere in the middle.”
+# LD_LIBRARY_PATH=$(echo $LD_LIBRARY_PATH | sed -E -e 's/^:*//' -e 's/:*$//' -e 's/:+/:/g')
+# LIBRARY_PATH=$(echo $LIBRARY_PATH | sed -E -e 's/^:*//' -e 's/:*$//' -e 's/:+/:/g')
+
+# Rust
+# This directory is used by upstream rustup (ie when installing with curl script).
+if [ -d "$HOME/.cargo" ]; then
+  export PATH="$PATH:$HOME/.cargo/bin"
+fi
+
+export RUST_BACKTRACE=1
+
+# This finds the sources installed by `rustup component add rust-src`.
+# It's handy because running the rustup update keeps compiler and sources
+# versions in sync.
+type rustc >/dev/null 2>&1 && export RUST_SRC_PATH=$(rustc --print sysroot)/lib/rustlib/src/rust/src/
+
+export VDPAU_NVIDIA_NO_OVERLAY=1
+
+## My own variables
+
+# The command by which prefered terminal is launched
+export TERM_CMD="alacritty"
+
+#export FONT_PANGO="DejaVu Sans Mono 12"
+export FONT_PANGO="DejaVu Sans Mono for Powerline 12"
+
+# User folder that stores information from scripts
+export STATE_FOLDER="$HOME/.state"
+
+# `cd` without manual tab-completing. Also an easier to type alias, as 'cd'
+# uses the same finger in the standard touch typing style.
+function k() {
+  # Use `cd` for the full parts.
+  dir="$(dirname $1)"
+  cd "$dir"
+  # Complete the last part.
+  base="$(basename $1)"
+  matches="$(ls -d */ | grep -iF "$base")"
+  count=$(echo $matches | wc -l)
+  if (( $count == 0 )); then
+    exit
+  elif (( $count > 1 )); then
+    # For multiple matches, pick the shortest and print all.
+    matches=$(echo "$matches" | perl -e 'print sort { length($a) <=> length($b) } <>')
+    echo "$matches"
+    cd "$(echo "$matches" | head -n 1)"
+  else
+    cd "$matches"
+  fi
+}
+
+# Compact `watch git diff`.
+function wgd() {
+  if [[ $(git rev-parse --is-inside-work-tree) = true ]]; then
+    # Use grep to remove three less informative lines. Might be some flags in git-diff
+    # to do this better. Now it matches any line containing "index ". I couldn't get
+    # beginning of line `^` to work, possibly because of color escape sequences.
+    watch -c "git diff -U1 --color=always | grep -E -v '\-\-\-|\+\+\+|index '"
+  fi
+}
+
+# Extract any archive.
+function ex() {
+  if [ $# = 0 ]; then
+    echo "Usage:     $0 [archives ...]"
+    echo "Example:   $0 *.zip"
+  fi
+
+  files=("$@")
+  for file in ${files[@]}; do
+    case $file in
+      *.tar.bz2) tar xjf $file;;
+      *.tar.gz) tar xzf $file;;
+      *.bz2) bunzip2 $file;;
+      *.rar) unrar x $file;;
+      *.gz) gunzip $file;;
+      *.tar) tar xf $file;;
+      *.tbz2) tar xjf $file;;
+      *.tgz) tar xzf $file;;
+      *.zip) unzip $file;;
+      *.Z) uncompress $file;;
+      *.7z) 7z x $file;;
+      *.xz) tar xvJf $file;;
+      *) echo "'$file' cannot be extracted via ex()" ;;
+    esac
+  done
+}
+
+# `cd` into path under current git project root. Outside git use $PWD.
+function cdg() {
+    cd "$(git rev-parse --show-toplevel 2> /dev/null || echo ".")/$@"
+}
+
+# Stream first youtube search result.
+function yv() {
+  youtube-dl \
+    --default-search=ytsearch: \
+    --youtube-skip-dash-manifest \
+    -o - \
+    "$*" \
+    | mpv -
+}
+
+# Audio only.
+function ya() {
+  youtube-dl \
+    --default-search=ytsearch: \
+    --youtube-skip-dash-manifest \
+    -o - \
+    --format="bestaudio[ext!=webm]" \
+    "$*" \
+    | mpv -
+}
+
+# Add all search hits from the music library and play in order.
+function play() {
+  mpc clear
+  mpc search title "$*" | mpc add
+  mpc play
+}
