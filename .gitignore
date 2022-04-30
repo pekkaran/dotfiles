@@ -1,0 +1,10 @@
+.vim/.netrwhist
+.config/Trolltech.conf
+.mpv/watch_later/
+
+.zcompdump
+.zcompdump.zwc
+.zcompcache
+.zhistory
+
+.DS_Store
