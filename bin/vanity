@@ -1,0 +1,15 @@
+#!/bin/bash
+#
+# Run this in a git repo to get some vanity statistics.
+
+echo "Lines changed since first commit:"
+git log --numstat --pretty="%H" | awk '
+   NF==3 {plus+=$1; minus+=$2;}
+   END   {printf("+%d, -%d, total %d\n", plus, minus, plus - minus)}'
+
+echo ""
+echo "Total number of commits $(git rev-list --all --count)"
+
+echo ""
+echo '`cloc --vcs=git`:'
+cloc --vcs=git

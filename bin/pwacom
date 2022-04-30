@@ -1,0 +1,21 @@
+#!/bin/bash
+# Portrait setup (right-handed). See also the script rwacom.
+device="Wacom Intuos Pro M"
+stylus="$device Pen stylus"
+eraser="$device Pen eraser"
+touch="$device Finger touch"
+pad="$device Pad pad"
+
+xsetwacom --set "$stylus" Rotate cw
+xsetwacom --set "$eraser" Rotate cw
+xsetwacom --set "$touch"  Rotate cw
+xsetwacom --set "$touch" Touch off
+
+# 16:9 monitor resolution.
+# Inactive area on the right side to give the right hand more room to rest on the tablet.
+xsetwacom --set "$stylus" Area 0 0 44704 25146
+
+# It's easy to hit the wheel by accident so I want to make it nop. Not sure if that's possible
+# so map to the tenth mouse button instead.
+xsetwacom --set "$pad" AbsWheelUp '10'
+xsetwacom --set "$pad" AbsWheelDown '10'

@@ -1,0 +1,48 @@
+#!/bin/bash
+# Finds lines like the following in source code:
+#
+#   // TODO STACK 2020_04_04-13:41:22 This is wrong because this and that.
+#
+# and outputs sorted lines like this:
+#
+#   2020_04_04-13:41:22 path/to/source/file.rs:123:5: This is wrong because this and that.
+#
+# where the numbers are one-indexed line and column.
+#
+# There can be leading whitespace on the parsed line, but the comment "word", here `//`
+# must not contain whitespace.
+#
+# Some vimscript to go with this program:
+#
+#   " Add todo note for a search program. `gcc` comments the line, and `==`
+#   " indents it.
+#   nmap <leader>t O<esc>"=strftime('TODO STACK %Y_%m_%d-%T')<cr>pgcc==
+#
+#   function! OpenTodoLine(num)
+#     let gitdir = finddir('.git/..', ';')
+#     let line = system("todo | sed '" . a:num . "q;d'")
+#     if empty(line)
+#       return
+#     endif
+#
+#     let tokens = split(line, " ")
+#     let source = split(tokens[1], ":")
+#     execute "e " . gitdir . '/' . source[0]
+#     execute source[1]
+#   endfunction
+#
+#   nnoremap <leader>r :call OpenTodoLine(1)<cr>
+
+for prog in git ag awk; do
+  if ! type $prog > /dev/null 2>&1; then
+    echo "command not found: $prog"
+    exit 0
+  fi
+done
+
+dir=$(git rev-parse --show-toplevel 2> /dev/null || echo ".")
+cd "$dir"
+
+ag --vimgrep "TODO STACK" \
+  | awk '{ printf "%s %s ", $5, $1; for (i = 6; i <= NF; ++i) printf "%s ", $i; print "" }' \
+  | sort -r

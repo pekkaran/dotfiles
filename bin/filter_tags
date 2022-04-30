@@ -1,0 +1,17 @@
+#!/bin/bash
+#
+# Suppose I have tagged my images using a command like `exiv2 -M"set Xmp.dc.subject MYTAG" image.png`.
+# Now if we run `filter_tags MYTAG`, it will list all the files in the current folder that contain that tag.
+# So for example to open only those images, run `filter_tags MYTAG | xargs sxiv`.
+#
+# The `find -exec` commands first constructs lines like this:
+#   ./image.png Xmp.dc.subject  XmpBag 2  MYTAG, other_tag
+# Then `grep` picks the lines where MYTAG appears (NOTE will match also the filenames, etc.).
+# Finally `sed` extracts the filenames we stored at the front.
+
+find . -type f \
+  -exec printf "{} " ';' \
+  -exec exiv2 -q -pa {} ';' \
+  -exec echo ';' \
+  | grep -a "$1" \
+  | sed -rn 's/(.+)Xmp\.dc.+/\1/p'

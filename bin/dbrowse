@@ -1,0 +1,43 @@
+#!/bin/bash
+#
+# A dmenu based file browser.
+#
+# TODO Trying to follow symlinks fails.
+
+enter() {
+  dir=$1
+  if [[ -d "$dir" ]]; then
+    # Directory. Pipe file list to dmenu after removing special symbols.
+    # sel="$(ls -Fa "$dir" | perl -pe 's#[@\*]##' | dmenu)"
+    sel="$(ls -Fa "$dir" | $menu)"
+    if [[ "$sel" == "../" ]]; then
+      enter "$(echo $dir | perl -pe '/(.+)\/.+\//; $_ = "$1/";')"
+    elif [[ "$sel" == "./" ]]; then
+      return
+    elif [[ -z "${sel// }" ]]; then
+      # Matches string with only spaces.
+      return
+    else
+      enter "${dir}${sel}"
+    fi
+  else
+    # Terminate by outputting the absolute path of the selected file.
+    echo "$dir"
+  fi
+}
+
+main() {
+  if [ $(uname -s) = "Darwin" ]; then
+    # <https://github.com/chipsenkbeil/choose>
+    # `homebrew install choose-gui`
+    menu=choose
+  else
+    menu=dmenu
+  fi
+  if [[ -z $1 ]]; then
+    enter "$(pwd)/"
+  else
+    enter "$(pwd)/$1/"
+  fi
+}
+main "$@"

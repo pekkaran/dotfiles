@@ -1,0 +1,14 @@
+#!/bin/bash
+
+main() {
+  if [ $# -eq 1 ]; then
+    CORES=$1
+  elif [ $(uname -s) = "Darwin" ]; then
+    CORES=$(sysctl -n hw.ncpu)
+  else
+    CORES=$(nproc)
+  fi
+  watchexec --clear --exts cpp,hpp -w .. -- make -j$CORES
+}
+
+main "$@"

@@ -1,0 +1,12 @@
+#!/bin/bash
+#
+# Command to run "blindly" if no monitors are enabled. Not tested in a long while.
+
+# Get descriptor of first monitor, eg "DP-0".
+OUTPUT=$(xrandr --listmonitors | grep 0: | awk '{gsub(/^[ \t]+/,""); print $4 }')
+
+if [ ! -z "$OUTPUT" ]; then
+  xrandr --output $OUTPUT --mode 1920x1080 --rotation normal
+else
+  echo "failed" # Ironically you won't be able to see this.
+fi

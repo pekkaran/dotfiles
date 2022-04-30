@@ -1,0 +1,6 @@
+#!/bin/bash
+
+main() {
+  /usr/bin/dmenu -b -fn "DejaVuSansMono-10:normal" -nb "#002b36" -sb "#073642" -nf "#839496" -sf "#839496" -i -l 20 "$@"
+}
+main "$@"

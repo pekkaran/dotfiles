@@ -1,0 +1,11 @@
+#!/bin/bash
+
+main() {
+  if type nvim > /dev/null 2>&1; then
+    \nvim -d "$@"
+  else
+    \vim -d "$@"
+  fi
+}
+
+main "$@"

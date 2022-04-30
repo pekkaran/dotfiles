@@ -1,0 +1,70 @@
+#!/bin/bash
+# Collect filenames and line numbers from `cargo check` error messages
+# and put them in a file in the root of the git repository.
+#
+# Some vimscript to go with this program:
+#
+#   function! OpenErrorLine(num)
+#     let gitdir = finddir('.git/..', ';')
+#     let errorfile = gitdir . "/.errorlines"
+#     if !filereadable(errorfile)
+#       return
+#     endif
+#
+#     " Count from bottom because those errors are more likely visible in `watch`
+#     " program output.
+#     let line = system("cat " . errorfile . " | sort -r | sed '" . a:num . "q;d'")
+#     if empty(line)
+#       return
+#     endif
+#
+#     let fname = split(line, " ")
+#     execute "e " . gitdir . '/' . fname[0]
+#     execute fname[1]
+#   endfunction
+#
+#   nnoremap <leader>e :call OpenErrorLine(1)<cr>
+
+# Works also with `cargo clippy` for example.
+#
+# Appending `--tests` is nice because I hate to find out some refactoring broke tests only
+# after I try to run them a week later, but it seems to duplicate each error in some setups.
+cargo_command=${1:-check}
+# cargo_command=${1:-check --tests}
+
+for prog in git cargo jq sed; do
+  if ! type $prog > /dev/null 2>&1; then
+    echo "command not found: $prog"
+    exit 0
+  fi
+done
+
+dir=$(git rev-parse --show-toplevel 2> /dev/null || echo ".")
+
+# Run the cargo command just once.
+# TODO Look at the script `m` if this could also be implemented so that it prints while running.
+#      Maybe not since we need `jq` to convert it. IIRC at the time of writing there was no
+#      option to simultaneously produce a JSON output and a normal output, so that we could
+#      print the latter in real time.
+output=$(cargo $cargo_command --message-format=json-diagnostic-rendered-ansi 2> /dev/null)
+
+# Display in stdout, in color.
+echo "$output" | jq --raw-output '
+    select(.reason=="compiler-message")
+    | .message
+    | .rendered'
+
+# Collect error lines to a file.
+# `grep -v rustc` removes lines like `/rustc/9bc8..e53/library/alloc/src/macros.rs 51`,
+# which occur around macro usage. Might be possible to also detect in the JSON but this is easier.
+echo "$output" | jq '
+    select(.reason=="compiler-message")
+    | .message
+    | .spans
+    | .[]
+    | select(.is_primary==true)
+    | [.file_name, .line_start]
+    | @sh' \
+  | sed "s/\"//g; s/'//g" \
+  | grep -v rustc \
+  > $dir/.errorlines

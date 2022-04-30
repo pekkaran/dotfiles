@@ -1,0 +1,15 @@
+#!/bin/bash
+# Left-handed setup. See also the script rwacom.
+device="Wacom Intuos Pro M"
+stylus="$device Pen stylus"
+eraser="$device Pen eraser"
+touch="$device Finger touch"
+pad="$device Pad pad"
+
+xsetwacom --set "$stylus" Rotate half
+xsetwacom --set "$eraser" Rotate half
+xsetwacom --set "$touch"  Rotate half
+xsetwacom --set "$touch" Touch off
+
+# 16:9 monitor resolution.
+xsetwacom --set "$stylus" Area 0 0 44704 25146

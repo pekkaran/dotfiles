@@ -1,0 +1,44 @@
+#!/bin/bash
+# The CMake routine for fresh build.
+#
+# * Arguments are passed to `cmake`.
+# * Assumes the build directory is in the root of a git repository.
+# * Running with `RM=1 tg` deletes the build folder instead of
+#   just the cache file.
+
+: "${TARGET:=target}"
+: "${RM:=}"
+
+if [[ $(git rev-parse --is-inside-work-tree) != true ]]; then
+  exit 0
+fi
+cd "$(git rev-parse --show-toplevel)"
+
+if [ ! -f CMakeLists.txt ]; then
+  echo "No CMakeLists.txt in current directory."
+  exit 0
+fi
+
+if [ -d "$TARGET" ]; then
+  if [ "$RM" ]; then
+    rm -r $TARGET
+    mkdir $TARGET
+    cd "$TARGET"
+  else
+    cd "$TARGET"
+    rm CMakeCache.txt
+  fi
+else
+  mkdir "$TARGET"
+  cd "$TARGET"
+fi
+
+cmake "$@" ..
+
+if [ $(uname -s) = "Darwin" ]; then
+  CORES=$(sysctl -n hw.ncpu)
+else
+  CORES=$(nproc)
+fi
+
+make -j$CORES

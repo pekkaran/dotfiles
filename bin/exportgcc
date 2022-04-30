@@ -1,0 +1,3 @@
+#!/bin/bash
+export CC=/bin/gcc
+export CXX=/bin/g++

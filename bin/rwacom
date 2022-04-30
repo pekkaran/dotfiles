@@ -1,0 +1,45 @@
+#!/bin/bash
+# Right-handed setup.
+device="Wacom Intuos Pro M"
+stylus="$device Pen stylus"
+eraser="$device Pen eraser"
+touch="$device Finger touch"
+pad="$device Pad pad"
+
+# monitor=DP-1
+# monitor=HDMI-0
+monitor=HEAD-0
+
+# Restrict to specific monitor. HEAD-0 probably works with nvidia drivers, and xrandr id otherwise.
+xsetwacom --set "$stylus" MapToOutput "$monitor"
+
+xsetwacom --set "$stylus" Rotate none
+xsetwacom --set "$eraser" Rotate none
+xsetwacom --set "$touch"  Rotate none
+xsetwacom --set "$touch" Touch off
+
+# The default height is 27940 (run `--set "$stylus" ResetArea` to get it).
+# 27940 * 9 / 10 = 25146, so this height fixes the aspect ratio for a 16:9 monitor.
+# xsetwacom --set "$stylus" Area 0 0 44704 25146
+
+# 27940 - 25146 = 2794, so this command moves the active area to the bottom. Changing between these two might be useful to avoid wearing my practice patterns into the tablet surface.
+xsetwacom --set "$stylus" Area 0 2794 44704 27940
+
+# I don't really use the keys on the tablet but below shows how to configure them.
+
+# Top four buttons
+# xsetwacom --set "$pad" Button 2 'key z'
+# xsetwacom --set "$pad" Button 3 'key e'
+# xsetwacom --set "$pad" Button 8 'key s'
+# xsetwacom --set "$pad" Button 9 'key a'
+
+# Bottom four buttons
+# xsetwacom --set "Wacom Intuos Pro M Pad pad" Button 10 'key p'
+# xsetwacom --set "Wacom Intuos Pro M Pad pad" Button 11 'key p'
+# xsetwacom --set "Wacom Intuos Pro M Pad pad" Button 12 'key p'
+# xsetwacom --set "$pad" Button 13 'key ctrl' # (modifiers, e.g. use the wheel and button for zooming instead of rotation)
+
+# Middle button and the wheel
+# xsetwacom --set "$pad" Button 1 'key 0' # (reset rotation)
+# xsetwacom --set "$pad" AbsWheelUp 'key 5'
+# xsetwacom --set "$pad" AbsWheelDown 'key 6'

@@ -1,0 +1,3 @@
+#!/bin/bash
+export CC=/bin/clang
+export CXX=/bin/clang++

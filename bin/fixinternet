@@ -1,0 +1,8 @@
+#!/bin/bash
+#
+# Try also:
+#   sudo systemctl restart dhcpcd
+# and then again this script.
+
+sudo ip link set eno1 down
+sudo ip link set eno1 up

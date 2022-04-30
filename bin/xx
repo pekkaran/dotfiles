@@ -1,0 +1,83 @@
+#!/bin/bash
+#
+# Manual control of external monitors. Use `arandr` for a GUI.
+
+if [[ $# -lt 1 ]]; then
+  echo "$#"
+  echo "usage: xx [h|d] [m|a|2|3] [a|b|l|r]"
+  echo "  where h|d means: HDMI, DisplayPort"
+  echo "  m|a|2|3 mean: mirror auto, and the numbers smaller resolutions"
+  echo "  and a|b|l|r mean: above below left right"
+  exit 0
+fi
+
+# TODO Rather use grep like in `fixmonitor` to find HDMI device with any name.
+# This only shows connected monitors:
+# $(xrandr --listmonitors | awk '{gsub(/^[ \t]+/,""); print $4 }')
+if [ $1 = "h" ]; then
+  device="HDMI-A-0"
+elif [ $1 = "d" ]; then
+  device="DisplayPort-0"
+else
+  echo "Unknown device $1"
+  exit 0
+fi
+
+main="eDP"
+
+disconnected="$(xrandr | grep "disconnected" | grep "$device")"
+# Connected but not enabled.
+connected="$(xrandr | grep " connected (" | grep "$device")"
+# Might not be the only way the automatic configuration can go wrong.
+wrong="$(xrandr | grep "+0+0" | grep $main)"
+
+mirror=
+mode="auto"
+cmd="above $main"
+if [[ $# -eq 2 ]]; then
+  wrong=true
+  if [[ $2 = "m" ]]; then
+    mirror=true
+    # The resolution needs to be same as the main monitor, `--auto` didn't set it correctly.
+    mode="mode 1920x1080"
+    cmd="same-as $main"
+  elif [[ $2 = "a" ]]; then
+    mode="auto"
+  elif [[ $2 = "2" ]]; then
+    mode="mode 2560x1440"
+  elif [[ $2 = "3" ]]; then
+    mode="mode 1920x1080"
+  else
+    echo "Unknown mode."
+  fi
+fi
+
+if [[ $# -eq 3 ]]; then
+  wrong=true
+  if [[ $3 = "a" ]]; then
+    cmd="above $main"
+  elif [[ $3 = "b" ]]; then
+    cmd="below $main"
+  elif [[ $3 = "l" ]]; then
+    cmd="left-of $main"
+  elif [[ $3 = "r" ]]; then
+    cmd="right-of $main"
+  else
+    echo "Unknown position."
+  fi
+fi
+
+if [ ! -z "$disconnected" ]; then
+  echo "$device is disconnected"
+elif [[ ! -z "$mirror" ]]; then
+  echo "mirroring $device"
+elif [[ ! -z "$connected" ]]; then
+  echo "enabling $device $cmd"
+elif [[ ! -z "$wrong" ]]; then
+  echo "changing $device $cmd"
+else
+  echo "disenabling $device"
+  cmd="off"
+fi
+
+xrandr --output "$main" --auto --output "$device" --$mode --$cmd

@@ -1,0 +1,3 @@
+#!/usr/bin/env python
+import csv, sys
+csv.writer(sys.stdout, delimiter=',').writerows(zip(*csv.reader(sys.stdin, delimiter=',')))

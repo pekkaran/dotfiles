@@ -1,0 +1,9 @@
+#!/bin/bash
+#
+# Open a file in git tree using dmenu. Extremely useful.
+
+if type nvim > /dev/null 2>&1; then
+  nvim $(gitbrowse)
+else
+  vim $(gitbrowse)
+fi

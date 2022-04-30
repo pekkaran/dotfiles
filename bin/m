@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+#
+# Run `make` and collect filenames and line numbers from clang error messages.
+#
+# For more information, see the script `ck` which does same for Rust's cargo.
+
+set -euo pipefail
+
+if [[ ! $(git rev-parse --is-inside-work-tree) = true ]]; then
+  echo "The script only works inside git repositories."
+  exit
+fi
+
+# Piping and variable capture usually remove colors which we
+# don't want.
+#
+# Normally we would use an option like `--color=always` for the
+# program on left side of the pipe, but the indirectness of `make`
+# makes it hard, and I'm not even sure `clang` has such an option.
+#
+# So instead we use `script` to preserve the color escape sequences
+# in the output file. Note that this prints the command to stdout
+# while it's running which is nice.
+temp=$(mktemp)
+script -q -c "make -j $(nproc)" "$temp"
+
+dir=$(git rev-parse --show-toplevel 2> /dev/null || echo ".")
+
+# Save the errors to a file.
+#
+# `sed` Remove the colors.
+# `grep` Only errors in the git repository.
+# `sed` Paths relative to root.
+# `cut` Path and line number.
+cat "$temp" \
+  | sed 's/\x1b\[[0-9;]*m//g' \
+  | grep "$dir" \
+  | sed -n "s#$dir/##p" \
+  | cut -d: -f1-2 \
+  | sed -n "s/:/ /p" \
+  > "$dir/.errorlines"
+
+rm "$temp"

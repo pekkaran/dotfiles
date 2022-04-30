@@ -1,0 +1,48 @@
+#!/bin/bash
+# Replace text in-place, in every matching file matching with the given extension.
+
+if ! type git > /dev/null 2>&1; then
+  echo "replace: command not found: git"
+  echo "         this program will only work in git repositories"
+  exit 0
+fi
+if ! type fd > /dev/null 2>&1; then
+  echo "replace: command not found: fd"
+  echo "         fd is a modern \`find\` replacement:"
+  echo "         https://github.com/sharkdp/fd"
+  exit 0
+fi
+
+if [[ $# -ne 3 ]]; then
+  echo "usage:   replace FILE_EXTENSION FROM_TEXT TO_TEXT"
+  echo "example: replace java \
+ProjectContractChargingPeriodProjectAccountReferenceVMFactoryBuilderStrategy \
+Abomination"
+  exit 0
+fi
+
+if [[ "$(git rev-parse --is-inside-work-tree 2>/dev/null)" != "true" ]]; then
+  # Running in-place replace commands is dangerous, only do it when we can restore from backup.
+  echo "replace: not inside a git repository"
+  exit 0
+fi
+
+if [[ ! -z "$(git status -s)" ]]; then
+  # So that a simple `git checkout -- .` will work to reverse changes.
+  echo "replace: uncommitted changes in the git repository"
+  exit 0
+fi
+
+# Probably the script functionality could also be achieved using
+# `find` and `xargs`, but `fd` is much nicer.
+#
+# fd:  -e file extension
+#      -x execute on each result
+# sed: -i in-place
+#      -e sed script next
+#      /g handle multiple matches per row (?)
+# {} is substituted a full path by `fd` for each match,
+#   which become target of the `sed` command.
+#
+# I don't know if the `-e` flag is just a hindrance.
+fd -e $1 -x sed -i -e "s/$2/$3/g" {}
