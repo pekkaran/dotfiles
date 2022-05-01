@@ -126,6 +126,7 @@ alias PR='sudo LANG=C pacman -R' # Remove the specified package(s), retaining it
 alias PRs='sudo LANG=C pacman -Rs' # Also remove dependencies of the packages, but not recursively so.
 alias PSc="sudo LANG=C pacman -Sc" # Clean cache - delete all not currently installed package files.
 alias Pclean="sudo LANG=C pacman -Sc" # Clean cache - delete all not currently installed package files.
+alias PSkeys="sudo LANG=C pacman -Sy archlinux-keyring" # Usually this fixes PGP issues from updating packages.
 alias pQ='LANG=C pacman -Q' # List all installed packages.
 alias pfiles="LANG=C pacman -Ql" # List all files installed by a given package.
 alias porphan="LANG=C pacman -Qdtq" # List all packages which are orphaned.

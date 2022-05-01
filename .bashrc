@@ -11,6 +11,7 @@ else
 fi
 
 PATH="$PATH:$HOME/dotfiles/bin"
+PATH="$PATH:$HOME/secrets/bin"
 PATH="$PATH:$HOME/bin"
 
 source "$HOME/dotfiles/shell.sh"

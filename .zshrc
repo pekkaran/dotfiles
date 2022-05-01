@@ -143,5 +143,5 @@ bindkey '^U' duplicate-terminal
 # I found `autojump` to be a bit slow and `z` buggy. Settled on the former for now.
 # Link to `z` because it seems difficult to google: <https://github.com/rupa/z>
 if type autojump > /dev/null 2>&1; then
-  source "$HOME/arch/misc/autojump.zsh"
+  source "$HOME/secrets/autojump.zsh"
 fi

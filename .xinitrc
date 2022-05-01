@@ -10,7 +10,7 @@ xset s off -dpms
 
 # Tune screen color temperature based on time.
 if type redshift > /dev/null 2>&1; then
-  redshift -l "$(<$HOME/secrets/redshift-coordinates)" -t 4500:2700
+  redshift -l "$(<$HOME/secrets/redshift-coordinates)" -t 4500:2700 &
 fi
 
 # Adjust speed of specific mouses.
