@@ -1,0 +1,42 @@
+#!/bin/bash
+
+[[ -f ~/.Xresources ]] && xrdb -merge -I$HOME ~/.Xresources
+
+# Keyboard stuff (layout, capslock is esc, custom mappings etc.).
+if type xkbcomp > /dev/null 2>&1; then
+  # The command prints a bunch of warnings that I'm too lazy to research, so just silence the output.
+  xkbcomp -I$HOME/.xkb ~/.xkb/keymap/xkbmap_us_custom $DISPLAY &> /dev/null
+fi
+
+# Adjust speed of specific mouses.
+if type xinput > /dev/null 2>&1; then
+  mouseid=$(xinput list | grep "SEMICCHIP Usb Mouse" | cut -f2 | cut -d= -f2)
+  xinput --set-prop $mouseid 'libinput Accel Speed' -0.4
+  mouseid=$(xinput list | grep "Logitech USB Optical Mouse" | cut -f2 | cut -d= -f2)
+  xinput --set-prop $mouseid 'libinput Accel Speed' -0.3
+fi
+
+# Start programs in background.
+# Cannot use arguments here since the commands are just whitespace separated.
+cmds=(
+  dunst
+  unclutter
+  devmon
+  lxqt-policykit-agent
+)
+for cmd in ${cmds[@]}; do
+  if type $cmd > /dev/null 2>&1; then
+    $cmd &
+  fi
+done
+
+id=$(xinput list | grep Touchpad | cut -f 2 | cut -d= -f 2)
+# Reverse scrolling direction (to smartphone-like).
+xinput set-prop $id "libinput Natural Scrolling Enabled" 1
+# Scroll slower.
+xinput set-prop $id "libinput Scrolling Pixel Distance" 30
+
+# Once ssh-agent is running, run `ssh-add` once before you need your keys.
+eval $(ssh-agent)
+
+exec i3
