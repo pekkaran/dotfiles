@@ -46,13 +46,12 @@ alias za='zathura'
 alias feh='feh -FZx' # full screen, auto-zoom, borderless
 alias ncmpc='\ncmpc -C' # no color
 alias mpv_fix_mono='mpv --audio-channels=1'
-# TODO Copy changes to these from the old repository.
-alias ims='sxiv $(find . -maxdepth 1 | grep -E "png|jpg|jpeg" | sort)'
-alias ims2='sxiv $(find . -maxdepth 2 | grep -E "png|jpg|jpeg" | sort)'
-alias ims3='sxiv $(find . -maxdepth 3 | grep -E "png|jpg|jpeg" | sort)'
-alias vids='mpv $(find . -maxdepth 1 | grep -E "mkv|mp4|avi|mov" | sort)'
-alias vids2='mpv $(find . -maxdepth 2 | grep -E "mkv|mp4|avi|mov" | sort)'
-alias vids3='mpv $(find . -maxdepth 3 | grep -E "mkv|mp4|avi|mov" | sort)'
+for i in $(seq 1 4); do
+  alias ims$i="find . -maxdepth $i | grep -iE \"gif|png|jpg|jpeg\" | sort | sxiv -i"
+  alias vids$i="find . -maxdepth $i | grep -iE \"gif|png|jpg|jpeg|mkv|mp4|avi|mov|webm\" | sort | mpv --playlist=-"
+done
+alias ims='ims1'
+alias vids='vids1'
 
 # Git
 #   Git has its own alias functionality but I don't want to type the "git " prefix to use it.
