@@ -20,7 +20,8 @@ fi
 alias cp='\cp -i' # prompt before overwriting
 alias mv='\mv -i' # prompt before overwriting
 alias chx='chmod +x'
-alias filesize='du -shD' # size of file or folder. s:summarize, h:human_readable, D=dereference_links
+alias fs='du -shD' # size of file or folder. s:summarize, h:human_readable, D=dereference_links
+alias filesize='echo "use: fs"'
 alias df='df -hT'
 alias lf='du -shx * | sort -h' # find large directories/files in current folder. Btw, if /var is filling /, then you probably forgot to run `pacman -Sc` for a year.
 
