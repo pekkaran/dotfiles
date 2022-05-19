@@ -45,6 +45,7 @@ fi
 alias za='zathura'
 alias feh='feh -FZx' # full screen, auto-zoom, borderless
 alias ncmpc='\ncmpc -C' # no color
+alias mp='\ncmpcpp' # [m]usic [p]layer
 alias mpv_fix_mono='mpv --audio-channels=1'
 for i in $(seq 1 4); do
   alias ims$i="find . -maxdepth $i | grep -iE \"gif|png|jpg|jpeg\" | sort | sxiv -i"

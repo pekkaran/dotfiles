@@ -8,6 +8,7 @@ fi
 mkdir -p .config/dunst
 mkdir -p .config/mpd
 mkdir -p .config/mpv
+mkdir -p .config/ncmpcpp
 mkdir -p .config/nvim
 mkdir -p .config/zathura
 
@@ -17,6 +18,7 @@ config_files=(
   mpv/scripts
   mpv/input.conf
   mpv/mpv.conf
+  ncmpcpp/config
   nvim/init.vim
   zathura/zathurarc
 )
