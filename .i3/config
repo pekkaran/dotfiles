@@ -167,8 +167,8 @@ bar {
     }
 }
 
-bindsym XF86AudioLowerVolume exec amixer -c 0 set Master 2-
-bindsym XF86AudioRaiseVolume exec amixer -c 0 set Master 2+
+bindsym XF86AudioLowerVolume exec amixer -c "$(sound_card)" set Master 2-
+bindsym XF86AudioRaiseVolume exec amixer -c "$(sound_card)" set Master 2+
 bindsym XF86AudioPlay exec mpc toggle
 bindsym XF86AudioStop exec mpc stop
 bindsym XF86AudioPrev exec mpc prev
@@ -192,6 +192,7 @@ bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcu
 
 # bindsym $mod+p exec trackpad-toggle
 
+# Note that since this is used only with `exec`, it can also be an environment variable.
 set $TERM alacritty
 
 bindsym $mod+Return exec $TERM

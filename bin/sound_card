@@ -1,0 +1,6 @@
+#!/bin/bash
+# Print number of the sound card to use for audio output.
+
+SOUND_CARD="$(cat /proc/asound/cards | grep "\[PCH" | awk '{ print $1 }')"
+SOUND_CARD=${SOUND_CARD:-0}
+echo "$SOUND_CARD"
