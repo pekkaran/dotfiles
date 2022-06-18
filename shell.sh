@@ -25,11 +25,13 @@ alias filesize='echo "use: fs"'
 alias df='df -hT'
 alias lf='du -shx * | sort -h' # find large directories/files in current folder. Btw, if /var is filling /, then you probably forgot to run `pacman -Sc` for a year.
 
-# Searching.
-alias ag='\ag -if --hidden' # ignore case, follow symlinks, search hidden files
-alias agi='\ag -f --hidden' # not --ignore-case
+# Searching. "rg" is a "grep" replacement
+# -i: ignore case
+# -. == --hidden: include hidden files in search
 alias rg='\rg -i --hidden'
 alias rgi='\rg --hidden'
+alias rgl='\rg -l' # Print filenames of matches instead.
+# "fd" is a "find" replacement.
 alias fd='\fd -H' # -H include hidden files
 alias fdi='\fd -H -I' # -I do not skip ignore files
 
