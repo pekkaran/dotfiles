@@ -1,5 +1,5 @@
 #!/bin/bash
-# Replace text in-place, in every matching file matching with the given extension.
+# Replace text in-place.
 
 if ! type git > /dev/null 2>&1; then
   echo "replace: command not found: git"
@@ -13,11 +13,9 @@ if ! type fd > /dev/null 2>&1; then
   exit 0
 fi
 
-if [[ $# -ne 3 ]]; then
-  echo "usage:   replace FILE_EXTENSION FROM_TEXT TO_TEXT"
-  echo "example: replace java \
-ProjectContractChargingPeriodProjectAccountReferenceVMFactoryBuilderStrategy \
-Abomination"
+if [[ $# -ne 2 ]]; then
+  echo "usage:   replace FROM_TEXT TO_TEXT"
+  echo "example: replace Something Else"
   exit 0
 fi
 
@@ -44,5 +42,4 @@ fi
 # {} is substituted a full path by `fd` for each match,
 #   which become target of the `sed` command.
 #
-# I don't know if the `-e` flag is just a hindrance.
-fd -e $1 -x sed -i -e "s/$2/$3/g" {}
+fd -x sed -i -e "s/$1/$2/g" {}
