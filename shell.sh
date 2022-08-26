@@ -40,6 +40,7 @@ alias en='LANG=en_EN.UTF-8' # Prefix commands with this to use the English local
 alias ssha='ssh-add -t 150000 $(find ~/.ssh | grep id | grep -v pub)'
 alias info='\info --vi-keys'
 alias uusb='devmon -u' # unmount everything mounted by devmon (included in udevil)
+alias gnutime="/usr/bin/time -f 'user: %U, sys: %S, percentage: %P, wall %e'"
 if type nvim > /dev/null 2>&1; then
   alias vim='nvim'
 fi
