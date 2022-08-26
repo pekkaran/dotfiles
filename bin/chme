@@ -1,0 +1,20 @@
+#!/bin/bash
+#
+# Recursive chown/chgrp. Note that this can be about as dangerous
+# as sudo rm -rf /.
+
+set -euo pipefail
+
+if [ $# -eq 0 ]; then
+  echo "Usage: chme <PATH>"
+  exit
+fi
+
+if [ "$1" == "/" ]; then
+  echo "Yikes"
+  exit
+fi
+
+ME=$(whoami)
+sudo chown -R $ME "$1"
+sudo chgrp -R $ME "$1"
