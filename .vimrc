@@ -74,6 +74,8 @@ set clipboard+=unnamedplus " Yanks and deletes additionally go to the + register
 set breakindent " Show soft-wrapped text with leading indent.
 set undolevels=1000 " Remember this many changes.
 
+set mouse= " Disable mouse support.
+
 " Use `.tags` instead of `tags` for ctags file.
 set tags=.tags;
 au BufReadPost .tags set syntax=tags
