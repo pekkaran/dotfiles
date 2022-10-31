@@ -46,3 +46,9 @@
 [submodule ".vim/bundle/vim-localrc"]
 	path = .vim/bundle/vim-localrc
 	url = https://github.com/thinca/vim-localrc.git
+[submodule ".vim/bundle/tokyonight.nvim"]
+	path = .vim/bundle/tokyonight.nvim
+	url = https://github.com/folke/tokyonight.nvim.git
+[submodule ".vim/bundle/lualine.nvim"]
+	path = .vim/bundle/lualine.nvim
+	url = https://github.com/nvim-lualine/lualine.nvim.git
