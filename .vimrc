@@ -19,13 +19,18 @@ let s:uname = system("echo -n \"$(uname)\"")
 runtime bundle/vim-pathogen/autoload/pathogen.vim
 let g:pathogen_disabled = []
 " call add(g:pathogen_disabled, 'disabled-plugin-name-goes-here')
+if has('nvim')
+  call add(g:pathogen_disabled, 'vim-airline')
+endif
+
 execute pathogen#infect()
 
-" Color scheme. But why do I have two solarized plugins?
-set background=dark
+" set background=dark
 set termguicolors
-" let g:solarized_italics = 0
-colorscheme solarized8
+
+if has('nvim')
+  colorscheme tokyonight-moon
+endif
 
 " Highlight current line number.
 autocmd! ColorScheme * hi CursorLineNR ctermfg=white
