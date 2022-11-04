@@ -81,3 +81,8 @@ else
 fi
 
 xrandr --output "$main" --auto --output "$device" --$mode --$cmd
+
+wallpaper="$HOME/wallpaper.png"
+if type feh > /dev/null 2>&1 && [ -f "$wallpaper" ]; then
+  feh --bg-max "$wallpaper"
+fi

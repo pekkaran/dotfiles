@@ -8,6 +8,7 @@ lua << END
 require('lualine').setup {
   theme = 'tokyonight-moon',
   sections = {
+    lualine_b = {'branch'}, -- removed diff and diagnostics
     lualine_c = {
       {
         'filename',
@@ -27,6 +28,7 @@ require('lualine').setup {
     lualine_a = {
       {
         'buffers',
+        max_length = vim.o.columns,
         symbols = {
           modified = '*',
           alternate_file = '',

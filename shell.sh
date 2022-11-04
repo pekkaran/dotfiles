@@ -168,9 +168,9 @@ export GTK_THEME=Adwaita:dark
 # Common linux environment variables
 export CC=/usr/bin/clang
 export CXX=/usr/bin/clang++
-export EDITOR="vim"
+export EDITOR="nvim"
 export PAGER="less"
-export VISUAL="vim"
+export VISUAL="nvim"
 export BROWSER="firefox"
 
 # zsh and bash history size in lines.
