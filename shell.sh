@@ -47,6 +47,7 @@ fi
 
 # Media
 alias za='zathura'
+alias sxiv='sxiv -a -s f' # play animations, scale fit
 alias feh='feh -FZx' # full screen, auto-zoom, borderless
 alias ncmpc='\ncmpc -C' # no color
 alias mp='\ncmpcpp' # [m]usic [p]layer
