@@ -274,7 +274,7 @@ function ex() {
       *.Z) uncompress $file;;
       *.7z) 7z x $file;;
       *.xz) tar xvJf $file;;
-      *) echo "'$file' cannot be extracted via ex()" ;;
+      *) echo "'$file' cannot be extracted via ex()"; return 1 ;;
     esac
   done
 }
