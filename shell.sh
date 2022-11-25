@@ -60,7 +60,6 @@ alias vids='vids1'
 
 # Git
 #   Git has its own alias functionality but I don't want to type the "git " prefix to use it.
-#   You can use `git commit --amend --reset-author` to fix local commit after running `anongit`.
 alias add='git add'
 alias branch='git branch -v'
 # TODO Start use the new `switch` and `restore` commands instead of `checkout`:
