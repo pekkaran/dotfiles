@@ -297,6 +297,10 @@ nnoremap <S-F11> :call OpenRandomFile()<cr>
 " Open hpp file buffer from cpp file and vice versa. Very crude.
 nnoremap <leader>z :e %:p:s,.hpp$,.X123X,:s,.cpp$,.hpp,:s,.X123X$,.cpp,<cr>
 
+" Normally `gf` opens file with the name under cursor, but that file must exist.
+" This remapping also opens a new file. Note you still need to save the new file.
+nnoremap gf :e <cfile><cr>
+
 " Insert mode timeout combinations.
 " These interfere with typing somewhat, so only start them with 'j' to
 " minimize the effects.
@@ -317,10 +321,8 @@ inoremap jf <C-j>
 
 " Quick save.
 nnoremap <leader>m :w<cr>
-" This wasn't a very good shortcut because I couldn't type 'json'.
-" inoremap js <esc>:w<cr>
 
-" Trying to learn use <c-h>. Be aware also of <c-w> and <c-u> which delete back word
+" Should use <c-h>. Be aware also of <c-w> and <c-u> which delete back word
 " or the entire line.
 inoremap <backspace> <nop>
 
@@ -416,7 +418,7 @@ inoremap ² <esc>:.s/\s\+$//e<cr>:nohl<cr>A => {<return>},<esc>O
 inoremap <C-i> <C-o>
 
 " Move individual lines up and down. I use this all the time. Especially handy
-" with `J` and `K` (latter is a custom command defined in this file).
+" with `J` (join) and `K` (split; a custom command defined in this file).
 nnoremap <C-j> :m .+1<CR>==
 nnoremap <C-k> :m .-2<CR>==
 vnoremap <C-j> :m '>+1<CR>gv=gv

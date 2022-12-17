@@ -177,8 +177,18 @@ export BROWSER="firefox"
 export HISTSIZE=10000
 export SAVEHIST=10000
 
-# less
-export LESS='-i -n -w  -z-4 -g -M -X -F -R'
+# `less` arguments
+# -i: ignore case is search
+# -n: no line numbers
+# -z: Scrolling behavior
+# -g: hilight only current search match
+# -M: ? --LONG-PROMPT
+# -X: ? Supplying this makes the output not clear from the screen, which I didn't like.
+# -F: Exit automatically if file fits the screen. Didn't like.
+# -R: ? tl;dr
+# -j: ? Line placement.
+export LESS='-i -n -g -M -R -j0'
+
 export LESS_TERMCAP_mb=$'\E[01;31m'
 export LESS_TERMCAP_md=$'\E[01;31m'
 export LESS_TERMCAP_me=$'\E[0m'

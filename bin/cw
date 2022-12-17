@@ -1,10 +1,14 @@
 #!/bin/bash
+#
+# This is a `watch`-like script for compiling Rust code when it changes.
+#
+# `ck` is my program to run `cargo check`, and at the same time
+# collect error locations a file in root of the git repository.
+# That file can then be used by a text editor to jump to the errors.
+#
+# The parameters `$@` are used for `cargo`, so you can use eg `cw run`
+# or `cw clippy`.
 main() {
-  # `ck` is my program to display cargo check (or other cargo command) output, while
-  # also collecting error locations from it to a file in root of the git repository.
-  # That file can then be used by a text editor to jump to the errors.
-  #
-  # The parameters $@ are used for cargo, so you can use `cw clippy` for example.
   cargo watch \
     --clear \
     --ignore .errorlines \
