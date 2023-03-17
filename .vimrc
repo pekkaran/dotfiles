@@ -219,6 +219,15 @@ autocmd BufEnter * execute "chdir ".escape(expand("%:p:h"), ' \\/.*$^~[]#')
 
 let mapleader=","
 
+" Clear junk from the screen.
+function! Reset()
+  cexpr []
+  cclose
+  echo
+endfunction
+" Use a mark because for some reason the space always moves the cursor.
+nnoremap <silent> <space> mz:nohl<cr> :call Reset()<cr>`z
+
 " Copy and paste.
 "
 "Vim offers the + and * registers to reference the system clipboard (:help quoteplus and :help quotestar). Note that on some systems, + and * are the same, while on others they are different. Generally on Linux, + and * are different: + corresponds to the desktop clipboard (XA_SECONDARY) that is accessed using CTRL-C, CTRL-X, and CTRL-V, while * corresponds to the X11 primary selection (XA_PRIMARY), which stores the mouse selection and is pasted using the middle mouse button in most applications.
@@ -262,6 +271,9 @@ nnoremap <leader>E :call OpenFirstErrorLine(0)<cr>
 nnoremap <leader>w :call OpenNextErrorLine(1)<cr>
 nnoremap <leader>W :call OpenNextErrorLine(-1)<cr>
 nnoremap <leader>r :call OpenTodoLine(1)<cr>
+
+" Delete empty lines in selection.
+vnoremap <leader>d :g/^$/d<cr>:nohl<cr>
 
 " vim-abolish plugin: Swap boolean values in selection or current line.
 " Note that numbers on line may be similarly incremented or decremented using
@@ -312,7 +324,7 @@ inoremap jk <esc>
 inoremap Jk <esc>
 inoremap JK <esc>
 inoremap jjk <esc>
-inoremap <esc> <nop>
+" inoremap <esc> <nop>
 " New line in insert mode.
 inoremap <cr> <nop>
 inoremap <C-l> <C-j>
@@ -335,7 +347,7 @@ vnoremap <insert> <nop>
 vnoremap <C-g> <nop>
 
 " Colon commands are common so put them behind the easier to type '.' and
-" remap the repetition key. `\` is normally the leader key.
+" remap the repeat/repetition key. `\` is normally the leader key.
 nnoremap . :
 vnoremap . :
 nnoremap \ .
@@ -446,15 +458,6 @@ nnoremap <C-i> :call DmenuOpen()<cr>
 " Toggle line numbers.
 nnoremap <C-n> :setlocal number!<cr>
 
-" Clear junk from the screen.
-function! Reset()
-  cexpr []
-  cclose
-  echo
-endfunction
-" Use a mark because for some reason the space always moves the cursor.
-nnoremap <silent> <space> mz:nohl<cr> :call Reset()<cr>`z
-
 " Center after search.
 nnoremap n nzz
 nnoremap N Nzz
@@ -507,8 +510,12 @@ autocmd FileType netrw setl bufhidden=wipe
 " }}}
 " {{{ * esearch
 let g:esearch = {} " Needed before specifying custom options.
+" Prefill with selected content, but not unless it's currently selected (default).
+let g:esearch.prefill = ['hlsearch']
 " Open the search window in a new buffer (:e) instead of tab.
 let g:esearch.win_new = {esearch -> esearch#buf#goto_or_open(esearch.name, 'e') }
+" Close search buffer when opening an entry. Does not run autocmds properly?
+" autocmd User esearch_win_config autocmd BufLeave <buffer> bd!
 " }}}
 " {{{ * vim-airline
 let g:airline_powerline_fonts = 1
