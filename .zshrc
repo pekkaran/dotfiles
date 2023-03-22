@@ -98,8 +98,13 @@ for x in ${sources[@]}; do
   fi
 done
 
-bindkey '^R' history-incremental-search-backward
-bindkey '^S' history-incremental-search-forward
+if type fzf > /dev/null 2>&1; then
+  source /usr/share/fzf/key-bindings.zsh
+  source /usr/share/fzf/completion.zsh
+else
+  bindkey '^R' history-incremental-search-backward
+  bindkey '^S' history-incremental-search-forward
+fi
 
 # Like '^L', this clears the terminal, but it also prevents scrolling back to the old stuff.
 # Very handy to do before a command that outputs lots of text, so you can find the beginning.

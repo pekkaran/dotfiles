@@ -1,9 +1,15 @@
 #!/bin/bash
-#
-# Open a file in git tree using dmenu. Extremely useful.
+# Open a file in git tree using fzf or dmenu. Extremely useful.
 
+VIM=vim
 if type nvim > /dev/null 2>&1; then
-  nvim $(gitbrowse)
+  VIM=nvim
+fi
+
+if type fzf > /dev/null 2>&1; then
+  git ls-files &> /dev/null || exit
+  gtdir="$(git rev-parse --show-toplevel )"
+  $VIM $(git ls-files "$gtdir" | fzf)
 else
-  vim $(gitbrowse)
+  $VIM $(gitbrowse)
 fi
