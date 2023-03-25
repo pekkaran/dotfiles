@@ -451,9 +451,7 @@ vnoremap <C-e> :s/
 nnoremap <C-s> :%Subvert/
 vnoremap <C-s> :Subvert/
 
-" My file opening functions.
 nnoremap <C-o> :call GitOpen()<cr>
-nnoremap <C-i> :call DmenuOpen()<cr>
 
 " Toggle line numbers.
 nnoremap <C-n> :setlocal number!<cr>
@@ -551,24 +549,17 @@ let g:clang_verbose_pmenu = 1 " show types and such in the omnicomplete menu
 au BufRead,BufNewFile *.rs setlocal textwidth=80
 " }}}
 " {{{ Functions
-if !exists("*DmenuOpen")
-  "" Open a file using my own dmenu-based file browser "dbrowse"
-  function! DmenuOpen()
-    let fname = system("dbrowse")
-    if empty(fname)
-      return
-    endif
-    " execute a:cmd . " " . fname
-    execute "e " . fname
-  endfunction
-
-  "" Similarly, open a file in the current git repository.
+if !exists("*GitOpen")
   function! GitOpen()
-    let fname = system("gitbrowse")
-    if empty(fname)
-      return
+    if executable("fzf")
+      execute("GFiles!")
+    else
+      let fname = system("gitbrowse")
+      if empty(fname)
+        return
+      endif
+      execute "e " . fname
     endif
-    execute "e " . fname
   endfunction
 endif
 

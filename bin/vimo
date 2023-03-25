@@ -9,7 +9,12 @@ fi
 if type fzf > /dev/null 2>&1; then
   git ls-files &> /dev/null || exit
   gtdir="$(git rev-parse --show-toplevel )"
-  $VIM $(git ls-files "$gtdir" | fzf)
+  if type bat > /dev/null 2>&1; then
+    # Options also set via `~/.config/bat/config`.
+    $VIM $(git ls-files "$gtdir" | fzf --preview "bat --line-range=:500 {}")
+  else
+    $VIM $(git ls-files "$gtdir" | fzf --preview "cat {}")
+  fi
 else
   $VIM $(gitbrowse)
 fi
