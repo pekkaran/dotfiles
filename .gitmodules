@@ -52,3 +52,6 @@
 [submodule ".vim/bundle/lualine.nvim"]
 	path = .vim/bundle/lualine.nvim
 	url = https://github.com/nvim-lualine/lualine.nvim.git
+[submodule ".vim/bundle/fzf.vim"]
+	path = .vim/bundle/fzf.vim
+	url = https://github.com/junegunn/fzf.vim.git
