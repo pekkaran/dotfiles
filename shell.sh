@@ -98,6 +98,7 @@ alias sma='git submodule add'
 alias sms='git submodule sync'
 alias smu='git submodule update'
 alias smuir='git submodule update --init --recursive'
+# To remove a submodule `submodule rm <path>` and commit.
 alias reflog='git reflog'
 # -v: verbose, shows the diff in the commit message editor. This can also be set as git config option.
 alias c='git commit -v'
@@ -134,6 +135,12 @@ alias PSkeys="sudo LANG=C pacman -Sy archlinux-keyring" # Usually this fixes PGP
 alias pQ='LANG=C pacman -Q' # List all installed packages.
 alias pfiles="LANG=C pacman -Ql" # List all files installed by a given package.
 alias porphan="LANG=C pacman -Qdtq" # List all packages which are orphaned.
+
+## Debian family package management. The names match the pacman aliases above.
+alias AS='sudo apt-get install'
+alias AR='sudo apt-get remove'
+alias AQ='apt list' # List all installed packages.
+alias DS='sudo dpkg -i' # Install `.deb` file.
 
 ## Rust
 alias cb='cargo build'
