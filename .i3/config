@@ -34,7 +34,7 @@ bindsym $mod+Shift+k move up
 bindsym $mod+Shift+l move right
 
 # switch workspace to other monitor. same keybinding works for both sides
-bindsym $mod+q move workspace to output left
+bindsym $mod+q move workspace to output next
 
 bindsym $mod+c workspace next
 
