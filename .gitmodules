@@ -22,9 +22,6 @@
 [submodule ".vim/bundle/vim-airline-themes"]
 	path = .vim/bundle/vim-airline-themes
 	url = https://github.com/vim-airline/vim-airline-themes.git
-[submodule ".vim/bundle/vim-colors-solarized"]
-	path = .vim/bundle/vim-colors-solarized
-	url = https://github.com/altercation/vim-colors-solarized.git
 [submodule ".vim/bundle/vim-cpp-modern"]
 	path = .vim/bundle/vim-cpp-modern
 	url = https://github.com/bfrg/vim-cpp-modern.git
@@ -37,9 +34,6 @@
 [submodule ".vim/bundle/vim-highlightedyank"]
 	path = .vim/bundle/vim-highlightedyank
 	url = https://github.com/machakann/vim-highlightedyank.git
-[submodule ".vim/bundle/vim-solarized8"]
-	path = .vim/bundle/vim-solarized8
-	url = https://github.com/lifepillar/vim-solarized8.git
 [submodule ".vim/bundle/vim-toml"]
 	path = .vim/bundle/vim-toml
 	url = https://github.com/cespare/vim-toml.git
