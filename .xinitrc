@@ -43,9 +43,6 @@ for cmd in ${cmds[@]}; do
   fi
 done
 
-# Once `ssh-agent` is running, run `ssh-add` once before you need your keys.
-eval $(ssh-agent)
-
 # Starting the window manager is required to be the last step.
 # NOTE There are some more graphical program auto-starting at the bottom of `.i3/config`.
 exec i3

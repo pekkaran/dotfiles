@@ -150,3 +150,13 @@ bindkey '^U' duplicate-terminal
 if type autojump > /dev/null 2>&1; then
   source "$HOME/secrets/autojump.zsh"
 fi
+
+# Once `ssh-agent` is running, run `ssh-add` once before you need your keys.
+# Alternatively it works to put `eval $(ssh-agent)` in `.xinitrc`,
+# but only when you are using `startx`.
+if ! pgrep -u "$USER" ssh-agent > /dev/null; then
+  ssh-agent > "$XDG_RUNTIME_DIR/ssh-agent.env"
+fi
+if [[ ! "$SSH_AUTH_SOCK" ]]; then
+  source "$XDG_RUNTIME_DIR/ssh-agent.env" > /dev/null
+fi
