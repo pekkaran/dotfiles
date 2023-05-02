@@ -1,0 +1,22 @@
+#!/bin/bash
+#
+# Create the next numbered folder and print its name.
+# This is useful with programs that take an output directory parameter. Eg:
+#   ./program --output $(next_file ~/tmp/outputs)
+
+set -euo pipefail
+
+if [[ $# -lt 1 ]]; then
+  DIR="."
+else
+  DIR="$1"
+fi
+
+for i in $(seq -f "%02g" 1 99); do
+  DIR_I="$DIR/$i"
+  if [[ ! -e "$DIR_I" ]]; then
+    mkdir -p "$DIR_I"
+    echo "$DIR_I"
+    exit 0
+  fi
+done
