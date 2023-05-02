@@ -31,9 +31,16 @@ alias lf='du -shx * | sort -h' # find large directories/files in current folder.
 alias rg='\rg -i --hidden'
 alias rgi='\rg --hidden'
 alias rgl='\rg -l' # Print filenames of matches instead.
+
 # "fd" is a "find" replacement.
-alias fd='\fd -H' # -H include hidden files
-alias fdi='\fd -H -I' # -I do not skip ignore files
+if type fdfind > /dev/null 2>&1; then
+  # The binary name is different in some distros.
+  alias fd='\fdfind -H'
+  alias fdi='\fdfind -H -I'
+else
+  alias fd='\fd -H' # -H include hidden files
+  alias fdi='\fd -H -I' # -I do not skip ignore files
+fi
 
 # Misc
 alias en='LANG=en_EN.UTF-8' # Prefix commands with this to use the English locale.
@@ -44,6 +51,8 @@ alias gnutime="/usr/bin/time -f 'user: %U, sys: %S, percentage: %P, wall %e'"
 if type nvim > /dev/null 2>&1; then
   alias vim='nvim'
 fi
+# `gr myprogram --myargs` will run until crash, print backtrace and exit.
+alias gr='gdb --ex run --ex bt -ex="set confirm off" --ex quit --args'
 
 # Media
 alias za='zathura'
@@ -139,8 +148,8 @@ alias porphan="LANG=C pacman -Qdtq" # List all packages which are orphaned.
 ## Debian family package management. The names match the pacman aliases above.
 alias AS='sudo apt-get install'
 alias AR='sudo apt-get remove'
-alias AQ='apt list' # List all installed packages.
 alias DS='sudo dpkg -i' # Install `.deb` file.
+alias aQ='apt list --installed' # List all installed packages.
 
 ## Rust
 alias cb='cargo build'
@@ -175,6 +184,7 @@ export GTK_THEME=Adwaita:dark
 # Common linux environment variables
 export CC=/usr/bin/clang
 export CXX=/usr/bin/clang++
+
 export EDITOR="nvim"
 export PAGER="less"
 export VISUAL="nvim"
