@@ -215,8 +215,8 @@ workspace 2 output HDMI-1
 exec --no-startup-id i3-msg 'workspace 1; exec firefox'
 assign [class="firefox"] 1
 exec --no-startup-id i3-msg 'workspace 2; exec alacritty -o font.size=8 -e daily'
-exec picom
+# exec picom
 exec steam -silent
 
 # xrandr setup. Could possibly instead use `nvidia-settings`.
-exec dualmonitor
+# exec dualmonitor
