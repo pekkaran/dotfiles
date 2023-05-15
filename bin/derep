@@ -1,0 +1,28 @@
+#!/usr/bin/env python3
+
+import re
+import sys
+
+def main(args):
+    count = 1
+    ref = None
+    for line in sys.stdin:
+        sline = re.sub(r'[0-9]+', '', line.strip())
+        if ref:
+            if sline == ref:
+                count += 1
+                print("\r", end='')
+                print(line.strip(), count, end='')
+            else:
+                print(line.strip(), end='')
+        else:
+            ref = sline
+            print(line.strip(), end='')
+        ref = sline
+    print()
+
+if __name__ == "__main__":
+    import argparse
+    p = argparse.ArgumentParser(__doc__)
+    args = p.parse_args()
+    main(args)
