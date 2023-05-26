@@ -1,0 +1,7 @@
+#!/bin/bash
+#
+# Display a large digital clock with milliseconds.
+
+: "${SIZE:=40}"
+
+$TERM_CMD -o font.size=$SIZE -e watch -t -n 0.1 date +"%T.%N"
