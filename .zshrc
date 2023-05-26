@@ -99,8 +99,15 @@ for x in ${sources[@]}; do
 done
 
 if type fzf > /dev/null 2>&1; then
-  source /usr/share/fzf/key-bindings.zsh
-  source /usr/share/fzf/completion.zsh
+  if [[ -f "/usr/share/doc/fzf/examples/completion.zsh" ]]; then
+    # Ubuntu.
+    source /usr/share/doc/fzf/examples/key-bindings.zsh
+    source /usr/share/doc/fzf/examples/completion.zsh
+  else
+    # Arch linux.
+    source /usr/share/fzf/key-bindings.zsh
+    source /usr/share/fzf/completion.zsh
+  fi
 else
   bindkey '^R' history-incremental-search-backward
   bindkey '^S' history-incremental-search-forward
