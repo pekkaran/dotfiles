@@ -67,6 +67,8 @@ for i in $(seq 1 4); do
 done
 alias ims='ims1'
 alias vids='vids1'
+alias first='ls | head -n1'
+alias last='ls | tail -n1' # `last` is an existing UNIX command
 
 # Git
 #   Git has its own alias functionality but I don't want to type the "git " prefix to use it.
