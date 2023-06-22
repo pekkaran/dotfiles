@@ -1,0 +1,15 @@
+#!/bin/bash
+#
+# Creates a new folder which has a symlink to every file/folder in the root
+# of the input folder.
+set -euo pipefail
+
+if [ $# -le 1 ]; then
+  echo "Usage $0 <input folder> <output folder>"
+  exit
+fi
+
+mkdir -p "$2"
+for i in $(ls $1/); do
+  ln -s $(realpath "$1/$i") "$2"
+done
