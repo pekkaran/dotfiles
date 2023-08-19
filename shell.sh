@@ -93,12 +93,16 @@ alias pull='git pull'
 alias push='git push'
 alias pushh='git push --set-upstream origin $(git branch --show-current)'
 alias rebase='git rebase -i'
+alias rc='git rebase --continue'
 alias rom='git rebase -i origin/main'
 alias remote='git remote'
 alias revert='git revert'
 alias show='git show'
+alias sta='git diff --stat HEAD~1' # Summary of file line changes for corresponding `show`.
+# show0 == show, sta0 == sta
 for i in $(seq 0 9); do
   alias show$i="git show HEAD~$i"
+  alias sta$i="git diff --stat HEAD~$(($i + 1)) HEAD~$i"
 done
 alias stash='git stash'
 alias status='git status'
@@ -288,24 +292,22 @@ function ex() {
     echo "Example:   $0 *.zip"
   fi
 
-  files=("$@")
-  for file in ${files[@]}; do
-    case $file in
-      *.tar.bz2) tar xjf $file;;
-      *.tar.gz) tar xzf $file;;
-      *.bz2) bunzip2 $file;;
-      *.rar) unrar x $file;;
-      *.gz) gunzip $file;;
-      *.tar) tar xf $file;;
-      *.tbz2) tar xjf $file;;
-      *.tgz) tar xzf $file;;
-      *.zip) unzip $file;;
-      *.Z) uncompress $file;;
-      *.7z) 7z x $file;;
-      *.xz) tar xvJf $file;;
-      *) echo "'$file' cannot be extracted via ex()"; return 1 ;;
-    esac
-  done
+  file="$1"
+  case "$file" in
+    *.tar.bz2) tar xjf "$file";;
+    *.tar.gz) tar xzf "$file";;
+    *.bz2) bunzip2 "$file";;
+    *.rar) unrar x "$file";;
+    *.gz) gunzip "$file";;
+    *.tar) tar xf "$file";;
+    *.tbz2) tar xjf "$file";;
+    *.tgz) tar xzf "$file";;
+    *.zip) unzip "$file";;
+    *.Z) uncompress "$file";;
+    *.7z) 7z x "$file";;
+    *.xz) tar xvJf "$file";;
+    *) echo "'$file' cannot be extracted via ex()"; return 1 ;;
+  esac
 }
 
 function exrm() {
