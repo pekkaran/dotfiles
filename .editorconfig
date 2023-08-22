@@ -12,10 +12,10 @@ insert_final_newline = true
 indent_style = space
 indent_size = 2
 
-[*.sh]
+[*.{sh,md}]
 indent_style = space
 indent_size = 2
 
-[*.py]
+[*.{cpp,hpp,py}]
 indent_style = space
 indent_size = 4
