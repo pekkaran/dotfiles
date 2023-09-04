@@ -1,17 +1,15 @@
-# Dotfiles
+# Linux dotfiles
 
-If you are looking to browse for ideas, may I suggest these files:
+If you are looking to browse for ideas, check out these:
 
-* `shell.sh`: Zsh/bash aliases, exports, and functions.
-* `.vimrc`
-* `.zshrc`
-* Everything in the `bin/` folder.
+* [Zsh/Bash aliases, exports, and functions](shell.sh)
+* [Zsh configuration](.zshrc)
+* [Vim/Nvim](.vimrc)
+* [Bash/Python scripts](bin)
 
-Some great dotfiles repositories by others, I wish I would remember them all:
+Some great dotfiles repositories by others that majorly influenced my own:
 
-* <https://github.com/casey/dotfiles>
 * <https://github.com/Shougo/shougo-s-github> Especially the Vim stuff.
 * <https://github.com/skwp/dotfiles>
-* <https://bitbucket.org/sjl/dotfiles> broken?
-
-Saving this as a reminder to do some more browsing myself: <https://wiki.archlinux.org/title/Dotfiles#User_repositories>
+* <https://github.com/casey/dotfiles>
+  * Especially [edmv](https://github.com/casey/dotfiles/blob/master/bin/edmv), a bulk rename utility that is so great that I had to backup it in this repository.
