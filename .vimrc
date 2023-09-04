@@ -727,6 +727,8 @@ nnoremap <silent> <expr> O <SID>NewLineInsertExpr(1, 'O')
 " Reminder that you can press <esc> after typing the abbreviation
 " and have it expanded as you return to normal mode, to avoid typing
 " a following character such as space.
+"
+" The letter 'x' may help avoid accidential substitutions.
 function! RustAbbrev()
   iabbrev mutvec let mut vec = vec![];
 
@@ -758,6 +760,8 @@ function! CppAbbrev()
   iabbrev printf printf("%\n");
   iabbrev logx log_debug("%");
   iabbrev forx for (size_t i = 0; i < ; ++i)
+  iabbrev forax for (const auto &s : ss)
+  iabbrev forsx for (const std::string &s : ss)
 endfunction
 autocmd! Filetype cpp,hpp call CppAbbrev()
 
