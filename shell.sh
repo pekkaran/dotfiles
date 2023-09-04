@@ -287,11 +287,6 @@ function wgd() {
 
 # Extract any archive.
 function ex() {
-  if [ $# = 0 ]; then
-    echo "Usage:     $0 [archives ...]"
-    echo "Example:   $0 *.zip"
-  fi
-
   file="$1"
   case "$file" in
     *.tar.bz2) tar xjf "$file";;
