@@ -3,9 +3,14 @@
 # Zsh/bash aliases, exports, and functions.
 
 # Coreutils and their replacements.
-if type exa > /dev/null 2>&1; then
+if type eza > /dev/null 2>&1; then
   # These might be available in future versions (currently in git master):
   # --no-permissions --no-filesize --no-user --no-time
+  alias la='eza -la --group-directories-first'
+  alias lat='eza -la -snew --group-directories-first'
+  alias lar='eza -laR --group-directories-first'
+  alias lag='eza -la --group-directories-first | \rg -i'
+elif type exa > /dev/null 2>&1; then
   alias la='exa -la --group-directories-first'
   alias lat='exa -la -snew --group-directories-first'
   alias lar='exa -laR --group-directories-first'
