@@ -52,3 +52,6 @@
 [submodule ".vim/bundle/fzf"]
 	path = .vim/bundle/fzf
 	url = https://github.com/junegunn/fzf.git
+[submodule ".vim/bundle/ron.vim"]
+	path = .vim/bundle/ron.vim
+	url = https://github.com/ron-rs/ron.vim.git
