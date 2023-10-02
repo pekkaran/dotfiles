@@ -306,8 +306,9 @@ set pastetoggle=<F10>
 " Can't map unmodified F11?
 nnoremap <S-F11> :call OpenRandomFile()<cr>
 
-" Open hpp file buffer from cpp file and vice versa. Very crude.
-nnoremap <leader>z :e %:p:s,.hpp$,.X123X,:s,.cpp$,.hpp,:s,.X123X$,.cpp,<cr>
+" Switch between source and header files. Very crude, only works for the
+" extension pairs cpp-hpp and c-h.
+nnoremap <leader>z :e %:p:s,.hpp$,.XHPPX,:s,.h$,.XHX,:s,.cpp$,.hpp,:s,.c$,.h,:s,.XHPPX$,.cpp,:s,.XHX$,.c,<cr>
 
 " Normally `gf` opens file with the name under cursor, but that file must exist.
 " This remapping also opens a new file. Note you still need to save the new file.
