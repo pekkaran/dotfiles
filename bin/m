@@ -6,6 +6,8 @@
 
 set -euo pipefail
 
+THREADS=$(($(nproc) / 2))
+
 if [[ ! $(git rev-parse --is-inside-work-tree) = true ]]; then
   echo "The script only works inside git repositories."
   exit
@@ -22,7 +24,7 @@ fi
 # in the output file. Note that this prints the command to stdout
 # while it's running which is nice.
 temp=$(mktemp)
-script -q -c "make -j $(nproc)" "$temp"
+script -q -c "make -j $THREADS" "$temp"
 
 dir=$(git rev-parse --show-toplevel 2> /dev/null || echo ".")
 
