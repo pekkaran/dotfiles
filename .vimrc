@@ -9,11 +9,18 @@
 "   * <https://github.com/Shougo>
 "
 " Main set {{{
-" Non vi-compatible.
+
 set nocompatible
 
 " Could be used to set OS-dependent options.
 let s:uname = system("echo -n \"$(uname)\"")
+
+syntax enable " Must come before `filetype`.
+" Detect filetypes. Must come before `if &filetype == …`.
+filetype detect
+filetype on
+filetype plugin on
+filetype plugin indent on
 
 " Plugin manager.
 runtime bundle/vim-pathogen/autoload/pathogen.vim
@@ -21,6 +28,9 @@ let g:pathogen_disabled = []
 " call add(g:pathogen_disabled, 'disabled-plugin-name-goes-here')
 if has('nvim')
   call add(g:pathogen_disabled, 'vim-airline')
+  if &filetype !=# 'rust'
+    call add(g:pathogen_disabled, 'ale')
+  endif
 endif
 
 execute pathogen#infect()
@@ -41,7 +51,6 @@ set ignorecase " Ignore case in search …
 set smartcase " … unless it's upper.
 set hlsearch
 
-syntax enable
 set title
 set noerrorbells
 set noswapfile
@@ -137,7 +146,6 @@ set langmenu=en
 " Set indentation rules for C/C++ programs.
 set cinoptions=l1,g0,+s,N-s,E-s,(s,k2s,U1,m1
 
-" TODO Trying out:
 set startofline " Some movement commands like C-d, G, and :<num> place cursor on first non-blank character.
 
 " }}}
@@ -152,12 +160,6 @@ set startofline " Some movement commands like C-d, G, and :<num> place cursor on
 set fileencodings=ucs-bom,utf-8,default,latin1,iso-2022-jp,euc-jp,sjis,cp932
 " TODO The above doesn't seem to work. I was able to read a `sjis` file with
 " `:e ++enc=sjis` after opening the file.
-
-" Detect filetypes.
-filetype detect
-filetype on
-filetype plugin on
-filetype plugin indent on
 
 " The JSON syntax highlighter does not support JSONL, but works well enough
 " since we rarely intend to edit JSONL files, just view them.
@@ -254,23 +256,37 @@ nmap <leader>t O<esc>"=strftime('TODO STACK %Y_%m_%d-%T')<cr>pgcc==
 " Open netrw split on the right side.
 nnoremap <leader>n :Vexplore!<cr>
 
-" Tags (eg ctags):
-" Go to definition under cursor.
-nnoremap <leader>j <C-]>
-nnoremap <C-]> <nop>
-" Go back to previous location after <C-]>.
-nnoremap <leader>k <C-t>
-" Next definition of last tag.
-nnoremap <leader>u :tn<cr>
-" List definitons of last tag.
-nnoremap <leader>l :ts<cr>
+if &filetype ==# 'rust'
+  nmap <leader>j <Plug>(ale_go_to_definition)
+  "nmap <leader>u <Plug>(ale_find_references)
+  nmap <leader>k <Plug>(ale_previous)
+  nmap <leader>h <Plug>(ale_hover)
+  " nmap <leader>l <Plug>(ale_symbol_search)
+  nmap <leader>r <Plug>(ale_rename)
+  nmap <leader>i <Plug>(ale_import)
+  " The language server does not always work, eg on commented out code.
+  nnoremap <leader>J <C-]>
+  nnoremap <C-]> <nop>
+  nnoremap <leader>K <C-t>
+else
+  " Tags (eg ctags):
+  " Go to definition under cursor.
+  nnoremap <leader>j <C-]>
+  nnoremap <C-]> <nop>
+  " Go back to previous location after <C-]>.
+  nnoremap <leader>k <C-t>
+  " Next definition of last tag.
+  nnoremap <leader>u :tn<cr>
+  " List definitons of last tag.
+  nnoremap <leader>l :ts<cr>
+endif
 
 " Own functions, defined later.
 nnoremap <leader>e :call OpenFirstErrorLine(1)<cr>
 nnoremap <leader>E :call OpenFirstErrorLine(0)<cr>
 nnoremap <leader>w :call OpenNextErrorLine(1)<cr>
 nnoremap <leader>W :call OpenNextErrorLine(-1)<cr>
-nnoremap <leader>r :call OpenTodoLine(1)<cr>
+" nnoremap <leader>r :call OpenTodoLine(1)<cr>
 
 " Delete empty lines in selection.
 vnoremap <leader>d :g/^$/d<cr>:nohl<cr>
@@ -502,6 +518,44 @@ autocmd FileType netrw setl bufhidden=wipe
 " some specific project, e.g. non-programming writing.
 
 "" Plugins with settings
+" }}}
+" {{{ * ale
+" <https://github.com/dense-analysis/ale>
+" <https://github.com/dense-analysis/ale/blob/master/doc/ale-rust.txt>
+" <https://github.com/dense-analysis/ale/blob/master/doc/ale.txt>
+" <https://rust-analyzer.github.io/manual.html>
+"
+" I'm using as Rust language server client for rust-analyzer (installed via rustup).
+"
+" The main issue with Ale seems to be it's main focus is on linting and it
+" does not implement any of the 'Assists' of rust-analyzer.
+
+if &filetype ==# 'rust'
+  let g:ale_enabled = 1
+  set omnifunc=ale#completion#OmniFunc
+  set completeopt=menu,menuone,noselect,noinsert " no 'preview'
+
+  let g:ale_linters = {'rust': ['analyzer']}
+  let g:ale_virtualtext_cursor = 'disabled' " Do not show super-noisy inline errors and warnings.
+  let g:airline#extensions#ale#enabled = 1 " move to airline section, check editing Rust
+  let g:ale_set_signs = 0 " Do not show the gutter.
+  " let g:ale_rust_ignore_error_codes = ['E0432', 'E0433'] " Example, looks like could be useful.
+
+  " Not really sure how these should be set with Supertab or similar in use.
+  " But this combination with Supertab enabled seems to give 'smart' completion
+  " with fallback for simple 'existing word in the buffer'.
+  let g:ale_completion_enabled = 1
+
+  " let g:ale_command_wrapper = 'nice -n5'
+  let g:ale_warn_about_trailing_whitespace = 0 " Already handled by other tools.
+  let g:ale_warn_about_trailing_blank_lines = 0
+
+  let g:ale_rust_analyzer_config = {
+  \  "diagnostics": {
+  \    "disabled": []
+  \  },
+  \}
+endif
 
 " }}}
 " {{{ * vim-cpp-modern
