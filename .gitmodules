@@ -55,3 +55,6 @@
 [submodule ".vim/bundle/ron.vim"]
 	path = .vim/bundle/ron.vim
 	url = https://github.com/ron-rs/ron.vim.git
+[submodule ".vim/bundle/ale"]
+	path = .vim/bundle/ale
+	url = https://github.com/dense-analysis/ale
