@@ -167,12 +167,18 @@ bar {
     }
 }
 
+# MPD music controls.
 bindsym XF86AudioLowerVolume exec amixer -c "$(sound_card)" set Master 2-
 bindsym XF86AudioRaiseVolume exec amixer -c "$(sound_card)" set Master 2+
 bindsym XF86AudioPlay exec mpc toggle
 bindsym XF86AudioStop exec mpc stop
 bindsym XF86AudioPrev exec mpc prev
 bindsym XF86AudioNext exec mpc next
+# Alternatives for reduced keyboards. Prior and Next are Page Up and Down.
+bindsym $mod+Prior exec amixer -c "$(sound_card)" set Master 4+
+bindsym $mod+Next exec amixer -c "$(sound_card)" set Master 4-
+bindsym $mod+Delete exec mpc toggle
+bindsym $mod+Insert exec mpc next
 
 bindsym       XF86Sleep exec random_wallpaper
 bindsym Shift+XF86Sleep exec random_wallpaper ~/Drive/art
