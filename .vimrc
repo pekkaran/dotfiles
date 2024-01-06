@@ -35,15 +35,16 @@ endif
 
 execute pathogen#infect()
 
-" set background=dark
 set termguicolors
 
 if has('nvim')
   colorscheme tokyonight-moon
+  hi Pmenu guibg=#2F334D
+  hi PmenuSel guibg=#2F334D guifg=#52AAFF
+  hi CursorLineNR guifg=#52AAFF
+else
+  hi CursorLineNR guifg=white ctermfg=white
 endif
-
-" Highlight current line number.
-autocmd! ColorScheme * hi CursorLineNR ctermfg=white
 
 " Searching.
 set incsearch " Search while typing.
@@ -312,7 +313,8 @@ nnoremap <F1> <nop>
 
 " Edit previous and next file by alphabetical sort.
 " From <https://github.com/tpope/vim-unimpaired/blob/master/plugin/unimpaired.vim>
-nnoremap <silent> <F7> :<C-U>edit <C-R>=<SID>fnameescape(fnamemodify(<SID>FileByOffset(v:count1), ':.'))<CR><CR>
+" nnoremap <silent> <F7> :<C-U>edit <C-R>=<SID>fnameescape(fnamemodify(<SID>FileByOffset(v:count1), ':.'))<CR><CR>
+nnoremap <silent> mm :<C-U>edit <C-R>=<SID>fnameescape(fnamemodify(<SID>FileByOffset(v:count1), ':.'))<CR><CR>
 nnoremap <silent> <F9> :<C-U>edit <C-R>=<SID>fnameescape(fnamemodify(<SID>FileByOffset(-v:count1), ':.'))<CR><CR>
 
 " These days vim can paste things without paste mode, but it's occasionally
@@ -533,7 +535,7 @@ autocmd FileType netrw setl bufhidden=wipe
 if &filetype ==# 'rust'
   let g:ale_enabled = 1
   set omnifunc=ale#completion#OmniFunc
-  set completeopt=menu,menuone,noselect,noinsert " no 'preview'
+  " set completeopt=menu,menuone,noselect,noinsert " no 'preview'
 
   let g:ale_linters = {'rust': ['analyzer']}
   let g:ale_virtualtext_cursor = 'disabled' " Do not show super-noisy inline errors and warnings.
@@ -787,6 +789,7 @@ nnoremap <silent> <expr> O <SID>NewLineInsertExpr(1, 'O')
 function! RustAbbrev()
   iabbrev mutvec let mut vec = vec![];
 
+  iabbrev debugx #[cfg(debug_assertions)]
   iabbrev derivex #[derive()]
   iabbrev derives #[derive(Clone, Copy, Debug, PartialEq)]
   iabbrev allowx #[allow(dead_code)]
