@@ -7,6 +7,11 @@ set guicursor=
 lua << END
 require('lualine').setup {
   theme = 'tokyonight-moon',
+  options = {
+    -- Fits more filenames and works without powerline fonts.
+    component_separators = { left = '', right = ''},
+    section_separators = { left = '', right = ''},
+  },
   sections = {
     lualine_b = {'branch'}, -- removed diff and diagnostics
     lualine_c = {
@@ -14,13 +19,6 @@ require('lualine').setup {
         'filename',
         newfile_status = true,
         path = 3
-        -- shorting_target = 40,    -- Shortens path to leave 40 spaces in the window
-        -- symbols = {
-        --   modified = '[+]',      -- Text to show when the file is modified.
-        --   readonly = '[-]',      -- Text to show when the file is non-modifiable or readonly.
-        --   unnamed = '[No Name]', -- Text to show for unnamed buffers.
-        --   newfile = '[New]',     -- Text to show for new created file before first writting
-        -- }
       }
     }
   },
@@ -28,7 +26,7 @@ require('lualine').setup {
     lualine_a = {
       {
         'buffers',
-        max_length = vim.o.columns,
+        max_length = vim.o.columns, -- Without this only about 50% of the available space will be used.
         symbols = {
           modified = '*',
           alternate_file = '',
@@ -36,7 +34,6 @@ require('lualine').setup {
         }
       }
     },
-    lualine_z = {'tabs'}
   }
 }
 END
