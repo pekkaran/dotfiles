@@ -609,7 +609,7 @@ au BufRead,BufNewFile *.rs setlocal textwidth=80
 if !exists("*GitOpen")
   function! GitOpen()
     if executable("fzf")
-      execute("GFiles!")
+      execute("GFiles! --others --exclude-standard --cached")
     else
       let fname = system("gitbrowse")
       if empty(fname)
