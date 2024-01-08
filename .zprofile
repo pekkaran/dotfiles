@@ -30,4 +30,3 @@ if [[ -f "$HOME/.auto-startx" ]]; then
 fi
 
 # TODO Move?
-export PATH="$HOME/.cargo/bin:$PATH"

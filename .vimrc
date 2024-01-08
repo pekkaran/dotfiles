@@ -795,6 +795,7 @@ function! RustAbbrev()
   iabbrev allowx #[allow(dead_code)]
   iabbrev attrx #[cfg_attr(test, derive(Clone))]
   iabbrev deprecatedx #[deprecated(note = "")]
+  iabbrev debugx #[cfg(debug_assertions)]
 
   iabbrev formatx format!("{:?}", )
   iabbrev warnx warn!("{}: ", function!());

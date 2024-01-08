@@ -101,6 +101,8 @@ alias rebase='git rebase -i'
 alias rc='git rebase --continue'
 alias rom='git rebase -i origin/main'
 alias remote='git remote'
+# Change all staged content to non-staged changes.
+alias rs='git restore --staged $(git rev-parse --show-toplevel)'
 alias revert='git revert'
 alias show='git show'
 alias sta='git diff --stat HEAD~1' # Summary of file line changes for corresponding `show`.

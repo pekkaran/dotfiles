@@ -18,7 +18,7 @@ if [[ $RELATIVE == "ON" ]]; then
   #   will place output_folder next to input_folder with symlinks
   #   like file -> ../input_folder/file
   cd "$2"
-  for i in $(find "$1/" -maxdepth 1); do
+  for i in $(find "$1/" -mindepth 1 -maxdepth 1); do
     ln -s "$i"
   done
 else

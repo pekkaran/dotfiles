@@ -16,3 +16,4 @@ PATH="$PATH:$HOME/bin"
 
 source "$HOME/dotfiles/shell.sh"
 source /usr/share/git/completion/git-completion.bash
+. "$HOME/.cargo/env"

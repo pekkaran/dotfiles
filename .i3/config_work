@@ -204,7 +204,7 @@ bindsym $mod+c exec i3lock -c 000000
 # Start programs.
 exec --no-startup-id i3-msg 'workspace 1; exec firefox'
 # exec --no-startup-id i3-msg 'workspace 2; exec alacritty -o font.size=8 -e work'
-exec 'exec alacritty -o font.size=8 -e work'
+exec 'alacritty -o font.size=8 -e work'
 exec dunst
 exec unclutter
 exec nm-applet
