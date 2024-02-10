@@ -234,7 +234,7 @@ endfunction
 function! DeleteEsearch()
   for bufnum in range(1, bufnr('$'))
     let bufname = bufname(bufnum)
-    if bufname =~# '/Search ‹'
+    if bufloaded(bufnum) && bufname =~# '/Search ‹'
       execute 'bd! ' . bufnum
     endif
   endfor
