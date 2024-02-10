@@ -222,14 +222,27 @@ autocmd BufEnter * execute "chdir ".escape(expand("%:p:h"), ' \\/.*$^~[]#')
 
 let mapleader=","
 
-" Clear junk from the screen.
+" Misc clearing, see the mapping that uses this.
 function! Reset()
   cexpr []
   cclose
   echo
 endfunction
+
+" Delete all buffers whose name matches. Here the matched text is part of all
+" the buffers that esearch plugin creates.
+function! DeleteEsearch()
+  for bufnum in range(1, bufnr('$'))
+    let bufname = bufname(bufnum)
+    if bufname =~# '/Search ‹'
+      execute 'bd! ' . bufnum
+    endif
+  endfor
+endfunction
+
+" Clear junk from the screen.
 " Use a mark because for some reason the space always moves the cursor.
-nnoremap <silent> <space> mz:nohl<cr> :call Reset()<cr>`z
+nnoremap <silent> <space> mz:nohl<cr> :call DeleteEsearch()<cr> :call Reset()<cr>`z
 
 " Copy and paste.
 "
