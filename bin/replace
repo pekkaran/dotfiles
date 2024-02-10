@@ -34,7 +34,8 @@ fi
 # Probably the script functionality could also be achieved using
 # `find` and `xargs`, but `fd` is much nicer.
 #
-# fd:  -e file extension
+# fd:  -t search filter
+#      (-e file extension)
 #      -x execute on each result
 # sed: -i in-place
 #      -e sed script next
@@ -42,4 +43,4 @@ fi
 # {} is substituted a full path by `fd` for each match,
 #   which become target of the `sed` command.
 #
-fd -x sed -i -e "s/$1/$2/g" {}
+fd -t file -x sed -i -e "s/$1/$2/g" {}
