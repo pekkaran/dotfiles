@@ -808,13 +808,14 @@ function! RustAbbrev()
   iabbrev allowx #[allow(dead_code)]
   iabbrev attrx #[cfg_attr(test, derive(Clone))]
   iabbrev deprecatedx #[deprecated(note = "")]
-  iabbrev debugx #[cfg(debug_assertions)]
+  iabbrev forx for i in 0...len()
+  iabbrev clippyx #![allow(clippy::clone_on_copy)]
+  iabbrev contextx .with_context(fformat!("to_do_something."))?
 
   iabbrev formatx format!("{:?}", )
   iabbrev warnx warn!("{}: ", function!());
   iabbrev enume for (i, item) in data.iter().enumerate()
   iabbrev enumx <c-o>:read ~/.vim/templates/enum.rs<cr>
-  iabbrev structx <c-o>:read ~/.vim/templates/struct.rs<cr>
   iabbrev defaultx <c-o>:read ~/.vim/templates/default.rs<cr>
   iabbrev iterx <c-o>:read ~/.vim/templates/iter.rs<cr>
   iabbrev iteratorx <c-o>:read ~/.vim/templates/iter.rs<cr>
@@ -822,8 +823,6 @@ function! RustAbbrev()
   iabbrev implx <c-o>:read ~/.vim/templates/impl.rs<cr>
   iabbrev fromx <c-o>:read ~/.vim/templates/from.rs<cr>
   iabbrev testx <c-o>:read ~/.vim/templates/test.rs<cr>
-  iabbrev fnx <c-o>:read ~/.vim/templates/fn.rs<cr>
-  iabbrev fnrng <c-o>:read ~/.vim/templates/fnrng.rs<cr>
 endfunction
 autocmd! Filetype rust call RustAbbrev()
 
