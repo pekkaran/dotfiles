@@ -16,6 +16,6 @@ indent_size = 2
 indent_style = space
 indent_size = 2
 
-[*.{cpp,hpp,py}]
+[*.{cpp,hpp,py,json}]
 indent_style = space
 indent_size = 4
