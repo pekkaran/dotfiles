@@ -1,0 +1,25 @@
+#!/bin/bash
+# Play a video and its FFmpeg -vf filtered version side-by-side without creating a video file as intermediary step.
+#
+# Usage example:
+#   ffmpeg-vf-dev video.mp4 "boxblur=10"
+#   PLAYER=vlc ffmpeg-vf-dev video.mp4 "boxblur=10"
+#
+# Docs for writing filters: <https://ffmpeg.org/ffmpeg-filters.html>
+
+VIDEO="$1"
+FILTER="$2"
+: "${PLAYER:=mpv}"
+
+if ! type ffmpeg > /dev/null 2>&1; then
+  echo "ffmpeg not found"
+  exit
+fi
+
+if ! type $PLAYER > /dev/null 2>&1; then
+  echo "Video player $PLAYER not found"
+  exit
+fi
+
+# Can't apparently use `ffplay` because it does not support -filter_complex (?).
+ffmpeg -i "$VIDEO" -vf "[0:v]split[half1][half2];[half2]$FILTER[out];[half1][out]hstack" -f matroska - | "$PLAYER" -
