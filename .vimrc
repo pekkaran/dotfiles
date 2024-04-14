@@ -848,8 +848,10 @@ function! CppAbbrev()
   iabbrev printf printf("%\n");
   iabbrev logx log_debug("%");
   iabbrev forx for (size_t i = 0; i < ; ++i)
-  iabbrev forax for (const auto &s : ss)
-  iabbrev forsx for (const std::string &s : ss)
+  iabbrev forax for (const auto &y : ys)
+  iabbrev forsx for (const std::string &y : ys)
+  iabbrev infx std::numeric_limits<float>::infinity()
+  iabbrev infinityx std::numeric_limits<float>::infinity()
 endfunction
 autocmd! Filetype cpp,hpp call CppAbbrev()
 
