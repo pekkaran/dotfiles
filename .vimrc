@@ -106,8 +106,8 @@ set smarttab " Insert blanks according to shiftwidth.
 " set textwidth=79
 " set formatoptions=cq
 
-" From casey:
 set formatoptions +=2 " Use paragraph second line indent
+set formatoptions +=1 " Try not to break lines after one letter words. For stuff like 'I think' or 'a thing'?
 set formatoptions +=c " Auto-wrap comments at textwidth
 set formatoptions +=j " Merge comments when joining lines
 set formatoptions +=q " Allow formatting comments with `gq`
@@ -115,6 +115,9 @@ set formatoptions +=r " Insert comment leader after <enter> in insert mode
 set formatoptions +=t " Auto-wrap at textwidth
 set formatoptions -=a " Disable automatic formatting of paragraphs
 set formatoptions -=l " Format long lines when inserting
+set formatoptions +=o " Automatically insert comment on `o`…
+set formatoptions +=/ " … except when the comment comes after a statement.
+
 " let g:rust_recommended_style=0 " Also apply textwidth for Rust. See :help rust.
 
 " Show tabs and trailing whitespace …
