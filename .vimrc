@@ -243,9 +243,22 @@ function! DeleteEsearch()
   endfor
 endfunction
 
+" Close all netrw buffers.
+function! CloseNetrw() abort
+  for bufn in range(1, bufnr('$'))
+    if bufexists(bufn) && getbufvar(bufn, '&filetype') ==# 'netrw'
+      silent! execute 'bwipeout ' . bufn
+      if getline(2) =~# '^" Netrw '
+        silent! bwipeout
+      endif
+      return
+    endif
+  endfor
+endfunction
+
 " Clear junk from the screen.
 " Use a mark because for some reason the space always moves the cursor.
-nnoremap <silent> <space> mz:nohl<cr> :call DeleteEsearch()<cr> :call Reset()<cr>`z
+nnoremap <silent> <space> mz:nohl<cr> :call DeleteEsearch()<cr> :call CloseNetrw()<cr> :call Reset()<cr>`z
 
 " Copy and paste.
 "
@@ -517,8 +530,9 @@ let g:netrw_banner = 0
 let g:netrw_browse_split = 4
 " Split size in percents.
 let g:netrw_winsize = 25
-" ?
-autocmd FileType netrw setl bufhidden=wipe
+" Close after opening a file. Do not seem to work.
+" let g:netrw_fastbrowse = 0
+" autocmd FileType netrw setl bufhidden=wipe
 
 " }}}
 " {{{ Plugins
