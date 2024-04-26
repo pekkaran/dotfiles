@@ -6,7 +6,12 @@ if ! type git > /dev/null 2>&1; then
   echo "         this program will only work in git repositories"
   exit 0
 fi
-if ! type fd > /dev/null 2>&1; then
+
+if type fd > /dev/null 2>&1; then
+  command="fd"
+elif type fdfind > /dev/null 2>&1; then
+  command="fdfind" # Ubuntu uses this name for the binary.
+else
   echo "replace: command not found: fd"
   echo "         fd is a modern \`find\` replacement:"
   echo "         https://github.com/sharkdp/fd"
@@ -43,4 +48,4 @@ fi
 # {} is substituted a full path by `fd` for each match,
 #   which become target of the `sed` command.
 #
-fd -t file -x sed -i -e "s/$1/$2/g" {}
+$command -t file -x sed -i -e "s/$1/$2/g" {}
