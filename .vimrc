@@ -822,7 +822,7 @@ function! RustAbbrev()
   iabbrev debugx #[cfg(debug_assertions)]
   iabbrev derivex #[derive()]
   iabbrev derives #[derive(Clone, Copy, Debug, PartialEq)]
-  iabbrev allowx #[allow(dead_code)]
+  iabbrev allowx #[allow(dead_code, unused_variables)]
   iabbrev attrx #[cfg_attr(test, derive(Clone))]
   iabbrev deprecatedx #[deprecated(note = "")]
   iabbrev forx for i in 0...len()
