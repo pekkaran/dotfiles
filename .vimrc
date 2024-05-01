@@ -840,6 +840,10 @@ function! RustAbbrev()
   iabbrev implx <c-o>:read ~/.vim/templates/impl.rs<cr>
   iabbrev fromx <c-o>:read ~/.vim/templates/from.rs<cr>
   iabbrev testx <c-o>:read ~/.vim/templates/test.rs<cr>
+
+  " Override /usr/share/nvim/runtime/indent/rust.vim
+  " Try removing after neovim 0.10 release.
+  set cinoptions=l1,g0,+s,N-s,E-s,(s,k2s,U1,m1
 endfunction
 autocmd! Filetype rust call RustAbbrev()
 
