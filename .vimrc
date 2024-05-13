@@ -35,12 +35,37 @@ endif
 
 execute pathogen#infect()
 
-set termguicolors
+" Mapping of ctermfg/ctermbg color numbers to Alacritty color names:
+" 0  normal black
+" 1  normal red
+" 2  normal green
+" 3  normal yellow
+" 4  normal blue
+" 5  normal magenta
+" 6  normal cyan
+" 7  normal white
+" 8  bright black
+" 9  bright red
+" 10 bright green
+" 11 bright yellow
+" 12 bright blue
+" 13 bright magenta
+" 14 bright cyan
+" 15 bright white
+
+" set notermguicolors
+" set background=light
+" hi LineNr ctermfg=8
+" hi CursorLineNr ctermfg=8 ctermbg=0 cterm=NONE
+" hi CursorLine ctermfg=8 ctermbg=0 cterm=NONE
+" hi Statement ctermfg=9
+" hi Todo ctermfg=0 ctermbg=8
 
 if has('nvim')
   colorscheme tokyonight-moon
-  hi Pmenu guibg=#2F334D
-  hi PmenuSel guibg=#2F334D guifg=#52AAFF
+  " colorscheme tokyonight-day
+  " hi Pmenu guibg=#2F334D
+  " hi PmenuSel guibg=#2F334D guifg=#52AAFF
   hi CursorLineNR guifg=#52AAFF
 else
   hi CursorLineNR guifg=white ctermfg=white

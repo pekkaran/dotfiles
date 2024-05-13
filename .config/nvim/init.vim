@@ -37,3 +37,5 @@ require('lualine').setup {
   }
 }
 END
+
+"hi lualine_a_inactive cterm=NONE ctermfg=8 ctermbg=0
