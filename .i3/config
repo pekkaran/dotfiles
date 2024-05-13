@@ -214,6 +214,8 @@ bindsym $mod+b exec echo '2' | nc -U /tmp/wall-socket -q 0
 
 bindsym $mod+s exec dunstctl close-all
 
+bindsym $mod+g exec flameshot gui -c -s
+
 workspace 1 output DP-1
 workspace 2 output HDMI-1
 
