@@ -141,7 +141,9 @@ set formatoptions +=t " Auto-wrap at textwidth
 set formatoptions -=a " Disable automatic formatting of paragraphs
 set formatoptions -=l " Format long lines when inserting
 set formatoptions +=o " Automatically insert comment on `o`…
-set formatoptions +=/ " … except when the comment comes after a statement.
+if has('nvim')
+  set formatoptions +=/ " … except when the comment comes after a statement.
+endif
 
 " let g:rust_recommended_style=0 " Also apply textwidth for Rust. See :help rust.
 
