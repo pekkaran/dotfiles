@@ -162,6 +162,7 @@ fi
 # Alternatively it works to put `eval $(ssh-agent)` in `.xinitrc`,
 # but only when you are using `startx`.
 if ! pgrep -u "$USER" ssh-agent > /dev/null; then
+  rm -f "$HOME/.ssh-agent.env"
   ssh-agent > "$HOME/.ssh-agent.env"
 fi
 if [[ ! "$SSH_AUTH_SOCK" ]]; then
