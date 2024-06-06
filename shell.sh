@@ -26,13 +26,12 @@ alias cp='\cp -i' # prompt before overwriting
 alias mv='\mv -i' # prompt before overwriting
 alias chx='chmod +x'
 alias fs='du -shD' # size of file or folder. s:summarize, h:human_readable, D=dereference_links
-alias filesize='echo "use: fs"'
-alias df='df -hT'
+alias df='df -hT' # Show file system space usage in human readabale format.
 alias lf='du -shx * | sort -h' # find large directories/files in current folder. Btw, if /var is filling /, then you probably forgot to run `pacman -Sc` for a year.
 
 # Searching. "rg" is a "grep" replacement
 # -i: ignore case
-# -. == --hidden: include hidden files in search
+# --hidden: include hidden files in search
 alias rg='\rg -i --hidden'
 alias rgi='\rg --hidden'
 alias rgl='\rg -l' # Print filenames of matches instead.
@@ -63,7 +62,6 @@ alias gr='gdb --ex run --ex bt -ex="set confirm off" --ex quit --args'
 alias za='zathura'
 alias sxiv='sxiv -a -s f' # play animations, scale fit
 alias feh='feh -FZx' # full screen, auto-zoom, borderless
-alias ncmpc='\ncmpc -C' # no color
 alias mp='\ncmpcpp' # [m]usic [p]layer
 alias mpv_fix_mono='mpv --audio-channels=1'
 for i in $(seq 1 4); do
@@ -72,8 +70,6 @@ for i in $(seq 1 4); do
 done
 alias ims='ims1'
 alias vids='vids1'
-alias first='ls | head -n1'
-alias last='ls | tail -n1' # `last` is an existing UNIX command
 
 # Git
 #   Git has its own alias functionality but I don't want to type the "git " prefix to use it.
@@ -106,11 +102,15 @@ alias remote='git remote'
 alias rs='git restore --staged $(git rev-parse --show-toplevel)'
 alias revert='git revert'
 alias show='git show'
-alias sta='git diff --stat HEAD~1' # Summary of file line changes for corresponding `show`.
-# show0 == show, sta0 == sta
+alias sta='git diff --stat HEAD~1 | head -n -1' # Summary of file line changes for corresponding `show`.
+alias recentf="git diff --stat HEAD~1 | head -n -1" # Same as `sta`, but see the variants below.
+# show0 == show, sta0 == sta, recentf0 == recentf
 for i in $(seq 0 9); do
   alias show$i="git show HEAD~$i"
-  alias sta$i="git diff --stat HEAD~$(($i + 1)) HEAD~$i"
+  # Files changed in the last i:th commit.
+  alias sta$i="git diff --stat HEAD~$(($i + 1)) HEAD~$i | head -n -1"
+  # Files changed in the last i commits together.
+  alias recentf$i="git diff --stat HEAD~$(($i + 1)) HEAD | head -n -1"
 done
 alias stash='git stash'
 alias status='git status'
@@ -135,6 +135,7 @@ function dt() {
     git --no-pager diff --no-index /dev/null $file
   done
 }
+# Grab all unstaged and stanged changes and commit them with the message "e".
 function ce() {
   cd "$(git rev-parse --show-toplevel)"
   git add .
