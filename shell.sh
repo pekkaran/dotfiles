@@ -1,6 +1,11 @@
 #!/bin/bash
 #
 # Zsh/bash aliases, exports, and functions.
+#
+# One thing to remember is that the aliases only work if they are the first part
+# of a command. If you want to do something like `ls | dmenu` or `ls | xargs vim`,
+# then aliases for `dmenu` and `vim` will be ignored. So to make such use cases work,
+# instead of aliases some programs have thin wrapper executables under `dotfiles/bin`.
 
 # Coreutils and their replacements.
 if type eza > /dev/null 2>&1; then
@@ -52,9 +57,6 @@ alias ssha='ssh-add -t 150000 $(find ~/.ssh | grep id | grep -v pub)'
 alias info='\info --vi-keys'
 alias uusb='devmon -u' # unmount everything mounted by devmon (included in udevil)
 alias gnutime="/usr/bin/time -f 'user: %U, sys: %S, percentage: %P, wall %e'"
-if type nvim > /dev/null 2>&1; then
-  alias vim='nvim'
-fi
 # `gr myprogram --myargs` will run until crash, print backtrace and exit.
 alias gr='gdb --ex run --ex bt -ex="set confirm off" --ex quit --args'
 
@@ -202,9 +204,11 @@ export GTK_THEME=Adwaita:dark
 export CC=/usr/bin/clang
 export CXX=/usr/bin/clang++
 
-export EDITOR="nvim"
+# There is the `dotfiles/bin/vim` executable which runs neovim if it's installed.
+export EDITOR="vim"
+export VISUAL="vim"
+
 export PAGER="less"
-export VISUAL="nvim"
 export BROWSER="firefox"
 
 # zsh and bash history size in lines.
