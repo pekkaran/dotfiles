@@ -1,0 +1,13 @@
+#!/bin/bash
+#
+# Prints and returns error if current directory is not inside a git repository.
+#
+# Example use (avoids git documentation spam when accidentally running `git diff` in wrong directory):
+#   alias d='in-git-repository && git diff'
+
+git ls-files &>/dev/null
+ret=$?
+if (( $ret )); then
+  echo "Not in a git repository."
+fi
+exit $ret

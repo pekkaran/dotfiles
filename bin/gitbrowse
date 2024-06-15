@@ -9,7 +9,7 @@ main() {
   match=
   gtdir=
   cwd=$PWD
-  git ls-files &>/dev/null || return # test if git
+  in-git-repository || return
   gtdir="$(git rev-parse --show-toplevel )"
   [[ "$cwd" != "$gtdir" ]] && pushd "$gtdir" &> /dev/null # git root
   [[ -n "$@" ]] && { match="$($GIT_LS | grep "$@")"; } ||

@@ -1,22 +1,21 @@
 #!/bin/bash
 # Open a file in git tree using fzf or dmenu. Extremely useful.
 
-VIM=vim
-if type nvim > /dev/null 2>&1; then
-  VIM=nvim
+if [[ -z $EDITOR ]]; then
+  echo "\$EDITOR is not set."
+  exit
 fi
 
 if type fzf > /dev/null 2>&1; then
-  # Check in a git repository.
-  git ls-files &> /dev/null || exit
+  in-git-repository || exit
   # `cd` to the root so `ls-files` shows paths relative to it.
   cd "$(git rev-parse --show-toplevel)"
   if type bat > /dev/null 2>&1; then
     # Options also set via `~/.config/bat/config`.
-    $VIM $(git ls-files | fzf --preview "bat --line-range=:500 {}")
+    $EDITOR $(git ls-files | fzf --preview "bat --line-range=:500 {}")
   else
-    $VIM $(git ls-files | fzf --preview "cat {}")
+    $EDITOR $(git ls-files | fzf --preview "cat {}")
   fi
 else
-  $VIM $(gitbrowse)
+  $EDITOR $(gitbrowse)
 fi

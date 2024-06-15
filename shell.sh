@@ -129,8 +129,8 @@ alias reflog='git reflog'
 alias c='git commit -v'
 alias ca='git commit -v -a'
 alias cam='git commit -v --amend'
-alias d='git diff'
-alias dc='git diff --cached'
+alias d='in-git-repository && git diff'
+alias dc='in-git-repository && git diff --cached'
 # Like `git diff` but for untracked files.
 function dt() {
   for file in $(git ls-files --others --exclude-standard); do
