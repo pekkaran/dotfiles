@@ -34,7 +34,7 @@ alias lf='du -shx * | sort -h' # find large directories/files in current folder.
 # --hidden: include hidden files in search
 alias rg='\rg -i --hidden'
 alias rgi='\rg --hidden'
-alias rgl='\rg -l' # Print filenames of matches instead.
+alias rgl='\rg -li' # Print filenames of matches instead.
 
 # "fd" is a "find" replacement.
 if type fdfind > /dev/null 2>&1; then
