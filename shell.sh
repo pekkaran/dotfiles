@@ -59,6 +59,8 @@ alias uusb='devmon -u' # unmount everything mounted by devmon (included in udevi
 alias gnutime="/usr/bin/time -f 'user: %U, sys: %S, percentage: %P, wall %e'"
 # `gr myprogram --myargs` will run until crash, print backtrace and exit.
 alias gr='gdb --ex run --ex bt -ex="set confirm off" --ex quit --args'
+# Prepend with video file to exactly compute the number of frames in it.
+alias packets='ffprobe -v error -select_streams v:0 -count_packets -show_entries stream=nb_read_packets -of csv=p=0'
 
 # Media
 alias za='zathura'
