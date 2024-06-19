@@ -16,7 +16,7 @@ def main(args):
         print("Could not find `ffmpeg`.")
         return
     if not shutil.which(args.videoPlayer) and not args.savePath:
-        print(f"Could not find `{videoPlayer}`. You can alternatively use --savePath.")
+        print(f"Could not find `{args.videoPlayer}`. You can alternatively use --savePath.")
         return
 
     ss = f"-ss {args.t0}" if args.t0 else ""
