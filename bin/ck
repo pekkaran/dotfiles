@@ -1,36 +1,24 @@
 #!/bin/bash
-# Collect filenames and line numbers from `cargo check` error messages
-# and put them in a file in the root of the git repository.
 #
-# Some vimscript to go with this program:
+# Parse and filter Rust `cargo check` (or `cargo <command>`) output for development aid.
+# See also `dotfiles/bin/cw` which runs this script in a "watch" loop.
 #
-#   function! OpenErrorLine(num)
-#     let gitdir = finddir('.git/..', ';')
-#     let errorfile = gitdir . "/.errorlines"
-#     if !filereadable(errorfile)
-#       return
-#     endif
+# Example:
+#   cd my-rust-project
+#   ck
 #
-#     " Count from bottom because those errors are more likely visible in `watch`
-#     " program output.
-#     let line = system("cat " . errorfile . " | sort -r | sed '" . a:num . "q;d'")
-#     if empty(line)
-#       return
-#     endif
+# will show filtered results of `cargo check` and save an `.errorlines` file
+# (see the `.vimrc` file for an example what to do with the errorlines files).
 #
-#     let fname = split(line, " ")
-#     execute "e " . gitdir . '/' . fname[0]
-#     execute fname[1]
-#   endfunction
+# You can also use this with clippy:
+#   ck clippy
 #
-#   nnoremap <leader>e :call OpenErrorLine(1)<cr>
+# In theory `ck run` should also work as wrapper for `cargo run`, but currently the output isn't parsed(?).
 
-# Works also with `cargo clippy` for example.
-#
-# Appending `--tests` is nice because I hate to find out some refactoring broke tests only
-# after I try to run them a week later, but it seems to duplicate each error in some setups.
-cargo_command=${1:-check}
-# cargo_command=${1:-check --tests}
+cargo_command=${1:-check} # Use eg "build", "clippy", or "run". The default is "check".
+
+# For developing `filter-rustc`.
+debug=${2:-off}
 
 for prog in git cargo jq sed; do
   if ! type $prog > /dev/null 2>&1; then
@@ -41,27 +29,36 @@ done
 
 dir=$(git rev-parse --show-toplevel 2> /dev/null || echo ".")
 
-# Run the cargo command just once.
-# TODO Look at the script `m` if this could also be implemented so that it prints while running.
-#      Maybe not since we need `jq` to convert it. IIRC at the time of writing there was no
-#      option to simultaneously produce a JSON output and a normal output, so that we could
-#      print the latter in real time.
+# Run rustc via cargo. Taking the output in JSON format suppresses normal output.
 output=$(cargo $cargo_command --message-format=json-diagnostic-rendered-ansi 2> /dev/null)
 
-# Display in stdout, in color.
-echo "$output" | jq --raw-output '
-    select(.reason=="compiler-message")
-    | .message
-    | .rendered'
+# Discard (lots of) top level data that we are not interested in.
+messages=$(echo "$output" | jq 'select(.reason=="compiler-message") | .message')
+
+# Could somehow be merged with the previous but I'm not good with jq.
+# `-s` turns the jq "generator" list output into valid JSON with square brackets and commas between items.
+messages=$(echo "$messages" | jq -s ".")
+
+# Optional step to modify the compiler warnings and errors.
+# See the script `dotfiles/bin/filter-rustc`, which I use mainly to reduce rustc's verbosity.
+if type filter-rustc > /dev/null 2>&1; then
+  if [ "$debug" == "debug" ]; then
+    echo "$messages" | filter-rustc --debug
+  else
+    messages=$(echo "$messages" | filter-rustc)
+  fi
+fi
+
+# Print on the terminal using colors.
+if [ "$debug" != "debug" ]; then
+  echo "$messages" | jq --raw-output '.[].rendered'
+fi
 
 # Collect error lines to a file.
 # `grep -v rustc` removes lines like `/rustc/9bc8..e53/library/alloc/src/macros.rs 51`,
 # which occur around macro usage. Might be possible to also detect in the JSON but this is easier.
-echo "$output" | jq '
-    select(.reason=="compiler-message")
-    | .message
-    | .spans
-    | .[]
+echo "$messages" | jq '
+    .[].spans.[]
     | select(.is_primary==true)
     | [.file_name, .line_start]
     | @sh' \

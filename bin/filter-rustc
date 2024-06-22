@@ -1,0 +1,119 @@
+#!/usr/bin/env python3
+#
+# Reduces Rust compiler warning verbosity where I find it detrimental.
+#
+# The usage of this script is unfortunately not very straightforward. You need to see
+# the `dotfiles/bin/ck` script in this repository to see how to invoke this and show the results.
+
+import json
+import re
+import subprocess
+import sys
+import tempfile
+
+RE_ERROR_EXPLANATIONS = re.compile(r"Some errors have detailed explanations: (.*)\.")
+
+# Print a Python object using `jq`.
+def jq_print(j):
+  # Using a temporary file to avoid character escaping issues.
+  with tempfile.NamedTemporaryFile() as tempFile:
+    tempFile.write(json.dumps(j, indent=4).encode())
+    # -C: color
+    out = subprocess.check_output(f"cat {tempFile.name} | jq -C .", shell=True).decode('utf-8').strip()
+    print(out)
+
+# Print the error as it will show in the rustc output.
+def print_rustc_rendered(item):
+  if not "rendered" in item: return
+  print(item["rendered"])
+
+def readJson(filePath):
+  with open(filePath) as f:
+    return json.load(f)
+
+# Use magenta, a color that rustc doesn't seem to use.
+# One nice reference: <https://stackoverflow.com/a/21786287>
+def in_color(s):
+  return "\x1b[35m" + s + "\x1b[0m"
+
+def print_warning(item):
+  item = item.copy()
+  del item["rendered"]
+  print(json.dumps(item, indent=4))
+
+def replace_rendered(item, s):
+  item["rendered"] = in_color(s)
+
+# Generic compression that shows the plain "message" field.
+def compress(item):
+  s = ""
+  if "spans" in item:
+    for i, span in enumerate(item["spans"]):
+      if i > 0: s += "\n"
+      s += "{}:{}".format(span["file_name"], span["line_start"])
+    s += ": "
+  s += "{}".format(item["message"])
+  replace_rendered(item, s)
+
+def filter_value_typo(item):
+  if not item["message"].startswith("cannot find value"): return
+  if "children" in item:
+    for child in item["children"]:
+      for span in child["spans"]:
+        if not "suggested_replacement" in span: continue
+        item["message"] = in_color("Typo? -> {}".format(span["suggested_replacement"]))
+        compress(item)
+
+def filter(args, item):
+  m = item["message"]
+
+  # rustc takes 7 lines of output per unused variable, which is extremely verbose
+  # considering it's routine to have them when writing new code. Condense to one line.
+  if m.startswith("unused variable"):
+    compress(item)
+
+  filter_value_typo(item)
+
+  # Compress advice about errors into copy-paste ready commands.
+  if m.startswith("For more information about an error"):
+    return None
+  m = RE_ERROR_EXPLANATIONS.match(m)
+  if m:
+    tokens = m.group(1).split(",")
+    s = "Help: "
+    for i, token in enumerate(tokens):
+      if i > 0: s += "; "
+      s += f"rustc --explain {token.strip()}"
+    replace_rendered(item, s)
+
+  return item
+
+def main(args):
+  with args.input as f:
+    content = f.read()
+  data = json.loads(content)
+
+  output = []
+  for item in data:
+    item = filter(args, item)
+    if item is not None:
+      output.append(item)
+
+  if args.debug:
+    pass
+    #print(output)
+  else:
+    print(json.dumps(output, separators=(',', ':')))
+
+if __name__ == "__main__":
+  import argparse
+  p = argparse.ArgumentParser(__doc__)
+  p.add_argument(
+      '--input',
+      type=argparse.FileType('r'),
+      default=sys.stdin,
+      help="Path to input file or else use stdin.",
+  )
+  p.add_argument("--debug", action="store_true")
+  args = p.parse_args()
+  main(args)

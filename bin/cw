@@ -3,7 +3,7 @@
 # This is a `watch`-like script for compiling Rust code when it changes.
 #
 # `ck` is my program to run `cargo check`, and at the same time
-# collect error locations a file in root of the git repository.
+# collect error locations to a file in root of the git repository.
 # That file can then be used by a text editor to jump to the errors.
 #
 # The parameters `$@` are used for `cargo`, so you can use eg `cw run`
