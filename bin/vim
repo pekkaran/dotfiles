@@ -4,7 +4,7 @@ main() {
   if type nvim > /dev/null 2>&1; then
     nvim "$@"
   else
-    vim "$@"
+    /usr/bin/vim "$@"
   fi
 }
 main "$@"
