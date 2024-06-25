@@ -44,8 +44,8 @@ def readJson(filePath):
 
 # One nice reference: <https://stackoverflow.com/a/21786287>
 def colorWarning(s): return "\x1b[33m" + s + "\x1b[0m"
-def colorError(s): return "\x1b[31m" + s + "\x1b[0m"
-def colorMeta(s): return "\x1b[37m" + s + "\x1b[0m"
+def colorError(s):   return "\x1b[31m" + s + "\x1b[0m"
+def colorMeta(s):    return "\x1b[37m" + s + "\x1b[0m"
 
 def printWarning(item):
   item = item.copy()
@@ -69,25 +69,31 @@ def getCodeLocations(item):
     for i, loc in enumerate(locs):
       if i > 0: s += ", "
       s += loc
-    s += ": "
   return s
+
+def render(item, locations, message):
+  if item["level"] == "error": s = colorError(locations)
+  else: s = colorWarning(locations)
+  s += f": {message}"
+  item["rendered"] = s
 
 # Generic compression that shows the plain "message" field.
 def compress(item):
-  s = getCodeLocations(item)
-  s += "{}".format(item["message"])
+  locations = getCodeLocations(item)
+  s = "{}".format(item["message"])
   if len(s) > 100: s += "\n"
   replaceRendered(item, s, item["level"] == "error")
+  render(item, locations, s)
 
 def filterWrongNumberOfArguments(item):
-  s = getCodeLocations(item)
+  locations = getCodeLocations(item)
+  s = ""
   found = False
   for span in item["spans"]:
     if span["label"] is not None:
       s += span["label"]
       found = True
-  if not found:
-    s += "{}: {}".format(item["message"], "TODO")
+  assert(found)
 
   s += ". Expected these arguments:"
   child = item["children"][0];
@@ -95,7 +101,7 @@ def filterWrongNumberOfArguments(item):
     if span["label"] is None: continue
     s += "\n    " + span["text"][0]["text"].strip()
   s += "\n"
-  replaceRendered(item, s, error=True)
+  render(item, locations, s)
 
 def filterValueTypo(item):
   if "children" in item:
