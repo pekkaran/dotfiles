@@ -42,15 +42,12 @@ def readJson(filePath):
   with open(filePath) as f:
     return json.load(f)
 
-# Use magenta, a color that rustc doesn't seem to use.
 # One nice reference: <https://stackoverflow.com/a/21786287>
-def colorWarning(s):
-  return "\x1b[35m" + s + "\x1b[0m"
+def colorWarning(s): return "\x1b[33m" + s + "\x1b[0m"
+def colorError(s): return "\x1b[31m" + s + "\x1b[0m"
+def colorMeta(s): return "\x1b[37m" + s + "\x1b[0m"
 
-def colorError(s):
-  return "\x1b[31m" + s + "\x1b[0m"
-
-def print_warning(item):
+def printWarning(item):
   item = item.copy()
   del item["rendered"]
   print(json.dumps(item, indent=4))
@@ -150,7 +147,14 @@ def main(args):
 
   output = []
   for item in data:
-    item = filter(args, item)
+    try:
+      item = filter(args, item)
+    except:
+      if item is not None:
+        output.append({
+          "rendered": colorMeta("filter-rustc failed to process a message, showing the original:"),
+        })
+
     if item is not None:
       output.append(item)
 
