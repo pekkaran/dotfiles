@@ -14,18 +14,24 @@ import json
 import re
 import subprocess
 import sys
-import tempfile
 
 RE_ERROR_EXPLANATIONS = re.compile(r"Some errors have detailed explanations: (.*)\.")
 
 # Print a Python object using `jq`.
+# Uses a temporary file to avoid character escaping issues.
 def jqPrint(j):
-  # Using a temporary file to avoid character escaping issues.
-  with tempfile.NamedTemporaryFile() as tempFile:
-    tempFile.write(json.dumps(j, indent=4).encode())
+  import tempfile
+  # TODO Should work with tempfile, but doesn't (only in some cases?).
+  # with tempfile.NamedTemporaryFile(mode="w") as tempFile:
+  with open("/tmp/filter-rustc", "w") as tempFile:
+    s = json.dumps(j)
+    tempFile.write(s)
+
+  with open("/tmp/filter-rustc") as tempFile:
+    content = tempFile.read()
     # -C: color
     out = subprocess.check_output(f"cat {tempFile.name} | jq -C .", shell=True).decode('utf-8').strip()
-    print(out)
+  print(out)
 
 # Print the error as it will show in the rustc output.
 def print_rustc_rendered(item):
@@ -73,7 +79,8 @@ def getCodeLocations(item):
 def compress(item):
   s = getCodeLocations(item)
   s += "{}".format(item["message"])
-  replaceRendered(item, s)
+  if len(s) > 100: s += "\n"
+  replaceRendered(item, s, item["level"] == "error")
 
 def filterWrongNumberOfArguments(item):
   s = getCodeLocations(item)
@@ -90,6 +97,7 @@ def filterWrongNumberOfArguments(item):
   for span in child["spans"]:
     if span["label"] is None: continue
     s += "\n    " + span["text"][0]["text"].strip()
+  s += "\n"
   replaceRendered(item, s, error=True)
 
 def filterValueTypo(item):
@@ -116,6 +124,10 @@ def filter(args, item):
 
   if code == "E0061" or m.startswith("this function takes"):
     filterWrongNumberOfArguments(item)
+
+  # NoSuchEnumVariant
+  if code == "E0599":
+    compress(item)
 
   # Compress advice about errors into copy-paste ready commands.
   if m.startswith("For more information about an error"):
