@@ -4,6 +4,11 @@
 #
 # The usage of this script is unfortunately not very straightforward. You need to see
 # the `dotfiles/bin/ck` script in this repository to see how to invoke this and show the results.
+#
+# Development note to self:
+# * `cd` to the cargo workspace folder you are debugging, and run `ck check debug`.
+# * Modify this script to print something when `args.debug` is True.
+# * Run `ck check` to see how your modifications changed the filter outputs.
 
 import json
 import re
@@ -14,7 +19,7 @@ import tempfile
 RE_ERROR_EXPLANATIONS = re.compile(r"Some errors have detailed explanations: (.*)\.")
 
 # Print a Python object using `jq`.
-def jq_print(j):
+def jqPrint(j):
   # Using a temporary file to avoid character escaping issues.
   with tempfile.NamedTemporaryFile() as tempFile:
     tempFile.write(json.dumps(j, indent=4).encode())
@@ -33,46 +38,84 @@ def readJson(filePath):
 
 # Use magenta, a color that rustc doesn't seem to use.
 # One nice reference: <https://stackoverflow.com/a/21786287>
-def in_color(s):
+def colorWarning(s):
   return "\x1b[35m" + s + "\x1b[0m"
+
+def colorError(s):
+  return "\x1b[31m" + s + "\x1b[0m"
 
 def print_warning(item):
   item = item.copy()
   del item["rendered"]
   print(json.dumps(item, indent=4))
 
-def replace_rendered(item, s):
-  item["rendered"] = in_color(s)
+def replaceRendered(item, s, error=False):
+  if error: item["rendered"] = colorError(s)
+  else: item["rendered"] = colorWarning(s)
+
+def getCodeLocations(item):
+  locs = []
+  if "spans" in item:
+    for i, span in enumerate(item["spans"]):
+      loc = "{}:{}".format(span["file_name"], span["line_start"])
+      if loc not in locs:
+        locs.append(loc)
+
+  s = ""
+  if locs:
+    for i, loc in enumerate(locs):
+      if i > 0: s += ", "
+      s += loc
+    s += ": "
+  return s
 
 # Generic compression that shows the plain "message" field.
 def compress(item):
-  s = ""
-  if "spans" in item:
-    for i, span in enumerate(item["spans"]):
-      if i > 0: s += "\n"
-      s += "{}:{}".format(span["file_name"], span["line_start"])
-    s += ": "
+  s = getCodeLocations(item)
   s += "{}".format(item["message"])
-  replace_rendered(item, s)
+  replaceRendered(item, s)
 
-def filter_value_typo(item):
-  if not item["message"].startswith("cannot find value"): return
+def filterWrongNumberOfArguments(item):
+  s = getCodeLocations(item)
+  found = False
+  for span in item["spans"]:
+    if span["label"] is not None:
+      s += span["label"]
+      found = True
+  if not found:
+    s += "{}: {}".format(item["message"], "TODO")
+
+  s += ". Expected these arguments:"
+  child = item["children"][0];
+  for span in child["spans"]:
+    if span["label"] is None: continue
+    s += "\n    " + span["text"][0]["text"].strip()
+  replaceRendered(item, s, error=True)
+
+def filterValueTypo(item):
   if "children" in item:
     for child in item["children"]:
       for span in child["spans"]:
         if not "suggested_replacement" in span: continue
-        item["message"] = in_color("Typo? -> {}".format(span["suggested_replacement"]))
+        item["message"] = colorWarning("Typo? -> {}".format(span["suggested_replacement"]))
         compress(item)
 
 def filter(args, item):
   m = item["message"]
+  code = None
+  if "code" in item and isinstance(item["code"], dict):
+    code = item["code"]["code"]
 
   # rustc takes 7 lines of output per unused variable, which is extremely verbose
   # considering it's routine to have them when writing new code. Condense to one line.
-  if m.startswith("unused variable"):
+  if code == "unused_variables" or m.startswith("unused variable"):
     compress(item)
 
-  filter_value_typo(item)
+  if m.startswith("cannot find value"):
+    filterValueTypo(item)
+
+  if code == "E0061" or m.startswith("this function takes"):
+    filterWrongNumberOfArguments(item)
 
   # Compress advice about errors into copy-paste ready commands.
   if m.startswith("For more information about an error"):
@@ -84,7 +127,7 @@ def filter(args, item):
     for i, token in enumerate(tokens):
       if i > 0: s += "; "
       s += f"rustc --explain {token.strip()}"
-    replace_rendered(item, s)
+    replaceRendered(item, s)
 
   return item
 
