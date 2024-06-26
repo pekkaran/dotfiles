@@ -8,13 +8,15 @@
 # Development note to self:
 # * `cd` to the cargo workspace folder you are debugging, and run `ck check debug`.
 # * Modify this script to print something when `args.debug` is True.
-# * Run `ck check` to see how your modifications changed the filter outputs.
+#   * You can start with `jqPrint(item)` and check modification results with `print(item["rendered"])`.
+# * Finally run `ck check` to see how your modifications changed the full filter output.
 
 import json
 import re
 import subprocess
 import sys
 
+RE_ERROR_CODE = re.compile(r"E\d\d\d\d")
 RE_ERROR_EXPLANATIONS = re.compile(r"Some errors have detailed explanations: (.*)\.")
 
 # Print a Python object using `jq`.
@@ -43,9 +45,10 @@ def readJson(filePath):
     return json.load(f)
 
 # One nice reference: <https://stackoverflow.com/a/21786287>
-def colorWarning(s): return "\x1b[33m" + s + "\x1b[0m"
-def colorError(s):   return "\x1b[31m" + s + "\x1b[0m"
-def colorMeta(s):    return "\x1b[37m" + s + "\x1b[0m"
+def colorWarning(s):    return "\x1b[33m" + s + "\x1b[0m"
+def colorSuggestion(s): return "\x1b[32m" + s + "\x1b[0m"
+def colorError(s):      return "\x1b[31m" + s + "\x1b[0m"
+def colorMeta(s):       return "\x1b[37m" + s + "\x1b[0m"
 
 def printWarning(item):
   item = item.copy()
@@ -94,7 +97,6 @@ def filterWrongNumberOfArguments(item):
       s += span["label"]
       found = True
   assert(found)
-
   s += ". Expected these arguments:"
   child = item["children"][0];
   for span in child["spans"]:
@@ -110,6 +112,32 @@ def filterValueTypo(item):
         if not "suggested_replacement" in span: continue
         item["message"] = colorWarning("Typo? -> {}".format(span["suggested_replacement"]))
         compress(item)
+
+# Eg when you try use a container method but the contained type does not implement the necessary
+# traits and you just need to stick to it some derive attributes to fix it.
+def filterMissingDerives(item):
+  locations = getCodeLocations(item)
+  s = item["message"]
+  found = False
+  if "children" in item:
+    for child in item["children"]:
+      for span in child["spans"]:
+        if not "suggested_replacement" in span: continue
+        found = True
+        s += ". Try adding these derives:\n  "
+        s += colorSuggestion(span["suggested_replacement"].strip())
+        if "text" in span and len(span["text"]) > 0 and "text" in span["text"][0]:
+          s += "\n  {}".format(span["text"][0]["text"])
+
+  # Missing trait bounds error cannot always be solved by derives, so this check
+  # is bound to fail sometimes. Leaving this as a note to self.
+  # Could instead just return without doing anything, then the original error is
+  # shown without the "meta" failure message.
+  if not found:
+    raise Exception("Failed to match filterMissingDerives.")
+
+  s += "\n"
+  render(item, locations, s)
 
 def filter(args, item):
   m = item["message"]
@@ -128,16 +156,26 @@ def filter(args, item):
   if code == "E0061" or m.startswith("this function takes"):
     filterWrongNumberOfArguments(item)
 
-  # NoSuchEnumVariant
-  if code == "E0599":
-    compress(item)
+  # NoSuchEnumVariant. TODO Multiple errors use this same code? Need to make the condition more specific.
+  # if code == "E0599":
+  #   compress(item)
+
+  if code == "E0599" and "but its trait bounds were not satisfied" in m:
+    filterMissingDerives(item)
 
   # Compress advice about errors into copy-paste ready commands.
+  # The formatting is different depending on whether there is one or more errors.
   if m.startswith("For more information about an error"):
     return None
-  m = RE_ERROR_EXPLANATIONS.match(m)
-  if m:
-    tokens = m.group(1).split(",")
+
+  if m.startswith("For more information about this error"):
+    match = RE_ERROR_CODE.search(m)
+    s = f"Help: rustc --explain {match.group(0)}"
+    replaceRendered(item, s)
+
+  match = RE_ERROR_EXPLANATIONS.match(m)
+  if match:
+    tokens = match.group(1).split(",")
     s = "Help: "
     for i, token in enumerate(tokens):
       if i > 0: s += "; "
@@ -155,7 +193,9 @@ def main(args):
   for item in data:
     try:
       item = filter(args, item)
-    except:
+    except Exception as e:
+      if args.debug:
+        raise
       if item is not None:
         output.append({
           "rendered": colorMeta("filter-rustc failed to process a message, showing the original:"),
@@ -166,7 +206,6 @@ def main(args):
 
   if args.debug:
     pass
-    #print(output)
   else:
     print(json.dumps(output, separators=(',', ':')))
 
