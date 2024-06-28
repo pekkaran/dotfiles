@@ -161,10 +161,11 @@ fi
 # Once `ssh-agent` is running, run `ssh-add` once before you need your keys.
 # Alternatively it works to put `eval $(ssh-agent)` in `.xinitrc`,
 # but only when you are using `startx`.
-# if ! pgrep -u "$USER" ssh-agent > /dev/null; then
-#   ssh-agent > "$HOME/.ssh-agent.env"
-# fi
-# if [[ ! "$SSH_AUTH_SOCK" ]]; then
-#   source "$HOME/.ssh-agent.env" > /dev/null
-# fi
-
+agent_env_path="$HOME/.ssh-agent.env"
+if ! pgrep -u "$USER" ssh-agent > /dev/null; then
+  rm -f "$agent_env_path"
+  ssh-agent > "$agent_env_path"
+fi
+if [[ ! "$SSH_AUTH_SOCK" ]]; then
+  source "$agent_env_path" > /dev/null
+fi
