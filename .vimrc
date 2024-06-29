@@ -53,6 +53,9 @@ execute pathogen#infect()
 " 14 bright cyan
 " 15 bright white
 
+" For terminal colors, enable this block and disable `colorscheme` below.
+" TODO Should probably convert the whole configuration to Lua.
+
 " set notermguicolors
 " set background=light
 " hi LineNr ctermfg=8
@@ -859,14 +862,14 @@ function! RustAbbrev()
   iabbrev formatx format!("{:?}", )
   iabbrev warnx warn!("{}: ", function!());
   iabbrev enume for (i, item) in data.iter().enumerate()
-  iabbrev enumx <c-o>:read ~/.vim/templates/enum.rs<cr>
-  iabbrev defaultx <c-o>:read ~/.vim/templates/default.rs<cr>
-  iabbrev iterx <c-o>:read ~/.vim/templates/iter.rs<cr>
-  iabbrev iteratorx <c-o>:read ~/.vim/templates/iter.rs<cr>
-  iabbrev matchx <c-o>:read ~/.vim/templates/match.rs<cr>
-  iabbrev implx <c-o>:read ~/.vim/templates/impl.rs<cr>
-  iabbrev fromx <c-o>:read ~/.vim/templates/from.rs<cr>
-  iabbrev testx <c-o>:read ~/.vim/templates/test.rs<cr>
+  iabbrev enumx <c-o>:read ~/dotfiles/code-templates/rust/enum.rs<cr>
+  iabbrev defaultx <c-o>:read ~/dotfiles/code-templates/rust/default.rs<cr>
+  iabbrev iterx <c-o>:read ~/dotfiles/code-templates/rust/iter.rs<cr>
+  iabbrev iteratorx <c-o>:read ~/dotfiles/code-templates/rust/iter.rs<cr>
+  iabbrev matchx <c-o>:read ~/dotfiles/code-templates/rust/match.rs<cr>
+  iabbrev implx <c-o>:read ~/dotfiles/code-templates/rust/impl.rs<cr>
+  iabbrev fromx <c-o>:read ~/dotfiles/code-templates/rust/from.rs<cr>
+  iabbrev testx <c-o>:read ~/dotfiles/code-templates/rust/test.rs<cr>
 
   " Override /usr/share/nvim/runtime/indent/rust.vim
   " Try removing after neovim 0.10 release.
