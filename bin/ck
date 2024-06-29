@@ -14,6 +14,7 @@
 #   ck clippy
 #
 # In theory `ck run` should also work as wrapper for `cargo run`, but currently the output isn't parsed(?).
+set -euo pipefail
 
 cargo_command=${1:-check} # Use eg "build", "clippy", or "run". The default is "check".
 
@@ -29,38 +30,44 @@ done
 
 dir=$(git rev-parse --show-toplevel 2> /dev/null || echo ".")
 
-# Run rustc via cargo. Taking the output in JSON format suppresses normal output.
-output=$(cargo $cargo_command --message-format=json-diagnostic-rendered-ansi 2> /dev/null)
-
-# Discard (lots of) top level data that we are not interested in.
-messages=$(echo "$output" | jq 'select(.reason=="compiler-message") | .message')
-
-# Could somehow be merged with the previous but I'm not good with jq.
-# `-s` turns the jq "generator" list output into valid JSON with square brackets and commas between items.
-messages=$(echo "$messages" | jq -s ".")
+# Run rustc via cargo. “json-diagnostic-rendered-ansi” suppressed normal output.
+set +e
+stderr=$(mktemp)
+messages=$(cargo $cargo_command --message-format=json-diagnostic-rendered-ansi 2> "$stderr")
+# Cargo seems to give the same exit value for every type of failure but we are only interested
+# in complilation failures.
+if [[ $(cat $stderr) == *"could not find"* ]]; then
+  cat "$stderr"
+  exit
+fi
+set -e
 
 # Optional step to modify the compiler warnings and errors.
+# TODO Update repository address.
 # See the script `dotfiles/bin/filter-rustc`, which I use mainly to reduce rustc's verbosity.
-if type filter-rustc > /dev/null 2>&1; then
+if type filter-rustc.py > /dev/null 2>&1; then
   if [ "$debug" == "debug" ]; then
-    echo "$messages" | filter-rustc --debug
+    echo "$messages" | filter-rustc.py --debug
   elif [ "$debug" == "disable" ]; then
-    echo "$messages" | filter-rustc --disable
+    echo "$messages" | filter-rustc.py --disable
   else
-    messages=$(echo "$messages" | filter-rustc)
+    messages=$(echo "$messages" | filter-rustc.py)
   fi
 fi
 
-# Print on the terminal using colors.
+# Discard (lots of) top level data that we are not interested in.
+messages=$(echo "$messages" | jq 'select(.reason=="compiler-message")')
+
+# Print to the terminal using colors.
 if [ "$debug" != "debug" ]; then
-  echo "$messages" | jq --raw-output '.[].rendered'
+  echo "$messages" | jq --raw-output ".message.rendered"
 fi
 
 # Collect error lines to a file.
 # `grep -v rustc` removes lines like `/rustc/9bc8..e53/library/alloc/src/macros.rs 51`,
 # which occur around macro usage. Might be possible to also detect in the JSON but this is easier.
 echo "$messages" | jq '
-    .[].spans.[]
+    .message.spans.[]
     | select(.is_primary==true)
     | [.file_name, .line_start]
     | @sh' \
