@@ -44,6 +44,8 @@ messages=$(echo "$messages" | jq -s ".")
 if type filter-rustc > /dev/null 2>&1; then
   if [ "$debug" == "debug" ]; then
     echo "$messages" | filter-rustc --debug
+  elif [ "$debug" == "disable" ]; then
+    echo "$messages" | filter-rustc --disable
   else
     messages=$(echo "$messages" | filter-rustc)
   fi
