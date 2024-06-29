@@ -362,3 +362,12 @@ function play() {
   mpc search title "$*" | mpc add
   mpc play
 }
+
+# Modern kids might instead call this "YOLO".
+# Don't use this ever. Except when you really need to. Alright go ahead, I'm not responsible.
+function roll() {
+  cd "$(git rev-parse --show-toplevel)"
+  git add .
+  git commit --amend --no-edit
+  git push --force
+}
