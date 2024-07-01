@@ -45,17 +45,20 @@ set -e
 # Optional step to modify the compiler warnings and errors.
 # TODO Update repository address.
 # See the script `dotfiles/bin/filter-rustc`, which I use mainly to reduce rustc's verbosity.
-if type filter-rustc.py > /dev/null 2>&1; then
+if type filter-rustc > /dev/null 2>&1; then
   if [ "$debug" == "debug" ]; then
-    echo "$messages" | filter-rustc.py --debug
+    echo "$messages" | filter-rustc --debug
   elif [ "$debug" == "disable" ]; then
-    echo "$messages" | filter-rustc.py --disable
+    echo "$messages" | filter-rustc --disable
   else
-    messages=$(echo "$messages" | filter-rustc.py)
+    messages=$(echo "$messages" | filter-rustc)
   fi
 fi
 
 # Discard (lots of) top level data that we are not interested in.
+#
+# NOTE This may currently fail with `ck test` when cargo test succeeds compiling and
+# prints something like "running 3 tests" instead of JSON.
 messages=$(echo "$messages" | jq 'select(.reason=="compiler-message")')
 
 # Print to the terminal using colors.
