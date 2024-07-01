@@ -426,6 +426,8 @@ vnoremap <C-g> <nop>
 
 " Colon commands are common so put them behind the easier to type '.' and
 " remap the repeat/repetition key. `\` is normally the leader key.
+nnoremap : <nop>
+vnoremap : <nop>
 nnoremap . :
 vnoremap . :
 nnoremap \ .
@@ -881,6 +883,7 @@ function! CppAbbrev()
   iabbrev cout std::cout << << std::endl
   iabbrev printf printf("%\n");
   iabbrev logx log_debug("%");
+  iabbrev warnx log_warn("%");
   iabbrev forx for (size_t i = 0; i < ; ++i)
   iabbrev forax for (const auto &y : ys)
   iabbrev forsx for (const std::string &y : ys)
@@ -888,6 +891,17 @@ function! CppAbbrev()
   iabbrev infinityx std::numeric_limits<float>::infinity()
 endfunction
 autocmd! Filetype cpp,hpp call CppAbbrev()
+
+function! PythonAbbrev()
+  iabbrev mainx <c-o>:read ~/dotfiles/code-templates/python/main.py<cr>
+  iabbrev csvx <c-o>:read ~/dotfiles/code-templates/python/readCsv.py<cr>
+  iabbrev jsonx <c-o>:read ~/dotfiles/code-templates/python/readJson.py<cr>
+  iabbrev jsonlx <c-o>:read ~/dotfiles/code-templates/python/readJsonl.py<cr>
+  iabbrev walkfiles <c-o>:read ~/dotfiles/code-templates/python/walkFiles.py<cr>
+  iabbrev walkfolders <c-o>:read ~/dotfiles/code-templates/python/walkFolders.py<cr>
+  iabbrev sluprx <c-o>:read ~/dotfiles/code-templates/python/slurp.py<cr>
+endfunction
+autocmd! Filetype python call PythonAbbrev()
 
 " Insert text like '— Update `2019_06_07`'.
 " nnoremap <F8> "=strftime('— Update `%Y_%m_%d`: ')<cr>p
