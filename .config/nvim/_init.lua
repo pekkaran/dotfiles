@@ -1,13 +1,11 @@
 -- Configuration for nvim.
+-- TODO Seems to contain mixed tabs and spaces because I edited
+-- this with half-working setup while migrating.
 
--- TODO no need to set these?
---filetype detect
---filetype on
---filetype plugin on
---filetype plugin indent on
--- vim.opt.noerrorbells = true
--- vim.opt.noswapfile = true
--- vim.opt.nobackup = true
+-- vim.cmd("filetype detect")
+vim.cmd("filetype on")
+vim.cmd("filetype plugin on")
+vim.cmd("filetype plugin indent on")
 
 -- lazy.nvim plugin manager setup.
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
@@ -20,7 +18,6 @@ vim.opt.rtp:prepend(lazypath)
 -- Must set maploaders before lazy.nvim setup().
 vim.g.mapleader = ","
 
--- <https://github.com/folke/tokyonight.nvim>
 require("lazy").setup({
   spec = {
     {
@@ -30,8 +27,42 @@ require("lazy").setup({
       opts = {},
     },
     {
-      'nvim-lualine/lualine.nvim',
-    }
+      "dense-analysis/ale",
+      ft = "rust",
+      config = function()
+        vim.g.ale_enabled = 1
+        vim.opt.omnifunc = "ale#completion#OmniFunc"
+
+        -- NOTE to set up the rust-analyzer server, run:
+        -- `rustup component add rust-analyzer`
+        vim.g.ale_linters = { rust = { "analyzer" } }
+
+        -- Do not show super-noisy inline errors and warnings.
+        vim.g.ale_virtualtext_cursor = 'disabled'
+        vim.g.ale_set_signs = 0 -- Do not show the gutter.
+        -- Example, looks like could be useful.
+        -- vim.g.ale_rust_ignore_error_codes = ['E0432', 'E0433']
+
+        -- Not really sure how this should be set with Supertab or
+        -- similar in use. But this combination with Supertab
+        -- enabled seems to give 'smart' completion with fallback
+        -- for simple 'existing word in the buffer'.
+        vim.g.ale_completion_enabled = 1
+
+        -- Already handled by other tools.
+        vim.g.ale_warn_about_trailing_whitespace = 0
+        vim.g.ale_warn_about_trailing_blank_lines = 0
+
+        -- vim.g.ale_rust_analyzer_config = {
+        --   diagnostics = {
+        --     disabled = []
+        --   },
+        -- }
+      end
+    },
+    { 'nvim-lualine/lualine.nvim' },
+    { 'eugen0329/vim-esearch' },
+    { 'editorconfig/editorconfig-vim' },
   },
 })
 vim.cmd[[colorscheme tokyonight-moon]]
@@ -39,9 +70,9 @@ vim.cmd[[colorscheme tokyonight-moon]]
 -- TODO Not tested properly, attempting to use normal vim plugins via pathogen.
 -- If "infect" fails, make sure (using symlinks) that the pathogen file is in this exact path:
 --   ~/.config/nvim/autoload/pathogen.vim
-local execute = vim.api.nvim_command
-execute('runtime autoload/pathogen.vim')
-execute('call pathogen#infect()')
+-- local execute = vim.api.nvim_command
+-- execute('runtime autoload/pathogen.vim')
+-- execute('call pathogen#infect()')
 
 vim.opt.guicursor = "" -- Show block cursor also in insert mode.
 vim.opt.number = true
@@ -95,16 +126,28 @@ vim.opt.smarttab = true -- Insert blanks according to shiftwidth.
 
 -- TODO bunch of other options in this section of the old .vimrc
 
--- Show tabs and trailing whitespace …
-vim.opt.list = true
-vim.opt.listchars = "tab:--,trail:-,extends:#,nbsp:-"
--- … but don't show trailing whitespace in insert mode.
--- augroup trailing
---   au!
---   au InsertEnter * :set listchars-=trail:-
---   au InsertLeave * :set listchars+=trail:-
--- augroup END
+local aucmd = vim.api.nvim_create_autocmd
+local function augroup(name, f)
+  f(vim.api.nvim_create_augroup(name, { clear = true }))
+end
 
+-- Show tabs and trailing whitespace but don't show trailing whitespace in insert mode.
+-- Apparently need to set the whole table at once(?).
+vim.opt.list = true
+local listchars_normal = { tab = '--', trail = '-', nbsp = '-', extends = '#' }
+local listchars_insert = { tab = '--', trail = ' ', nbsp = '-', extends = '#' }
+vim.opt.listchars = listchars_normal
+
+augroup('Listchars', function(g)
+  aucmd('InsertEnter', {
+    group = g,
+    callback = function() vim.opt.listchars = listchars_insert end
+  })
+  aucmd('InsertLeave', {
+    group = g,
+    callback = function() vim.opt.listchars = listchars_normal end
+  })
+end)
 
 -- Visual autocomplete for command menu.
 vim.opt.wildmenu = true
@@ -167,8 +210,29 @@ vim.opt.fileencodings = "ucs-bom,utf-8,default,latin1,iso-2022-jp,euc-jp,sjis,cp
 -- TODO Automatically cd into the directory that the file is in
 -- autocmd BufEnter * execute --chdir --.escape(expand(--%:p:h--), ' \\/.*$^~[]#')
 
--- TODO Space "reset" function.
--- nnoremap <silent> <space> mz:nohl<cr> :call DeleteEsearch()<cr> :call CloseNetrw()<cr> :call Reset()<cr>`z
+local map_args = { noremap = true, silent = true }
+
+local function clearJunk()
+  for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+    -- Delete all `esearch` buffers.
+    local buf_name = vim.api.nvim_buf_get_name(buf)
+    if buf_name:match("Search ‹") then
+      vim.api.nvim_buf_delete(buf, { force = true })
+    end
+    -- Delete all `netrw` buffers.
+    local filetype = vim.api.nvim_buf_get_option(buf, 'filetype')
+    if filetype == "netrw" then
+      vim.api.nvim_buf_delete(buf, { force = true })
+    end
+
+    -- Clear various visual effects.
+    vim.cmd.nohl()
+    -- vim.cmd.cexpr()
+    vim.cmd.cclose()
+    vim.cmd.echo()
+  end
+end
+vim.keymap.set("n", "<space>", clearJunk, map_args)
 
 --[[ TODO Not sure if all of this works the same way in nvim.
 " Copy and paste.
@@ -189,17 +253,262 @@ inoremap <C-v> <C-r><C-o>+
 --]]
 
 -- To quickly go to line 42, type '42,,'
-vim.api.nvim_set_keymap("n", "<leader><leader>", "Gzz", { noremap = true, silent = true })
+vim.keymap.set("n", "<leader><leader>", "Gzz", map_args)
 
--- TODO skipped over a lot of mappings
+-- Add todo note for a search program. `gcc` comments the line, and `==` indents it.
+-- TODO syntax issue
+-- vim.keymap.set("n", "<leader>t", 'O<esc>"=strftime('TODO STACK %Y_%m_%d-%T')<cr>pgcc==",
+
+-- Open netrw split on the right side.
+vim.keymap.set("n", "<leader>n", ":Vexplore!<cr>", map_args)
+
+local function set_keymaps_rust()
+  vim.keymap.set("n", "<leader>j", "<Plug>(ale_go_to_definition)", map_args)
+  vim.keymap.set("n", "<leader>k", "<Plug>(ale_previous)", map_args)
+  vim.keymap.set("n", "<leader>h", "<Plug>(ale_hover)", map_args)
+  vim.keymap.set("n", "<leader>r", "<Plug>(ale_rename)", map_args)
+  vim.keymap.set("n", "<leader>i", "<Plug>(ale_import)", map_args)
+
+  -- The language server does not always work, eg on commented out code.
+  -- Use capitalized keys to fallback to tags.
+  vim.keymap.set("n", "<leader>J", "<C-]>", map_args)
+  vim.keymap.set("n", "<C-]>", "<nop>", map_args)
+  vim.keymap.set("n", "<leader>K", "<C-t>", map_args)
+  vim.keymap.set("n", "<leader>U", ":tn<cr>", map_args)
+end
+
+local function set_keymaps_other()
+  -- Tags (eg ctags):
+  -- Go to definition under cursor.
+  vim.keymap.set("n", "<leader>j", "<C-]>", map_args)
+  vim.keymap.set("n", "<C-]>", "<nop>", map_args)
+  -- Go back to previous location after <C-]>.
+  vim.keymap.set("n", "<leader>k", "<C-t>", map_args)
+  -- Next definition of last tag.
+  vim.keymap.set("n", "<leader>u", ":tn<cr>", map_args)
+  -- List definitons of last tag.
+  vim.keymap.set("n", "<leader>l", ":ts<cr>", map_args)
+end
+
+augroup('FileTypeKeymaps', function(g)
+  aucmd('FileType', {
+    group = g,
+    callback = function()
+      if vim.bo.filetype == "rust" then
+        set_keymaps_rust()
+      else
+        set_keymaps_other()
+      end
+    end
+  })
+end)
+
+--[[
+" Own functions, defined later.
+nnoremap <leader>e :call OpenFirstErrorLine(1)<cr>
+nnoremap <leader>E :call OpenFirstErrorLine(0)<cr>
+nnoremap <leader>w :call OpenNextErrorLine(1)<cr>
+nnoremap <leader>W :call OpenNextErrorLine(-1)<cr>
+" nnoremap <leader>r :call OpenTodoLine(1)<cr>
+
+" Delete empty lines in selection.
+vnoremap <leader>d :g/^$/d<cr>:nohl<cr>
+
+" vim-abolish plugin: Swap boolean values in selection or current line.
+" Note that numbers on line may be similarly incremented or decremented using
+" the built-in <c-a> and <c-x> commands.
+vnoremap <leader>b :Subvert/{true,false}/{false,true}<cr>:nohl<cr>
+nnoremap <leader>b :.Subvert/{true,false}/{false,true}<cr>:nohl<cr>
+" Some abbreviations I use produce template code with placeholder variables like `Xx`.
+vnoremap <leader>2 :Subvert/{Xx,Yy}/{
+nnoremap <leader>2 :.Subvert/{Xx,Yy}/{
+
+" vim-clang-format plugin.
+" nnoremap <leader>F :<C-u>ClangFormat<cr>
+" vnoremap <leader>F :ClangFormat<cr>
+--]]
+
+vim.keymap.set("n", "<F1>", "<nop>", map_args)
+
+-- Edit previous and next file by alphabetical sort.
+-- From <https://github.com/tpope/vim-unimpaired/blob/master/plugin/unimpaired.vim>
+-- nnoremap <silent> mm :<C-U>edit <C-R>=<SID>fnameescape(fnamemodify(<SID>FileByOffset(v:count1), ':.'))<CR><CR>
+-- nnoremap <silent> <F9> :<C-U>edit <C-R>=<SID>fnameescape(fnamemodify(<SID>FileByOffset(-v:count1), ':.'))<CR><CR>
+
+-- These days vim can paste things without paste mode, but it's occasionally
+-- useful for typing things without interference from `imap`s.
+-- set pastetoggle=<F10>
+
+-- Can't map unmodified F11?
+vim.keymap.set("n", "<S-F11>", ":call OpenRandomFile()<cr>", map_args)
+
+-- Switch between source and header files. Very crude, only works for the
+-- extension pairs cpp-hpp and c-h.
+vim.keymap.set("n", "<leader>z", ":e %:p:s,.hpp$,.XHPPX,:s,.h$,.XHX,:s,.cpp$,.hpp,:s,.c$,.h,:s,.XHPPX$,.cpp,:s,.XHX$,.c,<cr>", map_args)
+
+-- Normally `gf` opens file with the name under cursor, but that file must exist.
+-- This remapping also opens a new file. Note you still need to save the new file.
+vim.keymap.set("n", "gf", ":e <cfile><cr>", map_args)
+
+-- Multi-character insert mode combinations.
+-- Requiring a timeout, these interfere with typing somewhat,
+-- so only start them with 'j' to minimize the effects.
+
+vim.keymap.set("i", "jk", "<esc>", map_args)
+vim.keymap.set("i", "Jk", "<esc>", map_args)
+vim.keymap.set("i", "JK", "<esc>", map_args)
+vim.keymap.set("i", "jjk", "<esc>", map_args)
+-- vim.keymap.set("i", "<esc>", "<nop>", map_args)
+-- New line in insert mode.
+vim.keymap.set("i", "<cr>", "<nop>", map_args)
+vim.keymap.set("i", "<C-l>", "<C-j>", map_args)
+vim.keymap.set("n", "<C-l>", "o", map_args)
+vim.keymap.set("i", "jf", "<C-j>", map_args)
+
+-- Quick save.
+vim.keymap.set("n", "<leader>m", ":w<cr>", map_args)
+
+-- Should use <c-h>. Be aware also of <c-w> and <c-u> which delete back word
+-- or the entire line.
+vim.keymap.set("i", "<backspace>", "<nop>", map_args)
+
+-- Normally this cycles between normal-insert-replace modes.
+vim.keymap.set("i", "<insert>", "<nop>", map_args)
+vim.keymap.set("n", "<insert>", "<nop>", map_args)
+vim.keymap.set("v", "<insert>", "<nop>", map_args)
+
+-- Do not use 'select mode'.
+vim.keymap.set("v", "<C-g>", "<nop>", map_args)
+
+-- Colon commands are common so put them behind the easier to type '.' and
+-- remap the repeat/repetition key. `\` is normally the leader key.
+vim.keymap.set("n", ":", "<nop>", map_args)
+vim.keymap.set("v", ":", "<nop>", map_args)
+vim.keymap.set("n", ".", ":", { noremap = true })
+vim.keymap.set("v", ".", ":", { noremap = true })
+vim.keymap.set("n", "\\", ".", map_args)
+vim.keymap.set("v", "\\", ".", map_args)
+
+-- Use one pinky finger instead of two for the register key.
+vim.keymap.set("n", ";", '"', map_args)
+vim.keymap.set("v", ";", '"', map_args)
+
+-- The black hole register. Prefix delete commands with this to not yank them
+vim.keymap.set("n", ";;", '"_', map_args)
+vim.keymap.set("v", ";;", '"_', map_args)
+
+-- System clipboard register (the one I use).
+vim.keymap.set("n", ";p", '"+', map_args)
+
+-- Indent in visual and select mode automatically re-selects. I find it enough
+-- to use the repeat key.
+-- vim.keymap.set("v", ">", ">gv", map_args)
+-- vim.keymap.set("v", "<", "<gv", map_args)
+
+-- By default ^ returns to the first non-whitespace character and 0 to the
+-- first character. Remapped because of how I happened to learn use one before
+-- the other. Mnemonic: # is left of $, and how in C/C++ `#macros` are often
+-- idented to the first column.
+vim.keymap.set("n", "0", "^", map_args)
+vim.keymap.set("n", "#", "0", map_args)
+vim.keymap.set("n", "^", "<nop>", map_args)
+
+-- Don't move on *, which searches for the word under cursor.
+local function star()
+  local view = vim.fn.winsaveview()
+  local args = string.format("keepjumps keeppatterns execute %q", "sil normal! *")
+  vim.api.nvim_command(args)
+  vim.fn.winrestview(view)
+end
+vim.keymap.set('n', '*', star, map_args)
+
+-- By default q is the macro recording key. Hard to exit when you press it by accident.
+vim.keymap.set("n", "+", "q", map_args)
+vim.keymap.set("n", "q", "<nop>", map_args)
+
+-- Kind of like the opposite of `J`, this command splits lines on space.
+-- By default K opens man page for word under cursor.
+vim.keymap.set("n", "K", "i<return><esc>", map_args)
+
+-- Often I want to yank text in visual mode, but accidentally hitting `u` instead of `y`.
+vim.keymap.set("v", "u", "<nop>", map_args)
+
+-- Backwards search. Easier to just search forward and cycle matches the other
+-- direction.
+vim.keymap.set("n", "?", "<nop>", map_args)
+
+-- Never put single deleted characters into the unnamed register.
+vim.keymap.set("n", "x", '"_x', map_args)
+vim.keymap.set("n", "X", '"_X', map_args)
+
+-- Delete [count] lines without putting them in the unnamed register. Useful for empty lines.
+-- Disabled because I actually wanted to use the original command ("delete to").
+-- vim.keymap.set("n", "df", '"_dd', map_args)
+
+-- Paste the last yanked text, ignoring the deleted stuff that goes in the unnamed register.
+-- vim.keymap.set("n", "cp", '"0p', map_args)
 
 -- Previous, next and close buffer.
-vim.api.nvim_set_keymap("n", "H", ":bp<cr>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "L", ":bn<cr>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "Q", ":bd<cr>", { noremap = true, silent = true })
+vim.keymap.set("n", "H", vim.cmd.bprev, map_args)
+vim.keymap.set("n", "L", vim.cmd.bnext, map_args)
+vim.keymap.set("n", "Q", vim.cmd.bdelete, map_args)
 
 -- Keep the cursor in place while joining lines
-vim.api.nvim_set_keymap("n", "J", "mzJ`z", { noremap = true, silent = true })
+vim.keymap.set("n", "J", "mzJ`z", map_args)
+
+-- TODO escape character issues
+-- Generate curly brackets block and leave in insert mode inside. Could be more
+-- robust. I have mapped to keys like ¹²³ from alt-123….
+-- vim.keymap.set("n", "¹",      ":.s/\s\+$//e<cr>:nohl<cr>A {<return>}<esc>O", map_args)
+-- vim.keymap.set("i", "¹", "<esc>:.s/\s\+$//e<cr>:nohl<cr>A {<return>}<esc>O", map_args)
+-- Rust `match` block.
+-- vim.keymap.set("n", "²",      ":.s/\s\+$//e<cr>:nohl<cr>A => {<return>},<esc>O", map_args)
+-- vim.keymap.set("i", "²", "<esc>:.s/\s\+$//e<cr>:nohl<cr>A => {<return>},<esc>O", map_args)
+
+-- Normally <C-o> allows executing normal mode commands from insert mode, but I use <C-o> for
+-- opening files.
+vim.keymap.set("i", "<C-i>", "<C-o>", map_args)
+
+-- Move individual lines up and down. I use this all the time. Especially handy
+-- with `J` (join) and `K` (split; a custom command defined in this file).
+vim.keymap.set("n", "<C-j>", ":m .+1<CR>==", map_args)
+vim.keymap.set("n", "<C-k>", ":m .-2<CR>==", map_args)
+vim.keymap.set("v", "<C-j>", ":m '>+1<CR>gv=gv", map_args)
+vim.keymap.set("v", "<C-k>", ":m '<-2<CR>gv=gv", map_args)
+vim.keymap.set("i", "<C-j>", "<nop>", map_args)
+vim.keymap.set("i", "<C-k>", "<nop>", map_args)
+
+-- Grep-like search plugin.
+vim.keymap.set("n", "<C-f>", "<plug>(esearch)", map_args)
+
+-- Substitute text.
+vim.keymap.set("n", "<C-e>", ":%s/", map_args)
+vim.keymap.set("v", "<C-e>", ":s/", map_args)
+vim.keymap.set("n", "<C-s>", ":%Subvert/", map_args)
+vim.keymap.set("v", "<C-s>", ":Subvert/", map_args)
+
+vim.keymap.set("n", "<C-o>", ":call GitOpen()<cr>", map_args)
+
+-- Toggle line numbers.
+vim.keymap.set("n", "<C-n>", ":setlocal number!<cr>", map_args)
+
+-- Center after search.
+vim.keymap.set("n", "n", "nzz", map_args)
+vim.keymap.set("n", "N", "Nzz", map_args)
+
+-- TODO Follow links and go back in help pages
+-- au FileType help nnoremap <return> <C-]>
+-- au FileType help nnoremap <backspace> <C-T>
+
+-- Misc
+
+vim.api.nvim_create_augroup("YankHighlight", { clear = true })
+vim.api.nvim_create_autocmd("TextYankPost", {
+  group = "YankHighlight",
+  callback = function()
+    vim.highlight.on_yank { higroup = "IncSearch", timeout = 500 }
+  end,
+})
 
 -- Plugins
 
@@ -207,11 +516,11 @@ require('lualine').setup {
   theme = 'tokyonight-moon',
   options = {
     -- Fits more filenames.
-    component_separators = { left = '', right = ''},
-    section_separators = { left = '', right = ''},
+    component_separators = { left = '', right = '' },
+    section_separators = { left = '', right = '' },
   },
   sections = {
-    lualine_b = {'branch'}, -- removed diff and diagnostics
+    lualine_b = { 'branch' }, -- removed diff and diagnostics
     lualine_c = {
       {
         'filename',
@@ -234,3 +543,12 @@ require('lualine').setup {
     },
   }
 }
+
+-- List of remaing plugins I used to use via pathogen.
+-- fzf.vim
+-- ron.vim
+-- supertab
+-- vim-abolish
+-- vim-cpp-modern
+-- vim-glsl
+-- vim-localrc
