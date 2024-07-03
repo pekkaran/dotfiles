@@ -1,13 +1,6 @@
 -- Configuration for nvim.
--- TODO Seems to contain mixed tabs and spaces because I edited
--- this with half-working setup while migrating.
 
--- vim.cmd("filetype detect")
-vim.cmd("filetype on")
-vim.cmd("filetype plugin on")
-vim.cmd("filetype plugin indent on")
-
--- lazy.nvim plugin manager setup.
+-- lazy.nvim plugin manager setup (you don't have to clone any repositories manually).
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
   local lazyrepo = "https://github.com/folke/lazy.nvim.git"
@@ -19,15 +12,19 @@ vim.opt.rtp:prepend(lazypath)
 vim.g.mapleader = ","
 
 require("lazy").setup({
+  -- opts = { rocks = { enabled = false } },
   spec = {
     {
       "folke/tokyonight.nvim",
       lazy = false,
       priority = 1000,
-      opts = {},
+      config = function()
+        vim.cmd("colorscheme tokyonight-moon")
+      end,
     },
     {
       "dense-analysis/ale",
+      lazy = false,
       ft = "rust",
       config = function()
         vim.g.ale_enabled = 1
@@ -53,6 +50,7 @@ require("lazy").setup({
         vim.g.ale_warn_about_trailing_whitespace = 0
         vim.g.ale_warn_about_trailing_blank_lines = 0
 
+        -- Not sure what this is, it was enabled but the syntax is now wrong for Lua.
         -- vim.g.ale_rust_analyzer_config = {
         --   diagnostics = {
         --     disabled = []
@@ -60,19 +58,16 @@ require("lazy").setup({
         -- }
       end
     },
-    { 'nvim-lualine/lualine.nvim' },
-    { 'eugen0329/vim-esearch' },
-    { 'editorconfig/editorconfig-vim' },
+    { "eugen0329/vim-esearch" },
+    { "editorconfig/editorconfig-vim" },
+    { "tikhomirov/vim-glsl" },
+    { "nvim-lualine/lualine.nvim" },
+    { "ervandew/supertab" },
+    { "tpope/vim-abolish" },
   },
 })
-vim.cmd[[colorscheme tokyonight-moon]]
 
--- TODO Not tested properly, attempting to use normal vim plugins via pathogen.
--- If "infect" fails, make sure (using symlinks) that the pathogen file is in this exact path:
---   ~/.config/nvim/autoload/pathogen.vim
--- local execute = vim.api.nvim_command
--- execute('runtime autoload/pathogen.vim')
--- execute('call pathogen#infect()')
+vim.cmd("colorscheme tokyonight-moon")
 
 vim.opt.guicursor = "" -- Show block cursor also in insert mode.
 vim.opt.number = true
@@ -94,10 +89,10 @@ vim.opt.showmode = false -- Do not show stuff on the status line because we have
 vim.opt.showtabline = 2
 vim.opt.scrolloff = 10 -- Minimum number of lines to always show below and above cursor.
 vim.opt.showmatch = true -- When a bracket is inserted, briefly jump to the matching one.
--- vim.opt.matchpairs+=<:> -- Also match < > with %. TODO lua
+vim.opt.matchpairs:append("<:>") -- Also match < > with %.
 vim.opt.hidden = true
 vim.opt.confirm = true
--- vim.opt.shortmess+=I -- Disable welcome message when starting vim without a file argument. TODO lua
+vim.opt.shortmess:append("I") -- Disable welcome message when starting vim without a file argument.
 vim.opt.gdefault = true -- Make `s///` behave like `s///g` and vice versa.
 vim.opt.splitbelow = true -- New split placement.
 vim.opt.splitright = true
@@ -109,12 +104,11 @@ vim.opt.wrap = true -- Wrap lines that don't fit to screen …
 vim.opt.linebreak = true -- … but only wrap at characters listed in `breakat`.
 vim.opt.virtualedit = block -- Free block placement in visual mode
 vim.opt.joinspaces = false -- When joining to line that ends in period, do not insert two spaces.
--- vim.opt.clipboard += unnamedplus -- Yanks and deletes additionally go to the + register, so you can paste them with ctrl-v. TODO lua
+vim.opt.clipboard:append("unnamedplus") -- Yanks and deletes additionally go to the + register, so you can paste them with ctrl-v.
 vim.opt.breakindent = true -- Show soft-wrapped text with leading indent.
 vim.opt.undolevels = 1000 -- Remember this many changes.
 vim.opt.mouse = "" -- Disable mouse support.
 vim.opt.tags = ".tags" -- filename for ctags file
--- au BufReadPost .tags vim.opt.syntax=tags -- TODO lua
 -- Indenting. Plugins like `editorconfig` will override these.
 vim.opt.tabstop = 4
 vim.opt.shiftwidth = 4
@@ -122,9 +116,18 @@ vim.opt.autoindent = true
 vim.opt.shiftround = true -- Round indent to multiple of shiftwidth when using < and >.
 vim.opt.smarttab = true -- Insert blanks according to shiftwidth.
 
--- TODO formatoptions, don't know how to manipulate lua lists…
-
--- TODO bunch of other options in this section of the old .vimrc
+-- C/C++ formatoptions
+vim.opt.formatoptions:append("2") -- Use paragraph second line indent
+vim.opt.formatoptions:append("1") -- Try not to break lines after one letter words. For stuff like 'I think' or 'a thing'?
+vim.opt.formatoptions:append("c") -- Auto-wrap comments at textwidth
+vim.opt.formatoptions:append("j") -- Merge comments when joining lines
+vim.opt.formatoptions:append("q") -- Allow formatting comments with `gq`
+vim.opt.formatoptions:append("r") -- Insert comment leader after <enter> in insert mode
+vim.opt.formatoptions:append("t") -- Auto-wrap at textwidth
+vim.opt.formatoptions:remove("a") -- Disable automatic formatting of paragraphs
+vim.opt.formatoptions:remove("l") -- Format long lines when inserting
+vim.opt.formatoptions:append("o") -- Automatically insert comment on `o`…
+vim.opt.formatoptions:append("/") -- … except when the comment comes after a statement.
 
 local aucmd = vim.api.nvim_create_autocmd
 local function augroup(name, f)
@@ -182,33 +185,57 @@ vim.opt.fileencodings = "ucs-bom,utf-8,default,latin1,iso-2022-jp,euc-jp,sjis,cp
 -- TODO The above doesn't seem to work. I was able to read a `sjis` file with
 -- `:e ++enc=sjis` after opening the file.
 
--- The JSON syntax highlighter does not support JSONL, but works well enough
--- since we rarely intend to edit JSONL files, just view them.
--- augroup jsonl
---   au!
---   autocmd BufNewFile,BufRead *.jsonl set syntax=json
--- augroup END
-
--- Skipped folding stuff from .vimrc.
+augroup('CustomSyntax', function(g)
+  aucmd({ "BufNewFile", "BufRead" }, {
+    group = g,
+    callback = function()
+      -- The JSON syntax highlighter does not actually support JSONL, but works well enough.
+      if vim.bo.filetype == "jsonl" then
+        vim.opt.syntax = "json"
+      end
+    end
+  })
+  aucmd("BufRead", {
+    pattern = "*.tags",
+    group = g,
+    callback = function() vim.opt.syntax = "tags" end
+  })
+end)
 
 -- TODO Limit git commit second paragraph width
 -- autocmd Filetype gitcommit setlocal spell textwidth=72
 
--- TODO Add git project root to path. This allows for easier finding with vim.
--- The substitution removes terminating null character.
--- Nothing bad happens if the git rev-parse fails outside a git repository.
--- let s:cdg = substitute(system(--git rev-parse --show-toplevel--), '\%x00', '', 'g')
--- let &path = &path.','.s:cdg
+-- Only show cursorline in the current window and in normal mode
+augroup('Cursorline', function(g)
+  aucmd({ "WinLeave", "InsertEnter" }, {
+    group = g,
+    callback = function() vim.opt.cursorline = false end
+  })
+  aucmd({ "WinEnter", "InsertLeave" }, {
+    group = g,
+    callback = function() vim.opt.cursorline = true end
+  })
+end)
 
--- TODO Only show cursorline in the current window and in normal mode
--- augroup cline
---   au!
---   au WinLeave,InsertEnter * set nocursorline
---   au WinEnter,InsertLeave * set cursorline
--- augroup END
+local vim_default_path = vim.o.path
+augroup('AutoCd', function(g)
+  aucmd("BufEnter", {
+    group = g,
+    callback = function()
+      -- Automatically cd into the directory that the file is in.
+      local current_file_path = vim.fn.expand("%:p:h")
+      local escaped_path = vim.fn.escape(current_file_path, ' \\/.*$^~[]#')
+      vim.cmd("chdir " .. escaped_path)
 
--- TODO Automatically cd into the directory that the file is in
--- autocmd BufEnter * execute --chdir --.escape(expand(--%:p:h--), ' \\/.*$^~[]#')
+      -- Add git project root to path. This allows for easier finding with vim.
+      local handle = io.popen("git rev-parse --show-toplevel 2> /dev/null")
+      local git_root = handle:read("*a")
+      handle:close()
+      -- Need to use `vim_default_path` or else the path will grow every time switching buffers.
+      vim.o.path = vim_default_path .. "," .. git_root:gsub("%z", ""):gsub("\n", "")
+    end
+  })
+end)
 
 local map_args = { noremap = true, silent = true }
 
@@ -234,23 +261,22 @@ local function clearJunk()
 end
 vim.keymap.set("n", "<space>", clearJunk, map_args)
 
---[[ TODO Not sure if all of this works the same way in nvim.
-" Copy and paste.
-"
-"Vim offers the + and * registers to reference the system clipboard (:help quoteplus and :help quotestar). Note that on some systems, + and * are the same, while on others they are different. Generally on Linux, + and * are different: + corresponds to the desktop clipboard (XA_SECONDARY) that is accessed using CTRL-C, CTRL-X, and CTRL-V, while * corresponds to the X11 primary selection (XA_PRIMARY), which stores the mouse selection and is pasted using the middle mouse button in most applications.
-"
-" NOTE that these (the * and + registers) do not work without a clipboard
-" tool vim can work with, for example `xclip`. See :help clipboard for
-" details.
-nnoremap <leader>y "+y
-nnoremap <leader>p "+p
-nnoremap <leader>P "+P
-vnoremap <leader>y "+ygv
-" vnoremap <C-c> "+yi
-" vnoremap <C-x> "+c
-" vnoremap <C-v> c<ESC>"+p
-inoremap <C-v> <C-r><C-o>+
---]]
+-- TODO Not sure if all of this works the same way in nvim.
+-- " Copy and paste.
+-- "
+-- "Vim offers the + and * registers to reference the system clipboard (:help quoteplus and :help quotestar). Note that on some systems, + and * are the same, while on others they are different. Generally on Linux, + and * are different: + corresponds to the desktop clipboard (XA_SECONDARY) that is accessed using CTRL-C, CTRL-X, and CTRL-V, while * corresponds to the X11 primary selection (XA_PRIMARY), which stores the mouse selection and is pasted using the middle mouse button in most applications.
+-- "
+-- " NOTE that these (the * and + registers) do not work without a clipboard
+-- " tool vim can work with, for example `xclip`. See :help clipboard for
+-- " details.
+-- nnoremap <leader>y "+y
+-- nnoremap <leader>p "+p
+-- nnoremap <leader>P "+P
+-- vnoremap <leader>y "+ygv
+-- " vnoremap <C-c> "+yi
+-- " vnoremap <C-x> "+c
+-- " vnoremap <C-v> c<ESC>"+p
+-- inoremap <C-v> <C-r><C-o>+
 
 -- To quickly go to line 42, type '42,,'
 vim.keymap.set("n", "<leader><leader>", "Gzz", map_args)
@@ -277,6 +303,12 @@ local function set_keymaps_rust()
   vim.keymap.set("n", "<leader>U", ":tn<cr>", map_args)
 end
 
+local function set_keymaps_help()
+  -- Follow links and go back in help pages
+  vim.keymap.set("n", "<return>", "<C-]>", map_args)
+  vim.keymap.set("n", "<backspace>", "<C-T>", map_args)
+end
+
 local function set_keymaps_other()
   -- Tags (eg ctags):
   -- Go to definition under cursor.
@@ -296,6 +328,8 @@ augroup('FileTypeKeymaps', function(g)
     callback = function()
       if vim.bo.filetype == "rust" then
         set_keymaps_rust()
+      elseif vim.bo.filetype == "help" then
+        set_keymaps_help()
       else
         set_keymaps_other()
       end
@@ -303,30 +337,19 @@ augroup('FileTypeKeymaps', function(g)
   })
 end)
 
---[[
-" Own functions, defined later.
-nnoremap <leader>e :call OpenFirstErrorLine(1)<cr>
-nnoremap <leader>E :call OpenFirstErrorLine(0)<cr>
-nnoremap <leader>w :call OpenNextErrorLine(1)<cr>
-nnoremap <leader>W :call OpenNextErrorLine(-1)<cr>
-" nnoremap <leader>r :call OpenTodoLine(1)<cr>
+-- Own functions, defined later.
+vim.keymap.set("n", "<leader>e", ":call OpenFirstErrorLine(1)<cr>", map_args)
+vim.keymap.set("n", "<leader>E", ":call OpenFirstErrorLine(0)<cr>", map_args)
+vim.keymap.set("n", "<leader>w", ":call OpenNextErrorLine(1)<cr>", map_args)
+vim.keymap.set("n", "<leader>W", ":call OpenNextErrorLine(-1)<cr>", map_args)
 
-" Delete empty lines in selection.
-vnoremap <leader>d :g/^$/d<cr>:nohl<cr>
-
-" vim-abolish plugin: Swap boolean values in selection or current line.
-" Note that numbers on line may be similarly incremented or decremented using
-" the built-in <c-a> and <c-x> commands.
-vnoremap <leader>b :Subvert/{true,false}/{false,true}<cr>:nohl<cr>
-nnoremap <leader>b :.Subvert/{true,false}/{false,true}<cr>:nohl<cr>
-" Some abbreviations I use produce template code with placeholder variables like `Xx`.
-vnoremap <leader>2 :Subvert/{Xx,Yy}/{
-nnoremap <leader>2 :.Subvert/{Xx,Yy}/{
-
-" vim-clang-format plugin.
-" nnoremap <leader>F :<C-u>ClangFormat<cr>
-" vnoremap <leader>F :ClangFormat<cr>
---]]
+-- vim-abolish plugin:
+-- Swap boolean values in selection or current line.
+vim.keymap.set("v", "<leader>b", ":Subvert/{true,false}/{false,true}<cr>:nohl<cr>", map_args)
+vim.keymap.set("n", "<leader>b", ":.Subvert/{true,false}/{false,true}<cr>:nohl<cr>", map_args)
+-- Some abbreviations I use produce template code with placeholder variables like `Xx`.
+vim.keymap.set("v", "<leader>2", ":Subvert/{Xx,Yy}/{", map_args)
+vim.keymap.set("n", "<leader>2", ":.Subvert/{Xx,Yy}/{", map_args)
 
 vim.keymap.set("n", "<F1>", "<nop>", map_args)
 
@@ -400,11 +423,6 @@ vim.keymap.set("v", ";;", '"_', map_args)
 -- System clipboard register (the one I use).
 vim.keymap.set("n", ";p", '"+', map_args)
 
--- Indent in visual and select mode automatically re-selects. I find it enough
--- to use the repeat key.
--- vim.keymap.set("v", ">", ">gv", map_args)
--- vim.keymap.set("v", "<", "<gv", map_args)
-
 -- By default ^ returns to the first non-whitespace character and 0 to the
 -- first character. Remapped because of how I happened to learn use one before
 -- the other. Mnemonic: # is left of $, and how in C/C++ `#macros` are often
@@ -433,8 +451,8 @@ vim.keymap.set("n", "K", "i<return><esc>", map_args)
 -- Often I want to yank text in visual mode, but accidentally hitting `u` instead of `y`.
 vim.keymap.set("v", "u", "<nop>", map_args)
 
--- Backwards search. Easier to just search forward and cycle matches the other
--- direction.
+-- Disable backwards search. It's more intuitive to always search forward
+-- and then cycle the matches forwards (`n`) or backwards (`N`).
 vim.keymap.set("n", "?", "<nop>", map_args)
 
 -- Never put single deleted characters into the unnamed register.
@@ -456,14 +474,13 @@ vim.keymap.set("n", "Q", vim.cmd.bdelete, map_args)
 -- Keep the cursor in place while joining lines
 vim.keymap.set("n", "J", "mzJ`z", map_args)
 
--- TODO escape character issues
 -- Generate curly brackets block and leave in insert mode inside. Could be more
 -- robust. I have mapped to keys like ¹²³ from alt-123….
--- vim.keymap.set("n", "¹",      ":.s/\s\+$//e<cr>:nohl<cr>A {<return>}<esc>O", map_args)
--- vim.keymap.set("i", "¹", "<esc>:.s/\s\+$//e<cr>:nohl<cr>A {<return>}<esc>O", map_args)
+vim.keymap.set("n", "¹",      [[:.s/\s\+$//e<cr>:nohl<cr>A {<return>}<esc>O]], map_args)
+vim.keymap.set("i", "¹", [[<esc>:.s/\s\+$//e<cr>:nohl<cr>A {<return>}<esc>O]], map_args)
 -- Rust `match` block.
--- vim.keymap.set("n", "²",      ":.s/\s\+$//e<cr>:nohl<cr>A => {<return>},<esc>O", map_args)
--- vim.keymap.set("i", "²", "<esc>:.s/\s\+$//e<cr>:nohl<cr>A => {<return>},<esc>O", map_args)
+vim.keymap.set("n", "²",      [[:.s/\s\+$//e<cr>:nohl<cr>A => {<return>},<esc>O]], map_args)
+vim.keymap.set("i", "²", [[<esc>:.s/\s\+$//e<cr>:nohl<cr>A => {<return>},<esc>O]], map_args)
 
 -- Normally <C-o> allows executing normal mode commands from insert mode, but I use <C-o> for
 -- opening files.
@@ -495,10 +512,6 @@ vim.keymap.set("n", "<C-n>", ":setlocal number!<cr>", map_args)
 -- Center after search.
 vim.keymap.set("n", "n", "nzz", map_args)
 vim.keymap.set("n", "N", "Nzz", map_args)
-
--- TODO Follow links and go back in help pages
--- au FileType help nnoremap <return> <C-]>
--- au FileType help nnoremap <backspace> <C-T>
 
 -- Misc
 
@@ -544,11 +557,53 @@ require('lualine').setup {
   }
 }
 
--- List of remaing plugins I used to use via pathogen.
+-- The .errorlines file consists of lines like "path/to/source_file.rs 123",
+-- created for example with my program `rust_error_lines`. So this function
+-- goes to the first or last error depending on `rev` and saves the list.
+-- NOTE vim has some feature called "quickfix list" that could maybe be used
+-- for the same purpose.
+vim.cmd[[
+
+function! OpenFirstErrorLine(rev)
+  let gitdir = finddir('.git/..', ';')
+  let errorfile = gitdir . "/.errorlines"
+  if !filereadable(errorfile)
+    return
+  endif
+
+  let g:error_lines = split(system("cat " . errorfile), '\n')
+  if empty(g:error_lines)
+    return
+  endif
+  if a:rev
+    call reverse(g:error_lines)
+  endif
+  let g:error_number = 0
+
+  call OpenErrorLine(gitdir)
+endfunction
+
+" Given previous call to OpenFirstErrorLine(), go to next (or previous error).
+function! OpenNextErrorLine(change)
+  let gitdir = finddir('.git/..', ';')
+  let errorfile = gitdir . "/.errorlines"
+  let g:error_number = g:error_number + a:change
+  call OpenErrorLine(gitdir)
+endfunction
+
+function! OpenErrorLine(gitdir)
+  if g:error_number >= len(g:error_lines)
+    return
+  endif
+  let line = g:error_lines[g:error_number]
+  let fname = split(line, " ")
+  execute "e " . a:gitdir . '/' . fname[0]
+  execute fname[1]
+endfunction
+
+]] -- vim.cmd
+
+-- List of remaining plugins I previously used via pathogen.
 -- fzf.vim
--- ron.vim
--- supertab
--- vim-abolish
 -- vim-cpp-modern
--- vim-glsl
 -- vim-localrc
