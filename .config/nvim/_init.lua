@@ -12,7 +12,6 @@ vim.opt.rtp:prepend(lazypath)
 vim.g.mapleader = ","
 
 require("lazy").setup({
-  -- opts = { rocks = { enabled = false } },
   spec = {
     {
       "folke/tokyonight.nvim",
@@ -64,10 +63,14 @@ require("lazy").setup({
     { "nvim-lualine/lualine.nvim" },
     { "ervandew/supertab" },
     { "tpope/vim-abolish" },
+    -- NOTE Need both but not installing a system package for `fzf`(?).
+    { "junegunn/fzf" },
+    {
+      "ibhagwan/fzf-lua",
+      config = function() require("fzf-lua").setup({}) end
+    },
   },
 })
-
-vim.cmd("colorscheme tokyonight-moon")
 
 vim.opt.guicursor = "" -- Show block cursor also in insert mode.
 vim.opt.number = true
@@ -405,8 +408,8 @@ vim.keymap.set("v", "<C-g>", "<nop>", map_args)
 
 -- Colon commands are common so put them behind the easier to type '.' and
 -- remap the repeat/repetition key. `\` is normally the leader key.
-vim.keymap.set("n", ":", "<nop>", map_args)
-vim.keymap.set("v", ":", "<nop>", map_args)
+-- vim.keymap.set("n", ":", "<nop>", map_args) -- Setting these to <nop> breaks abbreviations that use `:`.
+-- vim.keymap.set("v", ":", "<nop>", map_args)
 vim.keymap.set("n", ".", ":", { noremap = true })
 vim.keymap.set("v", ".", ":", { noremap = true })
 vim.keymap.set("n", "\\", ".", map_args)
@@ -484,7 +487,7 @@ vim.keymap.set("i", "²", [[<esc>:.s/\s\+$//e<cr>:nohl<cr>A => {<return>},<esc>O
 
 -- Normally <C-o> allows executing normal mode commands from insert mode, but I use <C-o> for
 -- opening files.
-vim.keymap.set("i", "<C-i>", "<C-o>", map_args)
+-- vim.keymap.set("i", "<C-i>", "<C-o>", map_args)
 
 -- Move individual lines up and down. I use this all the time. Especially handy
 -- with `J` (join) and `K` (split; a custom command defined in this file).
@@ -504,7 +507,9 @@ vim.keymap.set("v", "<C-e>", ":s/", map_args)
 vim.keymap.set("n", "<C-s>", ":%Subvert/", map_args)
 vim.keymap.set("v", "<C-s>", ":Subvert/", map_args)
 
-vim.keymap.set("n", "<C-o>", ":call GitOpen()<cr>", map_args)
+-- Shows a UI to open a file from the current git repository, where
+-- the selection is made by fuzzy finding on the file names.
+vim.keymap.set("n", "<C-o>", ":FzfLua git_files --others --exclude-standard --cached<cr>", map_args)
 
 -- Toggle line numbers.
 vim.keymap.set("n", "<C-n>", ":setlocal number!<cr>", map_args)
@@ -513,8 +518,7 @@ vim.keymap.set("n", "<C-n>", ":setlocal number!<cr>", map_args)
 vim.keymap.set("n", "n", "nzz", map_args)
 vim.keymap.set("n", "N", "Nzz", map_args)
 
--- Misc
-
+-- When yanking text, briefly highlight in color the region that was copied.
 vim.api.nvim_create_augroup("YankHighlight", { clear = true })
 vim.api.nvim_create_autocmd("TextYankPost", {
   group = "YankHighlight",
@@ -557,13 +561,13 @@ require('lualine').setup {
   }
 }
 
--- The .errorlines file consists of lines like "path/to/source_file.rs 123",
--- created for example with my program `rust_error_lines`. So this function
--- goes to the first or last error depending on `rev` and saves the list.
--- NOTE vim has some feature called "quickfix list" that could maybe be used
--- for the same purpose.
 vim.cmd[[
 
+" The .errorlines file consists of lines like "path/to/source_file.rs 123",
+" created for example with my program `rust_error_lines`. So this function
+" goes to the first or last error depending on `rev` and saves the list.
+" NOTE vim has some feature called "quickfix list" that could maybe be used
+" for the same purpose.
 function! OpenFirstErrorLine(rev)
   let gitdir = finddir('.git/..', ';')
   let errorfile = gitdir . "/.errorlines"
@@ -603,7 +607,67 @@ endfunction
 
 ]] -- vim.cmd
 
+augroup('Abbreviations', function(g)
+  aucmd('FileType', {
+    group = g,
+    callback = function()
+      if vim.bo.filetype == "rust" then
+        vim.cmd[[
+          iabbrev mutvec let mut vec = vec![];
+
+          iabbrev debugx #[cfg(debug_assertions)]
+          iabbrev derivex #[derive()]
+          iabbrev derives #[derive(Clone, Copy, Debug, PartialEq)]
+          iabbrev allowx #[allow(dead_code, unused_variables)]
+          iabbrev attrx #[cfg_attr(test, derive(Clone))]
+          iabbrev deprecatedx #[deprecated(note = "")]
+          iabbrev forx for i in 0...len()
+          iabbrev clippyx #![allow(clippy::clone_on_copy)]
+          iabbrev contextx .with_context(fformat!("to_do_something."))?
+
+          iabbrev formatx format!("{:?}", )
+          iabbrev warnx warn!("{}: ", function!());
+          iabbrev enume for (i, item) in data.iter().enumerate()
+          iabbrev enumx <esc>:read ~/dotfiles/code-templates/rust/enum.rs<cr>
+          iabbrev defaultx <esc>:read ~/dotfiles/code-templates/rust/default.rs<cr>
+          iabbrev iterx <esc>:read ~/dotfiles/code-templates/rust/iter.rs<cr>
+          iabbrev iteratorx <esc>:read ~/dotfiles/code-templates/rust/iter.rs<cr>
+          iabbrev matchx <esc>:read ~/dotfiles/code-templates/rust/match.rs<cr>
+          iabbrev implx <esc>:read ~/dotfiles/code-templates/rust/impl.rs<cr>
+          iabbrev fromx <esc>:read ~/dotfiles/code-templates/rust/from.rs<cr>
+          iabbrev testx <esc>:read ~/dotfiles/code-templates/rust/test.rs<cr>
+
+          " Override /usr/share/nvim/runtime/indent/rust.vim
+          " Try removing after neovim 0.10 release.
+          set cinoptions=l1,g0,+s,N-s,E-s,(s,k2s,U1,m1
+        ]]
+      elseif vim.bo.filetype == "cpp" or vim.bo.filetype == "hpp" then
+        vim.cmd[[
+          iabbrev cout std::cout << << std::endl
+          iabbrev printf printf("%\n");
+          iabbrev logx log_debug("%");
+          iabbrev warnx log_warn("%");
+          iabbrev forx for (size_t i = 0; i < ; ++i)
+          iabbrev forax for (const auto &y : ys)
+          iabbrev forsx for (const std::string &y : ys)
+          iabbrev infx std::numeric_limits<float>::infinity()
+          iabbrev infinityx std::numeric_limits<float>::infinity()
+        ]]
+      elseif vim.bo.filetype == "python" then
+        vim.cmd[[
+          iabbrev mainx <c-o>:read ~/dotfiles/code-templates/python/main.py<cr>
+          iabbrev csvx <c-o>:read ~/dotfiles/code-templates/python/readCsv.py<cr>
+          iabbrev jsonx <c-o>:read ~/dotfiles/code-templates/python/readJson.py<cr>
+          iabbrev jsonlx <c-o>:read ~/dotfiles/code-templates/python/readJsonl.py<cr>
+          iabbrev walkfiles <c-o>:read ~/dotfiles/code-templates/python/walkFiles.py<cr>
+          iabbrev walkfolders <c-o>:read ~/dotfiles/code-templates/python/walkFolders.py<cr>
+          iabbrev sluprx <c-o>:read ~/dotfiles/code-templates/python/slurp.py<cr>
+        ]]
+      end
+    end
+  })
+end)
+
 -- List of remaining plugins I previously used via pathogen.
--- fzf.vim
 -- vim-cpp-modern
 -- vim-localrc
