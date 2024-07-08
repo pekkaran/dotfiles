@@ -11,6 +11,9 @@ vim.opt.rtp:prepend(lazypath)
 -- Must set maploaders before lazy.nvim setup().
 vim.g.mapleader = ","
 
+-- Seems like this needs to be set before loading "ale". Maybe other options are similar?
+vim.g.ale_completion_enabled = 1
+
 require("lazy").setup({
   spec = {
     {
@@ -38,12 +41,6 @@ require("lazy").setup({
         vim.g.ale_set_signs = 0 -- Do not show the gutter.
         -- Example, looks like could be useful.
         -- vim.g.ale_rust_ignore_error_codes = ['E0432', 'E0433']
-
-        -- Not really sure how this should be set with Supertab or
-        -- similar in use. But this combination with Supertab
-        -- enabled seems to give 'smart' completion with fallback
-        -- for simple 'existing word in the buffer'.
-        vim.g.ale_completion_enabled = 1
 
         -- Already handled by other tools.
         vim.g.ale_warn_about_trailing_whitespace = 0
