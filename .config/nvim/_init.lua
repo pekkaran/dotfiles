@@ -111,7 +111,8 @@ vim.opt.clipboard:append("unnamedplus") -- Yanks and deletes additionally go to 
 vim.opt.breakindent = true -- Show soft-wrapped text with leading indent.
 vim.opt.undolevels = 1000 -- Remember this many changes.
 vim.opt.mouse = "" -- Disable mouse support.
-vim.opt.tags = ".tags" -- filename for ctags file
+-- The tags filename is non-default ".tags", and the rest of the string ";/" makes vim search a tags file from all parent directories until one is found.
+vim.opt.tags = ".tags;/"
 -- Indenting. Plugins like `editorconfig` will override these.
 vim.opt.tabstop = 4
 vim.opt.shiftwidth = 4
