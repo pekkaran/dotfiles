@@ -243,24 +243,26 @@ end)
 local map_args = { noremap = true, silent = true }
 
 local function clearJunk()
+  -- Delete all `esearch` buffers.
   for _, buf in ipairs(vim.api.nvim_list_bufs()) do
-    -- Delete all `esearch` buffers.
     local buf_name = vim.api.nvim_buf_get_name(buf)
     if buf_name:match("Search ‹") then
       vim.api.nvim_buf_delete(buf, { force = true })
     end
-    -- Delete all `netrw` buffers.
+  end
+  -- Delete all `netrw` buffers.
+  for _, buf in ipairs(vim.api.nvim_list_bufs()) do
     local filetype = vim.api.nvim_buf_get_option(buf, 'filetype')
     if filetype == "netrw" then
       vim.api.nvim_buf_delete(buf, { force = true })
     end
-
-    -- Clear various visual effects.
-    vim.cmd.nohl()
-    -- vim.cmd.cexpr()
-    vim.cmd.cclose()
-    vim.cmd.echo()
   end
+
+  -- Clear various visual effects.
+  vim.cmd.nohl()
+  -- vim.cmd.cexpr()
+  vim.cmd.cclose()
+  vim.cmd.echo()
 end
 vim.keymap.set("n", "<space>", clearJunk, map_args)
 
