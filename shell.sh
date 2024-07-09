@@ -68,6 +68,7 @@ alias sxiv='sxiv -a -s f' # play animations, scale fit
 alias feh='feh -FZx' # full screen, auto-zoom, borderless
 alias mp='\ncmpcpp' # [m]usic [p]layer
 alias mpv_fix_mono='mpv --audio-channels=1'
+alias mpv2='\mpv --vo=vdpau' # This fixed some video playback issue when using the default --vo=gpu.
 for i in $(seq 1 4); do
   alias ims$i="find . -maxdepth $i | grep -iE \"gif|png|jpg|jpeg\" | sort | sxiv -i"
   alias vids$i="find . -maxdepth $i | grep -iE \"gif|png|jpg|jpeg|mkv|mp4|avi|mov|webm\" | sort | mpv --playlist=-"
@@ -361,6 +362,20 @@ function play() {
   mpc clear
   mpc search title "$*" | mpc add
   mpc play
+}
+
+# Paranoid about making typos, avoid typing `rm -rf` to remove a git repository.
+function rmgit() {
+  if [ $# -ne 1 ]; then
+    echo "Usage: gitrm <dir>"
+    return
+  fi
+
+  if [ -d "$1/.git" ]; then
+    rm -rf "$1/.git" && rm -r "$1"
+  else
+    echo "Not a git repository."
+  fi
 }
 
 # Modern kids might instead call this "YOLO".
