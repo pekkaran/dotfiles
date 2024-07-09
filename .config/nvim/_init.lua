@@ -60,6 +60,7 @@ require("lazy").setup({
     { "nvim-lualine/lualine.nvim" },
     { "ervandew/supertab" },
     { "tpope/vim-abolish" },
+    { "tomtom/tcomment_vim" },
     -- NOTE Need both but not installing a system package for `fzf`(?).
     { "junegunn/fzf" },
     {
