@@ -1,3 +1,5 @@
+" NOTE Deprecated and unused. Replaced with .config/nvim/init.lua
+"
 " Configuration for vim and neovim.
 "
 " * In vim, press right to open a fold, use `zR` to open all the folds.
