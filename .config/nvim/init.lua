@@ -61,11 +61,23 @@ require("lazy").setup({
     { "ervandew/supertab" },
     { "tpope/vim-abolish" },
     { "tomtom/tcomment_vim" },
-    -- NOTE Need both but not installing a system package for `fzf`(?).
+    -- NOTE Need both `fzf` and `fzf-lua`, but not to install a system package for `fzf`(?).
     { "junegunn/fzf" },
     {
       "ibhagwan/fzf-lua",
-      config = function() require("fzf-lua").setup({}) end
+      config = function() require("fzf-lua").setup({
+        winopts = {
+          fullscreen = true,
+          border = "single",
+          preview = {
+            horizontal = 'right:50%',
+            winopts = {
+              number = false,
+              cursorline = false,
+            },
+          },
+        }
+      }) end
     },
   },
 })
