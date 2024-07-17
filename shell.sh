@@ -57,9 +57,8 @@ alias ssha='ssh-add -t 150000 $(find ~/.ssh | grep id | grep -v pub)'
 alias info='\info --vi-keys'
 alias uusb='devmon -u' # unmount everything mounted by devmon (included in udevil)
 alias gnutime="/usr/bin/time -f 'user: %U, sys: %S, percentage: %P, wall %e'"
-# `gr myprogram --myargs` will run until crash, print backtrace and exit.
-alias gr='gdb --ex run --ex bt -ex="set confirm off" --ex quit --args'
-# Prepend with video file to exactly compute the number of frames in it.
+# `gr myprogram --myargs` will run until crash, print backtrace and exit. There is also `--batch` option but it does not print in color(?).
+alias gr='gdb --ex run --ex bt -ex="set confirm off" --iex "set pagination off" --ex quit --args'
 alias packets='ffprobe -v error -select_streams v:0 -count_packets -show_entries stream=nb_read_packets -of csv=p=0'
 
 # Media
