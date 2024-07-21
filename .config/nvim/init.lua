@@ -130,6 +130,8 @@ vim.opt.autoindent = true
 vim.opt.shiftround = true -- Round indent to multiple of shiftwidth when using < and >.
 vim.opt.smarttab = true -- Insert blanks according to shiftwidth.
 
+vim.g.netrw_browse_split = 4 -- When opening a file from netrw split, show it in the original split.
+
 -- C/C++ formatoptions
 vim.opt.formatoptions:append("2") -- Use paragraph second line indent
 vim.opt.formatoptions:append("1") -- Try not to break lines after one letter words. For stuff like 'I think' or 'a thing'?
@@ -676,10 +678,22 @@ augroup('Abbreviations', function(g)
           iabbrev walkfolders <c-o>:read ~/dotfiles/code-templates/python/walkFolders.py<cr>
           iabbrev sluprx <c-o>:read ~/dotfiles/code-templates/python/slurp.py<cr>
         ]]
+      else
+        vim.cmd[[
+          iabbrev update! <C-r>=strftime('— Update `%Y_%m_%d`:')<cr>
+        ]]
       end
     end
   })
 end)
+
+-- Experimental. Default to markdown.
+vim.cmd [[
+  augroup MarkdownFallback
+    autocmd!
+    autocmd BufRead,BufNewFile * if &ft == '' | set filetype=markdown | endif
+  augroup END
+]]
 
 -- List of remaining plugins I previously used via pathogen.
 -- vim-cpp-modern
