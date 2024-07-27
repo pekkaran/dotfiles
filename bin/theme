@@ -1,0 +1,85 @@
+#!/usr/bin/env python3
+
+"""Manage basic theme settings for multiple programs simultaneously."""
+
+import json
+import pathlib
+import shutil
+
+CONFIGURATION_PATH = pathlib.Path.home() / ".theme.json"
+THEMES_PATH = pathlib.Path.home() / "dotfiles" / "themes"
+
+ALACRITTY_PATH = pathlib.Path.home() / ".alacritty.toml"
+
+ALACRITTY_THEMES = {
+    "light": ".alacritty-tokyo-day.toml",
+    "dark": ".alacritty-tokyo-moon.toml",
+    "pink": ".alacritty-pink.toml",
+}
+
+DEFAULT_CONFIG = {
+    "theme": "dark",
+    "fontSize": 10,
+    "font": "DM Mono",
+}
+
+def readJson(filePath):
+  with open(filePath) as f:
+    return json.load(f)
+
+def slurpFile(filePath):
+  with open(filePath) as f:
+    return f.read()
+
+def tryReplaceThemeFile(inputName, outputPath):
+  inputPath = THEMES_PATH / inputName
+  if not inputPath.exists():
+     print("Could not find `{}`", str(inputPath))
+     return False
+  shutil.copyfile(inputPath, outputPath)
+  return True
+
+def generateAlacrittyConfig(config):
+  theme = config["theme"]
+  if not theme in ALACRITTY_THEMES: return
+  fileName = ALACRITTY_THEMES[theme]
+  if not tryReplaceThemeFile(fileName, ALACRITTY_PATH): return
+  alacritty_config = slurpFile(ALACRITTY_PATH)
+
+  with open(ALACRITTY_PATH, "a") as f:
+    # Not bothering to parse TOML to avoid dependencies.
+    if not "[font]" in alacritty_config:
+      fontSize = config["fontSize"]
+      f.write(f"\n[font]\nsize = {fontSize}\n")
+    if not "[font.normal]" in alacritty_config:
+      font = config["font"]
+      f.write(f"\n[font.normal]\nfamily = \"{font}\"\n")
+
+def main(args):
+  config = DEFAULT_CONFIG
+  try: config = readJson(CONFIGURATION_PATH)
+  except: pass
+
+  if args.theme: config["theme"] = args.theme
+  elif args.toggleTheme:
+    config["theme"] = "light" if config["theme"] == "dark" else "dark"
+
+  if args.font: config["font"] = args.font
+  if args.fontSize: config["fontSize"] = args.fontSize
+
+  # Currently only generate Alacritty config, but we can also read the theme.json
+  # file directly in some programs such as vim.
+  generateAlacrittyConfig(config)
+
+  with open(CONFIGURATION_PATH, "w") as f:
+    f.write(json.dumps(config, indent=4))
+
+if __name__ == "__main__":
+  import argparse
+  p = argparse.ArgumentParser(__doc__)
+  p.add_argument("--theme", help="`dark` or `light`")
+  p.add_argument("--toggleTheme", action="store_true")
+  p.add_argument("--font")
+  p.add_argument("--fontSize", type=int)
+  args = p.parse_args()
+  main(args)
