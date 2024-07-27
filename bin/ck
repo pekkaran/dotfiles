@@ -50,6 +50,8 @@ if type filter-rustc > /dev/null 2>&1; then
     echo "$messages" | filter-rustc --debug
   elif [ "$debug" == "disable" ]; then
     echo "$messages" | filter-rustc --disable
+  elif [ "$debug" == "raw" ]; then
+    echo "$messages" | filter-rustc
   else
     messages=$(echo "$messages" | filter-rustc)
   fi
