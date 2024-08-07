@@ -82,6 +82,8 @@ require("lazy").setup({
   },
 })
 
+vim.opt.backup = false
+vim.opt.swapfile = false
 vim.opt.guicursor = "" -- Show block cursor also in insert mode.
 vim.opt.number = true
 vim.opt.incsearch = true -- Search while typing.
