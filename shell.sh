@@ -32,7 +32,7 @@ alias mv='\mv -i' # prompt before overwriting
 alias chx='chmod +x'
 alias fs='du -shD' # size of file or folder. s:summarize, h:human_readable, D=dereference_links
 alias df='df -hT' # Show file system space usage in human readabale format.
-alias lf='du -shx * | sort -h' # find large directories/files in current folder. Btw, if /var is filling /, then you probably forgot to run `pacman -Sc` for a year.
+alias lf='du -shx {.*,*} | sort -h' # find large directories/files in current folder. Btw, if /var is filling /, then you probably forgot to run `pacman -Sc` for a year.
 
 # Searching. "rg" is a "grep" replacement
 # -i: ignore case
