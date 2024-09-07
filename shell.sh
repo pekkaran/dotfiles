@@ -179,6 +179,7 @@ alias cr='cargo run --'
 # --tests: Do not run doc tests etc.
 # --nocapture: Show prints from tests.
 alias ct='cargo test --tests -- --nocapture'
+alias cn='cargo nextest run' # --nocapture makes too verbose
 alias cbr='cargo build --release'
 alias crr='cargo run --release --'
 # `cargo install cargo-deps`. `dot` is in the graphviz package.
