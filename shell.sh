@@ -146,7 +146,9 @@ function ce() {
   git commit -a -m "e"
 }
 # List branches recently committed to.
-alias recent='git for-each-ref --sort=-committerdate refs/heads/ | head -n 20'
+alias recent='git branch -a --sort=-committerdate | grep -v remotes/ | head -n 20'
+alias recent-remote='git branch -a --sort=-committerdate | grep remotes/ | head -n 20'
+# alias recent-alt='git for-each-ref --sort=-committerdate refs/heads/ | head -n 20'
 
 ## Pacman
 # Use the English locale in case of something goes wrong. Capital first letter indicates sudo use.
