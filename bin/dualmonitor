@@ -1,5 +1,5 @@
 #!/bin/bash
 # Setup for monitors at home. Right vertical. Run by `.i3/config`.
 
-xrandr --output HDMI-0 --primary --output DP-0 --auto --rotation left --right-of HDMI-0
+xrandr --output HDMI-0 --primary --output DP-0 --auto --rotation left --left-of HDMI-0
 random_wallpaper
