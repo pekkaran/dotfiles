@@ -9,7 +9,7 @@ set -euo pipefail
 THREADS=$(($(nproc) / 2))
 
 if [[ ! $(git rev-parse --is-inside-work-tree) = true ]]; then
-  echo "The script only works inside git repositories."
+  make -j "$THREADS"
   exit
 fi
 
