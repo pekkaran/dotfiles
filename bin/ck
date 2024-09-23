@@ -57,10 +57,14 @@ if type filter-rustc > /dev/null 2>&1; then
   fi
 fi
 
+# Running `ck test` when `cargo test` succeeds compiling may print something like
+# "running 3 tests" instead of JSON. This is a hacky way to abort further processing.
+if [[ $messages =~ "ENTERING PASSTHROUGH MODE" ]]; then
+  echo "$messages"
+  exit
+fi
+
 # Discard (lots of) top level data that we are not interested in.
-#
-# NOTE This may currently fail with `ck test` when cargo test succeeds compiling and
-# prints something like "running 3 tests" instead of JSON.
 messages=$(echo "$messages" | jq 'select(.reason=="compiler-message")')
 
 # Print to the terminal using colors.
