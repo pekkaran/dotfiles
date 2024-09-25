@@ -1,0 +1,39 @@
+## .bashrc
+
+# Check for an interactive session
+[ -z "$PS1" ] && return
+
+# Prompt
+if [ "$(id -u)" == "0" ]; then
+  export PS1='\[\e[0;31m\]\W\$\[\e[0m\] ' # red for root
+else
+  export PS1='\[\e[0;36m\]\W\$\[\e[0m\] ' # cyan for normal user
+fi
+
+PATH="$PATH:$HOME/dotfiles/bin"
+PATH="$PATH:$HOME/secrets/bin"
+PATH="$PATH:$HOME/bin"
+
+source "$HOME/dotfiles/shell.sh"
+source /usr/share/git/completion/git-completion.bash
+. "$HOME/.cargo/env"
+
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+__conda_setup="$('/home/toki/miniforge3/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
+if [ $? -eq 0 ]; then
+    eval "$__conda_setup"
+else
+    if [ -f "/home/toki/miniforge3/etc/profile.d/conda.sh" ]; then
+        . "/home/toki/miniforge3/etc/profile.d/conda.sh"
+    else
+        export PATH="/home/toki/miniforge3/bin:$PATH"
+    fi
+fi
+unset __conda_setup
+
+if [ -f "/home/toki/miniforge3/etc/profile.d/mamba.sh" ]; then
+    . "/home/toki/miniforge3/etc/profile.d/mamba.sh"
+fi
+# <<< conda initialize <<<
+
