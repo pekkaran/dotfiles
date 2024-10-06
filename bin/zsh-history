@@ -1,0 +1,31 @@
+#!/usr/bin/env python3
+
+import datetime
+import os
+
+HISTORY_FILE_PATH = os.path.expanduser('~/.zsh_history')
+
+def color(s):
+  return f"\x1b[32m{str(s)}\x1b[0m"
+
+def main():
+  with open(HISTORY_FILE_PATH, 'r') as f:
+    current_day = None
+    for line in f:
+      if not line.startswith(": "): continue
+      timestamp_str, command = line[2:].split(';', 1)
+
+      timestamp = int(timestamp_str.split(':')[0])
+      dt = datetime.datetime.fromtimestamp(timestamp)
+      readable_time = color(dt.strftime('%H:%M:%S'))
+
+      day = dt.strftime('%Y_%m_%d')
+      if day != current_day:
+        line = color("-" * 25)
+        print(f"{line} {day} {line}")
+        current_day = day
+
+      print(f"[{readable_time}]   {command.strip()}")
+
+if __name__ == "__main__":
+  main()
