@@ -1,7 +1,10 @@
 #!/bin/sh
 i3status | while :
 do
-  playing=$(mpc current)
+  playing="Install mpc"
+  if type mpc > /dev/null 2>&1; then
+    playing="$(mpc current)"
+  fi
   read line
-  echo "$playing | $line" || exit 1
+  echo "${playing} | ${line}" || exit 1
 done
