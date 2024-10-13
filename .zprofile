@@ -22,11 +22,9 @@ fi
 
 # Automatically startx on the first virtual terminal. Test a named file exists
 # in my experience all kinds of autologins are dangerous on new, partially
-# broken installs. Also sleep to give time to hit Ctrl-C.
-if [[ -f "$HOME/.auto-startx" ]]; then
-  echo "sleeping\n"
+# broken installs.
+if [[ -f "$HOME/.auto-startx" && -z $DISPLAY && $XDG_VTNR -eq 1 ]]; then
+  echo "Sleeping for 3 seconds before starting X. Hit Ctrl-C to abort.\n"
   sleep 3
-  [[ -z $DISPLAY && $XDG_VTNR -eq 1 ]] && exec startx
+  exec startx
 fi
-
-# TODO Move?
