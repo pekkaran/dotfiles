@@ -2,7 +2,7 @@
 
 main() {
   if type nvim > /dev/null 2>&1; then
-    \nvim -d "$@"
+    \nvim -u $HOME/dotfiles/.config/nvim/init.lua -d "$@"
   else
     \vim -d "$@"
   fi
