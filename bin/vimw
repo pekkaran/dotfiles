@@ -6,12 +6,7 @@ if [ $# -eq 0 ]; then
   exit 0
 fi
 
-VIM=vim
-if type nvim > /dev/null 2>&1; then
-  VIM=nvim
-fi
-
 set -e
 path=$(which $1)
 
-$VIM "$path"
+vim "$path"
