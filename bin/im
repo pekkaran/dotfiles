@@ -1,0 +1,16 @@
+#!/bin/bash
+
+main() {
+  if type nsxiv > /dev/null 2>&1; then
+    nsxiv -a -f -s f "$@"
+  elif type sxiv > /dev/null 2>&1; then
+    echo "Falling back to sxiv."
+    sxiv -a -f -s f "$@"
+  elif type feh > /dev/null 2>&1; then
+    echo "Falling back to feh."
+    feh -FZx "$@"
+  else
+    echo "Failed to find a supported image viewer."
+  fi
+}
+main "$@"

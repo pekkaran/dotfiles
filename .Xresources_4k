@@ -8,3 +8,7 @@ Xft.dpi: 192
 ! Xft.hinting: 1
 ! Xft.antialias: 1
 ! Xft.rgba: rgb
+
+! nsxiv:
+Nsxiv.bar.background: #000000
+Nsxiv.bar.foreground: #FFFFFF
