@@ -52,6 +52,11 @@ parser.add_argument("src_files",
                     nargs="+",
                     help="The file(s) to rename.")
 
+parser.add_argument("--ln",
+                    action="store_true",
+                    default=False,
+                    help="Create symlinks instead of renaming.")
+
 parser.add_argument("-n", "--no",
                     action="store_true",
                     default=False,
@@ -132,7 +137,11 @@ for src, dst in pairs:
     unchanged += 1
     continue
   sys.stderr.write("%s -> %s\n" % (src, dst))
-  if not args.no:
+  if args.no:
+    pass
+  elif args.ln:
+    subprocess.call(f"ln -s \"{src}\" \"{dst}\"", shell=True)
+  else:
     shutil.move(src, dst)
 
 if unchanged:
