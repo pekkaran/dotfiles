@@ -4,7 +4,7 @@ main() {
   if type fdfind > /dev/null 2>&1; then
     \fdfind -H "$@"
   else
-    \fd -H "$@"
+    /usr/bin/fd -H "$@"
   fi
 }
 main "$@"
