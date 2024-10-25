@@ -40,15 +40,10 @@ alias rg='\rg -i --hidden'
 alias rgi='\rg --hidden'
 alias rgl='\rg -li' # Print filenames of matches instead.
 
-# "fd" is a "find" replacement.
+# "fd" is a "find" replacement. The binary name is different in some distros.
 if type fdfind > /dev/null 2>&1; then
-  # The binary name is different in some distros.
-  alias fd='\fdfind -H'
-  alias fdi='\fdfind -H -I'
   alias lf='\fdfind -H -I -d 1 -X du -shx | sort -h'
 else
-  alias fd='\fd -H' # -H include hidden files
-  alias fdi='\fd -H -I' # -I do not skip ignore files
   alias lf='\fd -H -I -d 1 -X du -shx | sort -h' # find large directories/files in current folder. Btw, if /var is filling /, then you probably forgot to run `pacman -Sc` for a year.
 fi
 
