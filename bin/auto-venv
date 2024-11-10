@@ -1,0 +1,34 @@
+#!/usr/bin/env python3
+#
+# TODO Just a sketch, unfinished!
+#
+# Usage (idea):
+#   mv random-python-script-I-just-downloaded.py xyz.py
+#   auto-venv xyz.py
+#
+# Does automatic setup and prints:
+#   source ~/dev/ai/venv/xyz/bin/activate && python path/to/xyz.py
+#
+# Then you run that command.
+
+def setupVenv(dependencies: list[str]):
+    import pathlib, re
+    if not dependencies: return
+    m = re.search("(/home/.+/dev/.+?)/", __file__)
+    if not m: return
+    p = pathlib.Path(m.group(1)) / "venv" / pathlib.Path(__file__).stem
+    if not p.exists():
+        subprocess.run(f"python -m venv {p}", shell=True)
+        subprocess.run("pip install {}".format(" ".join(dependencies)), shell=True)
+    subprocess.run(f"source {p}/bin/activate", shell=True)
+    out = subprocess.check_output("pip list", shell=True).decode('utf-8').strip()
+
+def main(args):
+    pass
+
+if __name__ == "__main__":
+    import argparse
+    p = argparse.ArgumentParser(__doc__)
+    p.add_argument("scriptPath", type=pathlib.Path)
+    args = p.parse_args()
+    main(args)
