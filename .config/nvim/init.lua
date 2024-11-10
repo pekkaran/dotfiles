@@ -675,9 +675,8 @@ augroup('Abbreviations', function(g)
           iabbrev mainx <c-o>:read ~/dotfiles/code-templates/python/main.py<cr>
           iabbrev csvx <c-o>:read ~/dotfiles/code-templates/python/readCsv.py<cr>
           iabbrev jsonx <c-o>:read ~/dotfiles/code-templates/python/readJson.py<cr>
-          iabbrev jsonlx <c-o>:read ~/dotfiles/code-templates/python/readJsonl.py<cr>
-          iabbrev walkfiles <c-o>:read ~/dotfiles/code-templates/python/walkFiles.py<cr>
-          iabbrev walkfolders <c-o>:read ~/dotfiles/code-templates/python/walkFolders.py<cr>
+          iabbrev jsonlx <c-o>:read ~/dotfiles/code-templates/python/readJson.py<cr>
+          iabbrev walkx <c-o>:read ~/dotfiles/code-templates/python/walk.py<cr>
           iabbrev sluprx <c-o>:read ~/dotfiles/code-templates/python/slurp.py<cr>
         ]]
       else
@@ -696,6 +695,13 @@ vim.cmd [[
     autocmd BufRead,BufNewFile * if &ft == '' | set filetype=markdown | endif
   augroup END
 ]]
+
+aucmd("FileType", {
+  pattern = "txt",
+  callback = function()
+    vim.opt_local.commentstring = "//%s"
+  end,
+})
 
 -- List of remaining plugins I previously used via pathogen.
 -- vim-cpp-modern
