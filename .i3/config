@@ -143,8 +143,6 @@ for_window [class="^.*"] border pixel 0
 
 for_window [class=".*Steam.*"] floating enable
 for_window [class="mpv"] floating enable
-for_window [class="feh"] floating enable
-for_window [class="sxiv"] floating enable
 for_window [class=".*Wine.*"] floating enable
 for_window [class="Matplotlib"] floating enable
 
@@ -208,6 +206,7 @@ bindsym $mod+Shift+d exec TERM_CMD=$TERM dmenu_term_run
 bindsym $mod+d exec dmenu_run
 
 # Send signals to a "coding server".
+# `pacman -S openbsd-netcat` (the other netcats do not work here).
 bindsym $mod+m exec echo '0' | nc -U /tmp/wall-socket -q 0
 bindsym $mod+n exec echo '1' | nc -U /tmp/wall-socket -q 0
 bindsym $mod+b exec echo '2' | nc -U /tmp/wall-socket -q 0
