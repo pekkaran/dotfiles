@@ -12,7 +12,7 @@ main() {
   cargo watch \
     --clear \
     --ignore .errorlines \
-    --watch "$(git rev-parse --show-toplevel)" \
     --shell "ck $@"
 }
+    # --watch "$(git rev-parse --show-toplevel)" \
 main "$@"
