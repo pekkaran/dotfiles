@@ -1,7 +1,12 @@
 import os
+import pathlib
 
-def walkFiles(folderPath):
-    for (folderPath, folderNames, fileNames) in os.walk(folderPath):
+def walkFiles(path: pathlib.Path):
+    if not path.exists():
+        raise Exception(f"No such path `{str(path)}`.")
+    if path.is_file():
+        yield path.name
+    for (folderPath, folderNames, fileNames) in os.walk(path):
         fileNames.sort()
         for fileName in fileNames:
             yield fileName
