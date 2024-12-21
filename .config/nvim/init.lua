@@ -308,7 +308,7 @@ vim.keymap.set("n", "<leader><leader>", "Gzz", map_args)
 -- Open netrw split on the right side.
 vim.keymap.set("n", "<leader>n", ":Vexplore!<cr>", map_args)
 
-local function set_keymaps_rust()
+function set_keymaps_rust()
   vim.keymap.set("n", "<leader>j", "<Plug>(ale_go_to_definition)", map_args)
   vim.keymap.set("n", "<leader>k", "<Plug>(ale_previous)", map_args)
   vim.keymap.set("n", "<leader>h", "<Plug>(ale_hover)", map_args)
