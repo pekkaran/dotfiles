@@ -9,7 +9,7 @@ def color(s):
   return f"\x1b[32m{str(s)}\x1b[0m"
 
 def main():
-  with open(HISTORY_FILE_PATH, 'r') as f:
+  with open(HISTORY_FILE_PATH, 'r', encoding="utf8", errors='ignore') as f:
     current_day = None
     for line in f:
       if not line.startswith(": "): continue
@@ -21,8 +21,11 @@ def main():
 
       day = dt.strftime('%Y_%m_%d')
       if day != current_day:
-        line = color("-" * 25)
-        print(f"{line} {day} {line}")
+        up_line = color("^" * 25)
+        down_line = color("v" * 25)
+        if current_day is not None:
+          print(f"{up_line} {current_day} {up_line}")
+        print(f"{down_line} {day} {down_line}")
         current_day = day
 
       print(f"[{readable_time}]   {command.strip()}")
