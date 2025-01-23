@@ -64,9 +64,11 @@ alias feh='echo "use im instead"'
 alias mp='\ncmpcpp' # [m]usic [p]layer
 alias mpv_fix_mono='mpv --audio-channels=1'
 alias mpv2='\mpv --vo=vdpau' # This fixed some video playback issue when using the default --vo=gpu.
+alias jj='cd "$(fd . -t d -d 4 | fzf)"'
 for i in $(seq 1 4); do
   alias ims$i="find . -maxdepth $i | grep -iE \"gif|png|jpg|jpeg\" | sort | im -i"
   alias vids$i="find . -maxdepth $i | grep -iE \"gif|png|jpg|jpeg|mkv|mp4|avi|mov|webm\" | sort | mpv --playlist=-"
+  alias j$i='cd "$(fd . -t d -d $i | fzf)"'
 done
 alias ims='ims1'
 alias vids='vids1'
