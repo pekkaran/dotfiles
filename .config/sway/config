@@ -216,6 +216,10 @@ input "type:keyboard" {
   xkb_file $HOME/.xkb/keymap/xkbmap_us_custom
 }
 
+input "1133:50498:Logitech_Wireless_Receiver_Mouse" {
+  pointer_accel -0.4
+}
+
 # Start programs.
 exec --no-startup-id i3-msg 'workspace 1; exec firefox'
 assign [class="firefox"] 1
@@ -226,6 +230,7 @@ exec dunst
 exec mpd
 exec unclutter
 exec devmon
+exec gammastep
 # exec rwacom
 # exec lxqt-policykit-agent
 exec steam -silent
