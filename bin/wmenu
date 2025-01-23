@@ -1,0 +1,7 @@
+#!/bin/bash
+
+main() {
+  # /usr/bin/wmenu -b -f "DejaVuSansMono-10:normal" -N "#002b36" -S "#073642" -n "#839496" -s "#839496" -i -l 20 "$@"
+  /usr/bin/wmenu -b -N "#002b36" -S "#073642" -n "#839496" -s "#839496" -i -l 20 "$@"
+}
+main "$@"

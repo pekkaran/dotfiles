@@ -20,11 +20,13 @@ if (( $#commands[(i)lesspipe(|.sh)] )); then
   export LESSOPEN="| /usr/bin/env $commands[(i)lesspipe(|.sh)] %s 2>&-"
 fi
 
-# Automatically startx on the first virtual terminal. Test a named file exists
-# in my experience all kinds of autologins are dangerous on new, partially
-# broken installs.
+# Automatically run wayland/xorg on the first virtual terminal. Test a named
+# file exists, because in my experience all kinds of autologins are dangerous
+# on new, partially broken installs.
 if [[ -f "$HOME/.auto-startx" && -z $DISPLAY && $XDG_VTNR -eq 1 ]]; then
-  echo "Sleeping for 3 seconds before starting X. Hit Ctrl-C to abort.\n"
+  echo "Sleeping for 3 seconds before starting desktop. Hit Ctrl-C to abort.\n"
   sleep 3
-  exec startx
+
+  # exec startx
+  exec sway --unsupported-gpu
 fi
