@@ -169,3 +169,7 @@ fi
 if [[ ! "$SSH_AUTH_SOCK" ]]; then
   source "$agent_env_path" > /dev/null
 fi
+
+if [ -f "$HOME/.zshrc_local" ]; then
+  source "$HOME/.zshrc_local"
+fi
