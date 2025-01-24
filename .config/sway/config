@@ -220,11 +220,27 @@ input "1133:50498:Logitech_Wireless_Receiver_Mouse" {
   pointer_accel -0.4
 }
 
+workspace 1 output HDMI-A-2
+workspace 3 output HDMI-A-2
+workspace 4 output HDMI-A-2
+workspace 5 output HDMI-A-2
+workspace 6 output HDMI-A-2
+workspace 7 output HDMI-A-2
+workspace 8 output HDMI-A-2
+workspace 9 output HDMI-A-2
+workspace 0 output HDMI-A-2
+workspace i output HDMI-A-2
+workspace p output HDMI-A-2
+workspace 2 output DP-2
+workspace t output DP-2
+workspace u output DP-2
+workspace y output DP-2
+
 # Start programs.
 exec --no-startup-id i3-msg 'workspace 1; exec firefox'
 assign [class="firefox"] 1
 
-exec --no-startup-id i3-msg 'workspace 2; exec alacritty -o font.size=8 -e daily'
+exec --no-startup-id i3-msg 'workspace 2; exec alacritty -o font.size=18 -e daily'
 
 exec dunst
 exec mpd
