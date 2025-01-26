@@ -220,6 +220,15 @@ input "1133:50498:Logitech_Wireless_Receiver_Mouse" {
   pointer_accel -0.4
 }
 
+# If having issues, could be good to test OpenTabletDriver.
+input "1386:789:Wacom_Intuos_Pro_M_Pen" {
+  # The tablet is 16:10 so leave the bottom 10% unmapped to get monitor 16:9.
+  # Remove from bottom so that the tablet moves towards you to give better
+  # hand support and allow the keyboard to be slightly closer.
+  map_from_region 0x0 1x0.9
+  map_to_output HDMI-A-2
+}
+
 workspace 1 output HDMI-A-2
 workspace 3 output HDMI-A-2
 workspace 4 output HDMI-A-2
