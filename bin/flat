@@ -1,0 +1,19 @@
+#!/bin/bash
+set -euo pipefail
+
+if [ $# -eq 0 ]; then
+  echo "Usage: flat <DIRECTORY>"
+  exit
+fi
+
+if [ "$1" == "." ]; then
+  exit
+fi
+
+if [ "$1" == "/" ]; then
+  echo "Yikes"
+  exit
+fi
+
+mv "$1"/* .
+rmdir "$1"

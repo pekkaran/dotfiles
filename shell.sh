@@ -323,14 +323,6 @@ function ex() {
   esac
 }
 
-function exrm() {
-  ex "$1" && rm "$1"
-}
-
-function flat() {
-  mv "$@"/* . && rmdir "$@"
-}
-
 # `cd` into path under current git project root. Outside git use $PWD.
 function cdg() {
     cd "$(git rev-parse --show-toplevel 2> /dev/null || echo ".")/$@"
