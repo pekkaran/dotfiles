@@ -1,0 +1,25 @@
+#!/bin/bash
+# Extract any archive.
+set -euo pipefail
+
+if [ $# -eq 0 ]; then
+  echo "Usage: exrm <ARCHIVE>"
+  exit
+fi
+
+file="$1"
+case "$file" in
+  *.tar.bz2) tar xjf "$file";;
+  *.tar.gz) tar xzf "$file";;
+  *.bz2) bunzip2 "$file";;
+  *.rar) unrar x "$file";;
+  *.gz) gunzip "$file";;
+  *.tar) tar xf "$file";;
+  *.tbz2) tar xjf "$file";;
+  *.tgz) tar xzf "$file";;
+  *.zip) unzip "$file";;
+  *.Z) uncompress "$file";;
+  *.7z) 7z x "$file";;
+  *.xz) tar xvJf "$file";;
+  *) echo "'$file' cannot be extracted via ex()"; return 1 ;;
+esac

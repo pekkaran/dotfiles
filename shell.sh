@@ -303,26 +303,6 @@ function wgd() {
   fi
 }
 
-# Extract any archive.
-function ex() {
-  file="$1"
-  case "$file" in
-    *.tar.bz2) tar xjf "$file";;
-    *.tar.gz) tar xzf "$file";;
-    *.bz2) bunzip2 "$file";;
-    *.rar) unrar x "$file";;
-    *.gz) gunzip "$file";;
-    *.tar) tar xf "$file";;
-    *.tbz2) tar xjf "$file";;
-    *.tgz) tar xzf "$file";;
-    *.zip) unzip "$file";;
-    *.Z) uncompress "$file";;
-    *.7z) 7z x "$file";;
-    *.xz) tar xvJf "$file";;
-    *) echo "'$file' cannot be extracted via ex()"; return 1 ;;
-  esac
-}
-
 # `cd` into path under current git project root. Outside git use $PWD.
 function cdg() {
     cd "$(git rev-parse --show-toplevel 2> /dev/null || echo ".")/$@"
