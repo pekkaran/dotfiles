@@ -1,4 +1,6 @@
 #!/bin/bash
+#
+# Extract any archive into a directory and remove the archive.
 set -euo pipefail
 
 if [ $# -eq 0 ]; then
@@ -11,5 +13,32 @@ if [ "$1" == "/" ]; then
   exit
 fi
 
-ex "$1"
-rm "$1"
+if [ $# -ge 2 ]; then
+  if [ "$2" == "simple" ]; then
+    ex "$1"
+    rm "$1"
+    exit
+  fi
+fi
+
+# Note: All of below is just an elaborate "ex $1 && rm $1" that
+# ensures the archive gets extracted into a new folder rather than
+# the current directory.
+
+cd $(dirname "$1")
+name="$(basename "$1")"
+folder=$(basename "${name%%.*}")
+mkdir "$folder"
+mv "$name" "$folder"
+cd "$folder"
+ex "$name"
+rm "$name"
+
+# If the archive contained a top-level folder, then this "flattens"
+# the extra level.
+if [[ $(ls 2>/dev/null -Ubad1 -- * | wc -l) == "1" ]]; then
+  cd ..
+  tmp="$folder-tmp" # Cannot flatten if the names happen to be same.
+  mv "$folder" "$tmp"
+  flat "$tmp"
+fi
