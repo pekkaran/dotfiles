@@ -198,6 +198,8 @@ alias dki='docker image'
 alias dkr='docker run'
 alias dkri='docker run -it' # interactive, tty
 
+alias calc='calc -d'
+
 alias w='$HOME/dev/other/wall/target/debug/wall'
 
 # Not exactly to my taste, but I use GTK so rarely I didn't investigate options.
