@@ -451,6 +451,8 @@ vim.keymap.set("n", "0", "^", map_args)
 vim.keymap.set("n", "#", "0", map_args)
 vim.keymap.set("n", "^", "<nop>", map_args)
 
+vim.keymap.set("n", "s", "<nop>", map_args) -- Weird/useless command, avoid triggering by accident.
+
 -- Don't move on *, which searches for the word under cursor.
 local function star()
   local view = vim.fn.winsaveview()
