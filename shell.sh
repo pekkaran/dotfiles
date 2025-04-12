@@ -100,8 +100,6 @@ alias rc='git rebase --continue'
 alias rom='git rebase -i origin/main'
 alias romaster='git rebase -i origin/master'
 alias remote='git remote'
-# Change all staged content to non-staged changes.
-alias rs='git restore --staged $(git rev-parse --show-toplevel)'
 alias revert='git revert'
 alias show='git show'
 alias sta='git diff --stat HEAD~1 | head -n -1' # Summary of file line changes for corresponding `show`.
@@ -308,6 +306,15 @@ function wgd() {
 # `cd` into path under current git project root. Outside git use $PWD.
 function cdg() {
     cd "$(git rev-parse --show-toplevel 2> /dev/null || echo ".")/$@"
+}
+
+# Change (all) staged content to non-staged changes.
+function rs() {
+  if [ $# -ge 1 ]; then
+    git restore --staged "$1"
+  else
+    git restore --staged "$(git rev-parse --show-toplevel)"
+  fi
 }
 
 # Stream first youtube search result.
