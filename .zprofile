@@ -27,6 +27,6 @@ if [[ -f "$HOME/.auto-startx" && -z $DISPLAY && $XDG_VTNR -eq 1 ]]; then
   echo "Sleeping for 3 seconds before starting desktop. Hit Ctrl-C to abort.\n"
   sleep 3
 
-  # exec startx
-  exec sway --unsupported-gpu
+  exec startx
+  # exec sway --unsupported-gpu
 fi

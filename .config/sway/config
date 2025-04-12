@@ -31,14 +31,6 @@ bindsym $mod+Shift+l move right
 # switch workspace to other monitor. same keybinding works for both sides
 bindsym $mod+q move workspace to output right
 
-bindsym $mod+c workspace next
-
-# split in horizontal orientation
-# bindsym $mod+c split h
-
-# split in vertical orientation
-# bindsym $mod+v split v
-
 # enter fullscreen mode for the focused container
 bindsym $mod+f fullscreen
 
@@ -204,13 +196,15 @@ bindsym $mod+d exec wmenu_path | wmenu "$@" | ${SHELL:-"/bin/sh"} &
 bindsym $mod+m exec echo '0' | nc -U /tmp/wall-socket -q 0
 bindsym $mod+n exec echo '1' | nc -U /tmp/wall-socket -q 0
 bindsym $mod+b exec echo '2' | nc -U /tmp/wall-socket -q 0
+bindsym $mod+v exec echo '3' | nc -U /tmp/wall-socket -q 0
+bindsym $mod+c exec echo '4' | nc -U /tmp/wall-socket -q 0
 
 bindsym $mod+s exec dunstctl close-all
 
 bindsym $mod+g exec flameshot gui -c -s
 
-output HDMI-A-2 pos 0 0 res 3840x2160 scale 2
-output DP-2 pos 1920 0 res 1920x1080 transform 270
+# See ~/secrets/bin/sway_output
+include ~/.config/sway/output
 
 input "type:keyboard" {
   xkb_file $HOME/.xkb/keymap/xkbmap_us_custom
@@ -228,6 +222,12 @@ input "1386:789:Wacom_Intuos_Pro_M_Pen" {
   map_from_region 0x0 1x0.9
   map_to_output HDMI-A-2
 }
+
+# Only respond to the pen.
+input "1386:789:Wacom_Intuos_Pro_M_Finger" events disabled
+
+exec setenv WLR_XWAYLAND force_zero_scaling
+# xwayland enable lazy
 
 workspace 1 output HDMI-A-2
 workspace 3 output HDMI-A-2

@@ -36,14 +36,6 @@ bindsym $mod+Shift+l move right
 # switch workspace to other monitor. same keybinding works for both sides
 bindsym $mod+q move workspace to output next
 
-bindsym $mod+c workspace next
-
-# split in horizontal orientation
-# bindsym $mod+c split h
-
-# split in vertical orientation
-# bindsym $mod+v split v
-
 # enter fullscreen mode for the focused container
 bindsym $mod+f fullscreen
 
@@ -210,6 +202,8 @@ bindsym $mod+d exec dmenu_run
 bindsym $mod+m exec echo '0' | nc -U /tmp/wall-socket -q 0
 bindsym $mod+n exec echo '1' | nc -U /tmp/wall-socket -q 0
 bindsym $mod+b exec echo '2' | nc -U /tmp/wall-socket -q 0
+bindsym $mod+v exec echo '3' | nc -U /tmp/wall-socket -q 0
+bindsym $mod+c exec echo '4' | nc -U /tmp/wall-socket -q 0
 
 bindsym $mod+s exec dunstctl close-all
 
@@ -224,6 +218,7 @@ assign [class="firefox"] 1
 exec --no-startup-id i3-msg 'workspace 2; exec alacritty -o font.size=8 -e daily'
 # exec picom
 exec steam -silent
+exec discord --start-minimized
 
 # xrandr setup. Could possibly instead use `nvidia-settings`.
 # exec dualmonitor
