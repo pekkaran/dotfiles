@@ -11,33 +11,36 @@ vim.opt.rtp:prepend(lazypath)
 -- Must set maploaders before lazy.nvim setup().
 vim.g.mapleader = ","
 
--- Seems like this needs to be set before loading "ale". Maybe other options are similar?
-vim.g.ale_completion_enabled = 1
-
 require("lazy").setup({
   spec = {
-    { import = "plugins" }, -- this auto-loads everything in lua/plugins/
+    { import = "plugins" }, -- Load everything in `lua/plugins/`
     {
       "neovim/nvim-lspconfig",
       config = function()
         local lspconfig = require("lspconfig")
-        lspconfig.rust_analyzer.setup({
-          on_attach = function(client, bufnr)
-            -- Without this seems to change editor colors weirdly.
-            client.server_capabilities.semanticTokensProvider = nil
-            local map = function(mode, lhs, rhs, desc)
-              vim.keymap.set(mode, lhs, rhs, { buffer = bufnr, desc = desc })
-            end
 
-            map("n", "<leader>j", vim.lsp.buf.definition, "Go to definition")
-            map("n", "<leader>u", vim.lsp.buf.declaration, "Go to declaration")
-            -- map("n", "gr", vim.lsp.buf.references, "List references")
-            map("n", "<leader>i", vim.lsp.buf.implementation, "Go to implementation")
-            map("n", "K",  vim.lsp.buf.hover, "Show hover info")
-            map("n", "<leader>r", vim.lsp.buf.rename, "Rename symbol")
-            -- map("n", "]d", vim.diagnostic.goto_next, "Next diagnostic")
-            -- map("n", "[d", vim.diagnostic.goto_prev, "Prev diagnostic")
+        on_attach = function(client, bufnr)
+          -- Without this seems to change editor colors weirdly.
+          client.server_capabilities.semanticTokensProvider = nil
+          local map = function(mode, lhs, rhs, desc)
+            vim.keymap.set(mode, lhs, rhs, { buffer = bufnr, desc = desc })
           end
+
+          map("n", "<leader>j", vim.lsp.buf.definition, "Go to definition")
+          map("n", "<leader>u", vim.lsp.buf.declaration, "Go to declaration")
+          map("n", "<leader>i", vim.lsp.buf.implementation, "Go to implementation")
+          map("n", "<leader>r", vim.lsp.buf.rename, "Rename symbol")
+          map('n', '<leader>e', vim.diagnostic.open_float, "Show error popup")
+          -- map("n", "gr", vim.lsp.buf.references, "List references")
+          -- map("n", "<leader>o",  vim.lsp.buf.hover, "Show hover info")
+          -- map("n", "]d", vim.diagnostic.goto_next, "Next diagnostic")
+          -- map("n", "[d", vim.diagnostic.goto_prev, "Prev diagnostic")
+        end
+
+        lspconfig.rust_analyzer.setup({ on_attach = on_attach })
+        lspconfig.clangd.setup({
+          cmd = { "clangd", "--background-index", "--compile-commands-dir=target" },
+          on_attach = on_attach,
         })
       end
     },
@@ -49,36 +52,6 @@ require("lazy").setup({
         vim.cmd("colorscheme tokyonight-moon")
       end,
     },
-    -- {
-    --   "dense-analysis/ale",
-    --   lazy = false,
-    --   ft = "rust",
-    --   config = function()
-    --     vim.g.ale_enabled = 1
-    --     vim.opt.omnifunc = "ale#completion#OmniFunc"
-    --
-    --     -- NOTE to set up the rust-analyzer server, run:
-    --     -- `rustup component add rust-analyzer`
-    --     vim.g.ale_linters = { rust = { "analyzer" } }
-    --
-    --     -- Do not show super-noisy inline errors and warnings.
-    --     vim.g.ale_virtualtext_cursor = 'disabled'
-    --     vim.g.ale_set_signs = 0 -- Do not show the gutter.
-    --     -- Example, looks like could be useful.
-    --     -- vim.g.ale_rust_ignore_error_codes = ['E0432', 'E0433']
-    --
-    --     -- Already handled by other tools.
-    --     vim.g.ale_warn_about_trailing_whitespace = 0
-    --     vim.g.ale_warn_about_trailing_blank_lines = 0
-    --
-    --     -- Not sure what this is, it was enabled but the syntax is now wrong for Lua.
-    --     -- vim.g.ale_rust_analyzer_config = {
-    --     --   diagnostics = {
-    --     --     disabled = []
-    --     --   },
-    --     -- }
-    --   end
-    -- },
     { "eugen0329/vim-esearch" },
     { "editorconfig/editorconfig-vim" },
     { "tikhomirov/vim-glsl" },
@@ -334,21 +307,6 @@ vim.keymap.set("n", "<leader><leader>", "Gzz", map_args)
 
 -- Open netrw split on the right side.
 vim.keymap.set("n", "<leader>n", ":Vexplore!<cr>", map_args)
-
--- function set_keymaps_rust()
---   vim.keymap.set("n", "<leader>j", "<Plug>(ale_go_to_definition)", map_args)
---   vim.keymap.set("n", "<leader>k", "<Plug>(ale_previous)", map_args)
---   vim.keymap.set("n", "<leader>h", "<Plug>(ale_hover)", map_args)
---   vim.keymap.set("n", "<leader>r", "<Plug>(ale_rename)", map_args)
---   vim.keymap.set("n", "<leader>i", "<Plug>(ale_import)", map_args)
---
---   -- The language server does not always work, eg on commented out code.
---   -- Use capitalized keys to fallback to tags.
---   vim.keymap.set("n", "<leader>J", "<C-]>", map_args)
---   vim.keymap.set("n", "<C-]>", "<nop>", map_args)
---   vim.keymap.set("n", "<leader>K", "<C-t>", map_args)
---   vim.keymap.set("n", "<leader>U", ":tn<cr>", map_args)
--- end
 
 local function set_keymaps_help()
   -- Follow links and go back in help pages
@@ -739,7 +697,7 @@ augroup('Abbreviations', function(g)
           iabbrev jsonx <c-o>:read ~/dotfiles/code-templates/python/readJson.py<cr>
           iabbrev jsonlx <c-o>:read ~/dotfiles/code-templates/python/readJson.py<cr>
           iabbrev walkx <c-o>:read ~/dotfiles/code-templates/python/walk.py<cr>
-          iabbrev sluprx <c-o>:read ~/dotfiles/code-templates/python/slurp.py<cr>
+          iabbrev slurpx <c-o>:read ~/dotfiles/code-templates/python/slurp.py<cr>
         ]]
       else
         vim.cmd[[
