@@ -30,7 +30,7 @@ require("lazy").setup({
           map("n", "<leader>u", vim.lsp.buf.declaration, "Go to declaration")
           map("n", "<leader>i", vim.lsp.buf.implementation, "Go to implementation")
           map("n", "<leader>r", vim.lsp.buf.rename, "Rename symbol")
-          map('n', '<leader>e', vim.diagnostic.open_float, "Show error popup")
+          map('n', '<leader>w', vim.diagnostic.open_float, "Show warning popup")
           -- map("n", "gr", vim.lsp.buf.references, "List references")
           -- map("n", "<leader>o",  vim.lsp.buf.hover, "Show hover info")
           -- map("n", "]d", vim.diagnostic.goto_next, "Next diagnostic")
