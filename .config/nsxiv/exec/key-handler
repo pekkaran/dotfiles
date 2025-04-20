@@ -1,0 +1,11 @@
+#!/bin/sh
+
+[ "$NSXIV_USING_NULL" = 1 ] && DELIM='\0' || DELIM='\n'
+
+case "$1" in
+s) # Save using GUI
+  while read file; do
+    dest=$(zenity --file-selection --save --confirm-overwrite --filename="$(basename "$file")")
+    [ -n "$dest" ] && magick convert "$file" "$dest"
+  done ;;
+esac

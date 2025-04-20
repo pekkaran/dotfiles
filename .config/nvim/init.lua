@@ -564,6 +564,44 @@ vim.api.nvim_create_autocmd("TextYankPost", {
   end,
 })
 
+local function open_random_file()
+  local path = vim.fn.expand('%:p:h')
+  local files = vim.fn.readdir(path)
+
+  local stat = vim.loop.fs_stat
+  local file_list = {}
+  for _, f in ipairs(files) do
+    local full = path .. '/' .. f
+    if stat(full) and stat(full).type == "file" then
+      table.insert(file_list, full)
+    end
+  end
+
+  if #file_list > 0 then
+    local choice = file_list[math.random(#file_list)]
+    vim.cmd('edit ' .. vim.fn.fnameescape(choice))
+  else
+    print("No files found in directory.")
+  end
+end
+vim.keymap.set('n', '<leader>a', open_random_file, { noremap = true, silent = true })
+
+-- Enable spellcheck.
+vim.keymap.set('n', '<leader>se', function()
+  vim.opt_local.spell = not vim.opt_local.spell:get()
+  vim.opt_local.spelllang = 'en'
+end, { noremap = true, silent = true })
+
+-- Fix spelling of word under cursor. Use z= to show all suggestions. :help spell
+vim.keymap.set('n', '<leader>sf', function()
+  local suggestions = vim.fn.spellsuggest(vim.fn.expand('<cword>'))
+  if #suggestions > 0 then
+    vim.cmd('normal! ciw' .. suggestions[1])
+  else
+    print("No suggestions found.")
+  end
+end, { noremap = true, silent = true })
+
 -- Plugins
 
 require('lualine').setup {
