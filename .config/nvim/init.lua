@@ -37,6 +37,8 @@ require("lazy").setup({
           -- map("n", "[d", vim.diagnostic.goto_prev, "Prev diagnostic")
         end
 
+        -- pacman -S pyright
+        lspconfig.pyright.setup({ on_attach = on_attach })
         lspconfig.rust_analyzer.setup({ on_attach = on_attach })
         lspconfig.clangd.setup({
           cmd = { "clangd", "--background-index", "--compile-commands-dir=target" },

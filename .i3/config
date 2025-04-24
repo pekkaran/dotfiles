@@ -219,6 +219,7 @@ exec --no-startup-id i3-msg 'workspace 2; exec alacritty -o font.size=8 -e daily
 # exec picom
 exec steam -silent
 exec discord --start-minimized
+exec thunderbird
 
 # xrandr setup. Could possibly instead use `nvidia-settings`.
 # exec dualmonitor
