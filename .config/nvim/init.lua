@@ -40,10 +40,14 @@ require("lazy").setup({
         -- pacman -S pyright
         lspconfig.pyright.setup({ on_attach = on_attach })
         lspconfig.rust_analyzer.setup({ on_attach = on_attach })
+
         lspconfig.clangd.setup({
           cmd = { "clangd", "--background-index", "--compile-commands-dir=target" },
           on_attach = on_attach,
         })
+
+        -- sudo apt install python3-pylsp
+        lspconfig.pylsp.setup({ on_attach = on_attach })
       end
     },
     {
@@ -66,6 +70,11 @@ require("lazy").setup({
     {
       "ibhagwan/fzf-lua",
       config = function() require("fzf-lua").setup({
+        previewers = {
+          builtin = {
+            syntax = false, -- Disable Tree-sitter and regex syntax highlighting.
+          },
+        },
         winopts = {
           fullscreen = true,
           border = "single",
@@ -347,8 +356,8 @@ end)
 -- Own functions, defined later.
 vim.keymap.set("n", "<leader>e", ":call OpenFirstErrorLine(1)<cr>", map_args)
 vim.keymap.set("n", "<leader>E", ":call OpenFirstErrorLine(0)<cr>", map_args)
-vim.keymap.set("n", "<leader>w", ":call OpenNextErrorLine(1)<cr>", map_args)
-vim.keymap.set("n", "<leader>W", ":call OpenNextErrorLine(-1)<cr>", map_args)
+-- vim.keymap.set("n", "<leader>w", ":call OpenNextErrorLine(1)<cr>", map_args)
+-- vim.keymap.set("n", "<leader>W", ":call OpenNextErrorLine(-1)<cr>", map_args)
 
 -- vim-abolish plugin:
 -- Swap boolean values in selection or current line.

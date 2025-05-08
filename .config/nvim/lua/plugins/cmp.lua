@@ -28,8 +28,8 @@ return {
           else
             cmp.complete() -- Manually trigger.
             -- Expand the first suggestion.
-            cmp.select_next_item({ behavior = cmp.SelectBehavior.Select })
-            cmp.select_prev_item({ behavior = cmp.SelectBehavior.Insert })
+            -- cmp.select_next_item({ behavior = cmp.SelectBehavior.Select })
+            -- cmp.select_prev_item({ behavior = cmp.SelectBehavior.Insert })
           end
         end, { 'i', 's' }),
 
