@@ -201,7 +201,8 @@ bindsym $mod+c exec echo '4' | nc -U /tmp/wall-socket -q 0
 
 bindsym $mod+s exec dunstctl close-all
 
-bindsym $mod+g exec flameshot gui -c -s
+# bindsym $mod+g exec flameshot gui -c -s
+bindsym $mod+g exec grim -g "$(slurp)" - | wl-copy --type image/png
 
 # See ~/secrets/bin/sway_output
 include ~/.config/sway/output
@@ -229,6 +230,9 @@ input "1386:789:Wacom_Intuos_Pro_M_Finger" events disabled
 exec setenv WLR_XWAYLAND force_zero_scaling
 # xwayland enable lazy
 
+# Hide cursor after this many milliseconds of inactivity.
+seat seat0 hide_cursor 5000
+
 workspace 1 output HDMI-A-2
 workspace 3 output HDMI-A-2
 workspace 4 output HDMI-A-2
@@ -245,6 +249,16 @@ workspace t output DP-2
 workspace u output DP-2
 workspace y output DP-2
 
+# exec_always {
+#   export XDG_CURRENT_DESKTOP=sway
+#   export XDG_SESSION_DESKTOP=sway
+#   export XDG_SESSION_TYPE=wayland
+# }
+exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
+exec systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
+exec /usr/lib/xdg-desktop-portal -r &
+exec /usr/lib/xdg-desktop-portal-wlr &
+
 # Start programs.
 exec --no-startup-id i3-msg 'workspace 1; exec firefox'
 assign [class="firefox"] 1
@@ -256,6 +270,6 @@ exec mpd
 exec unclutter
 exec devmon
 exec gammastep
-# exec rwacom
-# exec lxqt-policykit-agent
 exec steam -silent
+exec discord --start-minimized
+exec thunderbird
