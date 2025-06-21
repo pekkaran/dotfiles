@@ -1,0 +1,83 @@
+#!/bin/bash
+# Repeatedly back up the same file or folder.
+#
+# The intended use case was work on custom editor programs that might
+# accidentally break or delete the file you are editing.
+#
+# Using git or other version control program could be a nicer solution.
+
+set -euo pipefail
+
+usage() {
+  echo "Usage: INTERVAL=<seconds> COUNT=<max_backups> $0 <input_file_or_folder> <output_folder>"
+  exit 1
+}
+if [ $# -ne 2 ]; then
+  usage
+fi
+
+INTERVAL=${INTERVAL:-300}
+COUNT=${COUNT:-60}
+
+INPUT_PATH="$1"
+OUTPUT_DIR="$2"
+
+cleanup() {
+  exit 0
+}
+trap cleanup SIGINT SIGTERM
+
+if [ ! -e "$INPUT_PATH" ]; then
+  echo "Error: Input path '$INPUT_PATH' does not exist."
+  exit 1
+fi
+
+if [ ! -d "$OUTPUT_DIR" ]; then
+  echo "Creating output directory: $OUTPUT_DIR"
+  mkdir -p "$OUTPUT_DIR"
+  if [ $? -ne 0 ]; then
+    echo "Error: Failed to create output directory '$OUTPUT_DIR'"
+    exit 1
+  fi
+fi
+
+if ! [[ "$INTERVAL" =~ ^[0-9]+$ ]] || [ "$INTERVAL" -le 0 ]; then
+  echo "Error: INTERVAL must be a positive integer (seconds)"
+  exit 1
+fi
+if ! [[ "$COUNT" =~ ^[0-9]+$ ]] || [ "$COUNT" -le 0 ]; then
+  echo "Error: COUNT must be a positive integer"
+  exit 1
+fi
+
+INPUT_BASENAME=$(basename "$INPUT_PATH")
+counter=0
+
+while true; do
+  backup_name="${INPUT_BASENAME}.${counter}"
+  backup_path="$OUTPUT_DIR/$backup_name"
+
+  if [ -f "$INPUT_PATH" ]; then
+    cp "$INPUT_PATH" "$backup_path"
+    backup_result=$?
+  elif [ -d "$INPUT_PATH" ]; then
+    cp -r "$INPUT_PATH" "$backup_path"
+    backup_result=$?
+  else
+    echo "Error: '$INPUT_PATH' is neither a file nor a directory"
+    exit 1
+  fi
+
+  if [ $backup_result -ne 0 ]; then
+    echo "Error: Backup #$counter failed"
+  fi
+
+  counter=$((counter + 1))
+  if [ $counter -ge $COUNT ]; then
+    counter=0
+  fi
+
+  timestamp=$(date '+%H:%M:%S')
+  printf "\rLast saved at $timestamp to $backup_path "
+  sleep "$INTERVAL"
+done
