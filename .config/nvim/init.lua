@@ -378,9 +378,6 @@ vim.keymap.set("n", "<F1>", "<nop>", map_args)
 -- useful for typing things without interference from `imap`s.
 -- set pastetoggle=<F10>
 
--- Can't map unmodified F11?
-vim.keymap.set("n", "<S-F11>", ":call OpenRandomFile()<cr>", map_args)
-
 -- Switch between source and header files. Very crude, only works for the
 -- extension pairs cpp-hpp and c-h.
 vim.keymap.set("n", "<leader>z", ":e %:p:s,.hpp$,.XHPPX,:s,.h$,.XHX,:s,.cpp$,.hpp,:s,.c$,.h,:s,.XHPPX$,.cpp,:s,.XHX$,.c,<cr>", map_args)
@@ -597,13 +594,58 @@ local function open_random_file()
 end
 vim.keymap.set('n', '<leader>a', open_random_file, { noremap = true, silent = true })
 
+_G.navigate_files = function(direction)
+  local current_file = vim.fn.expand('%:p')
+  local current_dir = vim.fn.expand('%:p:h')
+  local files = vim.fn.glob(current_dir .. '/*', false, true)
+  local file_list = {}
+  for _, file in ipairs(files) do
+    if vim.fn.isdirectory(file) == 0 then
+      table.insert(file_list, file)
+    end
+  end
+  table.sort(file_list)
+
+  local current_index = nil
+  for i, file in ipairs(file_list) do
+    if file == current_file then
+      current_index = i
+      break
+    end
+  end
+
+  if not current_index then
+    vim.api.nvim_echo({{"Current file not found in directory listing", "WarningMsg"}}, true, {})
+    return
+  end
+
+  local new_index
+  if direction == "next" then
+    new_index = current_index == #file_list and 1 or current_index + 1
+  else -- previous
+    new_index = current_index == 1 and #file_list or current_index - 1
+  end
+
+  vim.cmd('edit ' .. vim.fn.fnameescape(file_list[new_index]))
+  vim.api.nvim_echo({{"Navigated to " .. (direction == "next" and "next" or "previous") .. " file", "None"}}, true, {})
+end
+
+vim.api.nvim_set_keymap('n', '<leader>9', '<cmd>lua _G.navigate_files("previous")<CR>', { noremap = true, silent = true, desc = "Go to previous file" })
+vim.api.nvim_set_keymap('n', '<leader>0', '<cmd>lua _G.navigate_files("next")<CR>', { noremap = true, silent = true, desc = "Go to next file" })
+
 -- Enable spellcheck.
+-- Use `zg` to add word to the library.
 vim.keymap.set('n', '<leader>se', function()
   vim.opt_local.spell = not vim.opt_local.spell:get()
   vim.opt_local.spelllang = 'en'
 end, { noremap = true, silent = true })
 
--- Fix spelling of word under cursor. Use z= to show all suggestions. :help spell
+-- Disable spellcheck.
+vim.keymap.set('n', '<leader>sd', function()
+  vim.opt_local.spell = false
+end, { noremap = true, silent = true })
+
+-- Fix spelling of word under cursor. Use `z=` to show all suggestions. :help spell
 vim.keymap.set('n', '<leader>sf', function()
   local suggestions = vim.fn.spellsuggest(vim.fn.expand('<cword>'))
   if #suggestions > 0 then
