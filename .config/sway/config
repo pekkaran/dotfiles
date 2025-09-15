@@ -1,3 +1,5 @@
+# sudo apt install sway swaylock grim slurp xdg-desktop-portal-wlr
+
 set $mod Mod4
 
 font pango:DejaVu Sans Mono 12

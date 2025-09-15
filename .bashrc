@@ -10,9 +10,9 @@ else
   export PS1='\[\e[0;36m\]\W\$\[\e[0m\] ' # cyan for normal user
 fi
 
-PATH="$PATH:$HOME/dotfiles/bin"
-PATH="$PATH:$HOME/secrets/bin"
-PATH="$PATH:$HOME/bin"
+PATH="$HOME/dotfiles/bin:$PATH"
+PATH="$HOME/secrets/bin:$PATH"
+PATH="$HOME/bin:$PATH"
 
 source "$HOME/dotfiles/shell.sh"
 source /usr/share/git/completion/git-completion.bash

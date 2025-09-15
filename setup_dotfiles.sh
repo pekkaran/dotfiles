@@ -21,8 +21,10 @@ config_files=(
   ncmpcpp/config
   nvim/init.vim
   zathura/zathurarc
+  nvim/lua/plugins
 )
 
+mkdir -p .config/nvim/lua
 for file in ${config_files[@]}; do
   ln -s "$HOME"/dotfiles/.config/"$file" .config/"$file"
 done

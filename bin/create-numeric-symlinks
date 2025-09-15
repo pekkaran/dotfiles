@@ -1,0 +1,11 @@
+#!/bin/bash
+#
+# For each folder in the current folder, create symlinks 01, 02, … pointing to them.
+set -euo pipefail
+
+i=1
+for d in */; do
+  [ -d "$d" ] || continue
+  ln -s "${d%/}" $(printf "%02d" "$i")
+  ((i++))
+done
