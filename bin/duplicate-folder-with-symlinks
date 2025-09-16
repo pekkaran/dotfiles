@@ -25,7 +25,7 @@ else
   #   will place output_folder in the given path and populate it with absolute
   #   path symlinks to input_folder files.
   # Does not work with spaces in paths, to fix use the above approach with `fd -x`.
-  for i in $(ls $1/); do
-    ln -s $(realpath "$1/$i") "$2"
+  for i in $(ls "$1/"); do
+    ln -s "$(realpath "$1/$i")" "$2"
   done
 fi

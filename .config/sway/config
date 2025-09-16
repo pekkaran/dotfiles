@@ -34,7 +34,7 @@ bindsym $mod+Shift+l move right
 bindsym $mod+q move workspace to output right
 
 # enter fullscreen mode for the focused container
-bindsym $mod+f fullscreen
+# bindsym $mod+f fullscreen
 
 # change container layout (stacked, tabbed, toggle split)
 # bindsym $mod+s layout stacking
@@ -205,6 +205,8 @@ bindsym $mod+s exec dunstctl close-all
 
 # bindsym $mod+g exec flameshot gui -c -s
 bindsym $mod+g exec grim -g "$(slurp)" - | wl-copy --type image/png
+# Capture the larger monitor.
+bindsym $mod+f exec grim -o HDMI-A-2 ~/Pictures/$(date +'%Y-%m-%d_%H-%M-%S')_left.png && notify-send -t 1000 "Screenshot taken"
 
 # See ~/secrets/bin/sway_output
 include ~/.config/sway/output
@@ -232,8 +234,8 @@ input "1386:789:Wacom_Intuos_Pro_M_Finger" events disabled
 exec setenv WLR_XWAYLAND force_zero_scaling
 # xwayland enable lazy
 
-# Hide cursor after this many milliseconds of inactivity.
-seat seat0 hide_cursor 5000
+# Hide cursor after this many milliseconds of inactivity. Works poorly with browsers.
+# seat seat0 hide_cursor 5000
 
 workspace 1 output HDMI-A-2
 workspace 3 output HDMI-A-2
@@ -272,6 +274,6 @@ exec mpd
 exec unclutter
 exec devmon
 exec gammastep
-exec steam -silent
+exec GDK_SCALE=2 steam -silent
 exec discord --start-minimized
 exec thunderbird

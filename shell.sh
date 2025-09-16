@@ -29,9 +29,10 @@ else
 fi
 alias cp='\cp -i' # prompt before overwriting
 alias mv='\mv -i' # prompt before overwriting
-alias chx='chmod +x'
+alias chx='chmod +x' # make file executable
 alias fs='du -shD' # size of file or folder. s:summarize, h:human_readable, D=dereference_links
 alias df='df -hT' # Show file system space usage in human readabale format.
+alias lns='ln -s' # Create symbolic link
 
 # Searching. "rg" is a "grep" replacement
 # -i: ignore case
@@ -66,7 +67,7 @@ alias mpv_fix_mono='mpv --audio-channels=1'
 alias mpv2='\mpv --vo=vdpau' # This fixed some video playback issue when using the default --vo=gpu.
 alias jj='cd "$(fd . -t d -d 4 | fzf)"'
 for i in $(seq 1 4); do
-  alias ims$i="find . -maxdepth $i | grep -iE \"gif|png|jpg|jpeg\" | sort | im -i"
+  alias ims$i="find . -maxdepth $i | grep -iE \"gif|png|jpg|jpeg|webp|avif\" | sort | im -i"
   alias vids$i="find . -maxdepth $i | grep -iE \"gif|png|jpg|jpeg|mkv|mp4|avi|mov|webm\" | sort | mpv --playlist=-"
   alias j$i='cd "$(fd . -t d -d $i | fzf)"'
 done
@@ -92,6 +93,7 @@ alias fe='git fetch --tags --prune'
 alias log='GIT_PAGER="less" git log --graph --pretty=format:"%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset" --abbrev-commit'
 alias  lo='GIT_PAGER="less" git log         --pretty=format:"%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset" --abbrev-commit'
 alias merge='git merge'
+alias mergeff='git merge --ff'
 alias pull='git pull'
 alias push='git push'
 alias pushh='git push --set-upstream origin $(git branch --show-current)'
@@ -135,11 +137,16 @@ function dt() {
     git --no-pager diff --no-index /dev/null $file
   done
 }
-# Grab all unstaged and stanged changes and commit them with the message "e".
+# Grab all unstaged and stanged changes and commit them with the message "e" or "v".
 function ce() {
   cd "$(git rev-parse --show-toplevel)"
   git add .
   git commit -a -m "e"
+}
+function cv() {
+  cd "$(git rev-parse --show-toplevel)"
+  git add .
+  git commit -a -m "v"
 }
 # List branches recently committed to.
 alias recent='git branch -a --sort=-committerdate | grep -v remotes/ | head -n 20'

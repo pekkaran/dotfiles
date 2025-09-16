@@ -789,6 +789,7 @@ augroup('Abbreviations', function(g)
           iabbrev jsonlx <c-o>:read ~/dotfiles/code-templates/python/readJson.py<cr>
           iabbrev walkx <c-o>:read ~/dotfiles/code-templates/python/walk.py<cr>
           iabbrev slurpx <c-o>:read ~/dotfiles/code-templates/python/slurp.py<cr>
+          iabbrev raisex raise Exception("")
         ]]
       else
         vim.cmd[[

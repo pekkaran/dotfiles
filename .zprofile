@@ -34,3 +34,10 @@ if [[ -f "$HOME/.auto-startx" && -z $DISPLAY && $XDG_VTNR -eq 1 ]]; then
   export XDG_SESSION_TYPE=wayland
   exec sway --unsupported-gpu
 fi
+
+# Japanese input
+export GTK_IM_MODULE=fcitx
+export QT_IM_MODULE=fcitx
+export XMODIFIERS=@im=fcitx
+export SDL_IM_MODULE=fcitx
+export GLFW_IM_MODULE=ibus
