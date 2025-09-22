@@ -98,6 +98,10 @@ for x in ${sources[@]}; do
   fi
 done
 
+if [[ -s "$HOME/secrets/shell.sh" ]]; then
+  source "$HOME/secrets/shell.sh"
+fi
+
 if type fzf > /dev/null 2>&1; then
   if [[ -f "/usr/share/doc/fzf/examples/completion.zsh" ]]; then
     # Ubuntu.

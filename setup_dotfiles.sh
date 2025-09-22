@@ -19,7 +19,7 @@ config_files=(
   mpv/input.conf
   mpv/mpv.conf
   ncmpcpp/config
-  nvim/init.vim
+  nvim/init.lua
   zathura/zathurarc
   nvim/lua/plugins
 )
