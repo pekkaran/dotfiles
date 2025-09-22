@@ -17,6 +17,7 @@ require("lazy").setup({
     {
       "neovim/nvim-lspconfig",
       config = function()
+        -- sudo apt install python3-pylsp
         local lspconfig = require("lspconfig")
 
         on_attach = function(client, bufnr)
@@ -38,15 +39,25 @@ require("lazy").setup({
         end
 
         -- pacman -S pyright
+        -- sudo apt install -y nodejs npm  # Installs an insane number of packages.
+        -- sudo npm install -g pyright
         lspconfig.pyright.setup({ on_attach = on_attach })
+
         lspconfig.rust_analyzer.setup({ on_attach = on_attach })
 
+        -- sudo apt install clangd-18 clang-format-18 clang-tidy-18 (or whatever version you have of `clang`, here `clang-18`).
+        -- On Arch Linux it's called just `clangd`.
+        local clangd_cmd = "clangd"
+        if vim.fn.executable("clangd-18") == 1 then
+          clangd_cmd = "clangd-18"
+        end
+
         lspconfig.clangd.setup({
-          cmd = { "clangd", "--background-index", "--compile-commands-dir=target" },
+          -- Note: You need to generate `compile_commands.json` (eg via CMake) in `target/`.
+          cmd = { clangd_cmd, "--background-index", "--compile-commands-dir=target" },
           on_attach = on_attach,
         })
 
-        -- sudo apt install python3-pylsp
         lspconfig.pylsp.setup({ on_attach = on_attach })
       end
     },
@@ -292,22 +303,9 @@ local function clearJunk()
 end
 vim.keymap.set("n", "<space>", clearJunk, map_args)
 
--- TODO Not sure if all of this works the same way in nvim.
--- " Copy and paste.
--- "
--- "Vim offers the + and * registers to reference the system clipboard (:help quoteplus and :help quotestar). Note that on some systems, + and * are the same, while on others they are different. Generally on Linux, + and * are different: + corresponds to the desktop clipboard (XA_SECONDARY) that is accessed using CTRL-C, CTRL-X, and CTRL-V, while * corresponds to the X11 primary selection (XA_PRIMARY), which stores the mouse selection and is pasted using the middle mouse button in most applications.
--- "
--- " NOTE that these (the * and + registers) do not work without a clipboard
--- " tool vim can work with, for example `xclip`. See :help clipboard for
--- " details.
--- nnoremap <leader>y "+y
--- nnoremap <leader>p "+p
--- nnoremap <leader>P "+P
--- vnoremap <leader>y "+ygv
--- " vnoremap <C-c> "+yi
--- " vnoremap <C-x> "+c
--- " vnoremap <C-v> c<ESC>"+p
--- inoremap <C-v> <C-r><C-o>+
+-- If copypaste does not work and you get “clipboard: No provider. Try ":checkhealth" or ":h clipboard",
+-- on Wayland just install this package:
+--   sudo apt install wl-clipboard
 
 -- To quickly go to line 42, type '42,,'
 vim.keymap.set("n", "<leader><leader>", "Gzz", map_args)
