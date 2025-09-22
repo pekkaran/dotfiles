@@ -170,7 +170,7 @@ if ! pgrep -u "$USER" ssh-agent > /dev/null; then
   rm -f "$agent_env_path"
   ssh-agent > "$agent_env_path"
 fi
-if [[ ! "$SSH_AUTH_SOCK" ]]; then
+if [[ ! "$SSH_AUTH_SOCK" ]] && [[ -f "$agent_env_path" ]]; then
   source "$agent_env_path" > /dev/null
 fi
 
