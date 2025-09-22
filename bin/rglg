@@ -1,0 +1,14 @@
+#!/bin/bash
+#
+# Among files that match the second argument, find files that contain the first pattern and list the filenames.
+
+if ! command -v rg &> /dev/null; then
+  echo "`rg` not found"
+  return 1
+fi
+if [ -z "$1" ] || [ -z "$2" ]; then
+  echo "Usage: rglg \"text_to_search\" \"filename_pattern\""
+  return 1
+fi
+
+rg -l "$1" -g "$2"

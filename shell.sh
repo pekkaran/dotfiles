@@ -40,6 +40,7 @@ alias lns='ln -s' # Create symbolic link
 alias rg='\rg -i --hidden'
 alias rgi='\rg --hidden'
 alias rgl='\rg -li' # Print filenames of matches instead.
+# See also `bin/rglg`.
 
 # "fd" is a "find" replacement. The binary name is different in some distros.
 if type fdfind > /dev/null 2>&1; then
@@ -152,6 +153,10 @@ function cv() {
 alias recent='git branch -a --sort=-committerdate | grep -v remotes/ | head -n 20'
 alias recent-remote='git branch -a --sort=-committerdate | grep remotes/ | head -n 20'
 # alias recent-alt='git for-each-ref --sort=-committerdate refs/heads/ | head -n 20'
+
+# Change git repository HTTPS links to SSH.
+# Use when you want to push to your own public repositories (cloned with HTTPS or using such submodule addresses).
+alias gitssh='git config url."git@github.com:".insteadOf "https://github.com/"'
 
 ## Pacman
 # Use the English locale in case of something goes wrong. Capital first letter indicates sudo use.
@@ -373,4 +378,11 @@ function roll() {
   git add .
   git commit --amend --no-edit
   git push --force
+}
+
+# When you start a GUI program from shell you often get a spammy terminal which you can't close
+# because it would also close the GUI program. Press on such terminal "Ctrl-Z" and then run this
+# in it to make the GUI program independent and get rid of terminal window. (Tip: `fg` reverts Ctrl-Z)
+diso() {
+  bg %1 && disown %1 && exit
 }
