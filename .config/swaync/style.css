@@ -1,0 +1,9 @@
+* {
+  font-family: "Noto Serif CJK JP", sans-serif;
+  /* font-size: 30px; */
+  font-size: 60px;
+}
+.notification {
+  /* min-width: 1000px; */
+  min-width: 1920px;
+}

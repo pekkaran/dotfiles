@@ -139,18 +139,18 @@ for_window [class="Matplotlib"] floating enable
 # finds out, if available)
 bar {
     status_command i3status_custom
-    # font pango:DejaVu Sans Mono 12
+    font pango:DejaVu Sans Mono 28
     mode hide
     hidden_state hide
     colors {
-        background #002b36
-        statusline #839496
+        background #2f334d
+        statusline #828bb8
         separator  #839496
         # colorclass       <border> <background> <text>
-        focused_workspace  #cb4b16  #002b36      #839496
-        active_workspace   #002b36  #002b36      #839496
-        inactive_workspace #002b36  #002b36      #839496
-        binding_mode       #002b36  #002b36      #cb4b16
+        focused_workspace #82aaff #82aaff #2f334d
+        active_workspace #ffc777 #ffc777 #2f334d
+        inactive_workspace #2f334d #2f334d #828bb8
+        # binding_mode       #002b36  #002b36      #cb4b16
     }
 }
 
@@ -201,7 +201,8 @@ bindsym $mod+b exec echo '2' | nc -U /tmp/wall-socket -q 0
 bindsym $mod+v exec echo '3' | nc -U /tmp/wall-socket -q 0
 bindsym $mod+c exec echo '4' | nc -U /tmp/wall-socket -q 0
 
-bindsym $mod+s exec dunstctl close-all
+# bindsym $mod+s exec dunstctl close-all
+bindsym $mod+s exec swaync-client -C
 
 # bindsym $mod+g exec flameshot gui -c -s
 bindsym $mod+g exec grim -g "$(slurp)" - | wl-copy --type image/png
@@ -253,13 +254,9 @@ workspace t output DP-2
 workspace u output DP-2
 workspace y output DP-2
 
-# exec_always {
-#   export XDG_CURRENT_DESKTOP=sway
-#   export XDG_SESSION_DESKTOP=sway
-#   export XDG_SESSION_TYPE=wayland
-# }
-exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
-exec systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
+exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE XDG_RUNTIME_DIR
+exec systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE XDG_RUNTIME_DIR
+
 exec /usr/lib/xdg-desktop-portal -r &
 exec /usr/lib/xdg-desktop-portal-wlr &
 
@@ -269,7 +266,9 @@ assign [class="firefox"] 1
 
 exec --no-startup-id i3-msg 'workspace 2; exec alacritty -o font.size=18 -e daily'
 
-exec dunst
+# exec dunst
+exec swaync
+
 exec mpd
 exec unclutter
 exec devmon
