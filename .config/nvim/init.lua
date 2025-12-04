@@ -52,10 +52,18 @@ require("lazy").setup({
           clangd_cmd = "clangd-18"
         end
 
+        local util = require('lspconfig.util')
+
         lspconfig.clangd.setup({
           -- Note: You need to generate `compile_commands.json` (eg via CMake) in `target/`.
           cmd = { clangd_cmd, "--background-index", "--compile-commands-dir=target" },
           on_attach = on_attach,
+          -- By default the `compile_commands.json` file is found relative to "root_dir" which defaults to
+          -- searching for `.git/`. If the `target/` folder is not in a git repository or not at the root
+          -- of one, then the compile commands won't be found. This assists the search.
+          root_dir = function(fname)
+            return util.root_pattern('CMakeLists.txt')(fname) or util.root_pattern('.git')(fname)
+          end,
         })
 
         lspconfig.pylsp.setup({ on_attach = on_attach })
