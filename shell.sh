@@ -40,7 +40,8 @@ alias lns='ln -s' # Create symbolic link
 alias rg='\rg -i --hidden'
 alias rgi='\rg --hidden'
 alias rgl='\rg -li' # Print filenames of matches instead.
-# See also `bin/rglg`.
+# I always forget how to search only in files of specific name, it's:  rg <search> -g <filename>
+# where `-g` is short for `--glob`. See also `bin/rglg` which adds `-l` to only list the file names.
 
 # "fd" is a "find" replacement. The binary name is different in some distros.
 if type fdfind > /dev/null 2>&1; then
@@ -124,7 +125,7 @@ alias sma='git submodule add'
 alias sms='git submodule sync'
 alias smu='git submodule update'
 alias smuir='git submodule update --init --recursive'
-# To remove a submodule `submodule rm <path>` and commit.
+# To remove a submodule see `smr` function below.
 alias reflog='git reflog'
 # -v: verbose, shows the diff in the commit message editor. This can also be set as git config option.
 alias c='git commit -v'
@@ -148,6 +149,11 @@ function cv() {
   cd "$(git rev-parse --show-toplevel)"
   git add .
   git commit -a -m "v"
+}
+function smr() {
+  git submodule deinit -f -- "$1" &&
+  git rm -f -- "$1"
+  # And then commit the changes.
 }
 # List branches recently committed to.
 alias recent='git branch -a --sort=-committerdate | grep -v remotes/ | head -n 20'

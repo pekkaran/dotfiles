@@ -806,13 +806,15 @@ augroup('Abbreviations', function(g)
   })
 end)
 
--- Experimental. Default to markdown.
-vim.cmd [[
-  augroup MarkdownFallback
-    autocmd!
-    autocmd BufRead,BufNewFile * if &ft == '' | set filetype=markdown | endif
-  augroup END
-]]
+vim.api.nvim_create_augroup("MarkdownFallback", { clear = true })
+vim.api.nvim_create_autocmd({ "BufReadPost", "BufNewFile" }, {
+  group = "MarkdownFallback",
+  callback = function()
+    if vim.bo.filetype == "" or vim.bo.filetype == "conf" then
+      vim.bo.filetype = "markdown"
+    end
+  end,
+})
 
 aucmd("FileType", {
   pattern = "txt",
@@ -820,7 +822,3 @@ aucmd("FileType", {
     vim.opt_local.commentstring = "//%s"
   end,
 })
-
--- List of remaining plugins I previously used via pathogen.
--- vim-cpp-modern
--- vim-localrc
