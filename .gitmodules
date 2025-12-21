@@ -22,9 +22,6 @@
 [submodule ".vim/bundle/vim-airline-themes"]
 	path = .vim/bundle/vim-airline-themes
 	url = https://github.com/vim-airline/vim-airline-themes.git
-[submodule ".vim/bundle/vim-cpp-modern"]
-	path = .vim/bundle/vim-cpp-modern
-	url = https://github.com/bfrg/vim-cpp-modern.git
 [submodule ".vim/bundle/vim-esearch"]
 	path = .vim/bundle/vim-esearch
 	url = https://github.com/eugen0329/vim-esearch.git
