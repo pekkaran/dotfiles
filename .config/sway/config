@@ -15,6 +15,11 @@ client.background       #cb4b16
 # Use Mouse+$mod to drag floating windows to their wanted position
 floating_modifier $mod
 
+# Unable to make a compose key work.
+# input type:keyboard {
+#     xkb_options compose:rctrl
+# }
+
 # kill focused window
 bindsym $mod+x kill
 
@@ -210,6 +215,8 @@ bindsym $mod+g exec grim -g "$(slurp)" - | wl-copy --type image/png
 bindsym $mod+f exec grim -o HDMI-A-2 ~/Pictures/$(date +'%Y-%m-%d_%H-%M-%S')_left.png && notify-send -t 1000 "Screenshot taken"
 
 # See ~/secrets/bin/sway_output
+
+exec sway_output x
 include ~/.config/sway/output
 
 input "type:keyboard" {
@@ -264,7 +271,7 @@ exec /usr/lib/xdg-desktop-portal-wlr &
 exec --no-startup-id i3-msg 'workspace 1; exec firefox'
 assign [class="firefox"] 1
 
-exec --no-startup-id i3-msg 'workspace 2; exec alacritty -o font.size=18 -e daily'
+exec --no-startup-id i3-msg 'workspace 2; exec alacritty -e daily'
 
 # exec dunst
 exec swaync
@@ -276,3 +283,4 @@ exec gammastep
 exec GDK_SCALE=2 steam -silent
 exec discord --start-minimized
 exec thunderbird
+exec blueman-manager
