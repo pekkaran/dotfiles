@@ -92,8 +92,9 @@ alias clone='git clone'
 alias commit='git commit'
 alias fe='git fetch --tags --prune'
 # Setting $GIT_PAGER like that seems to fix an issue where few lines at top of the log are "invisible" until I scroll down and up (or press g).
-alias log='GIT_PAGER="less" git log --graph --pretty=format:"%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset" --abbrev-commit'
-alias  lo='GIT_PAGER="less" git log         --pretty=format:"%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset" --abbrev-commit'
+alias     log='GIT_PAGER="less" git log --graph --pretty=format:"%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset" --abbrev-commit'
+# Same but shows date of each commit instead of age.
+alias logdate='GIT_PAGER="less" git log --graph --pretty=format:"%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%ad) %C(bold blue)<%an>%Creset" --abbrev-commit --date=short'
 alias merge='git merge'
 alias mergeff='git merge --ff'
 alias pull='git pull'
