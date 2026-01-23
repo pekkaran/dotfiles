@@ -51,6 +51,9 @@ require("lazy").setup({
         if vim.fn.executable("clangd-18") == 1 then
           clangd_cmd = "clangd-18"
         end
+        if vim.fn.executable("clangd-20") == 1 then
+          clangd_cmd = "clangd-20"
+        end
 
         local util = require('lspconfig.util')
 
@@ -62,7 +65,8 @@ require("lazy").setup({
           -- searching for `.git/`. If the `target/` folder is not in a git repository or not at the root
           -- of one, then the compile commands won't be found. This assists the search.
           root_dir = function(fname)
-            return util.root_pattern('CMakeLists.txt')(fname) or util.root_pattern('.git')(fname)
+            -- Do not use 'CMakeLists.txt' here because some projects have those files also in subdirectories.
+            return util.root_pattern('.git')(fname)
           end,
         })
 
