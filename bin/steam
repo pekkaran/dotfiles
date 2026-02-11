@@ -1,0 +1,8 @@
+#!/bin/bash
+
+main() {
+  if type /usr/bin/steam > /dev/null 2>&1; then
+    GDK_SCALE=2 /usr/bin/steam -silent
+  fi
+}
+main "$@"
