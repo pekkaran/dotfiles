@@ -69,7 +69,7 @@ alias mpv_fix_mono='mpv --audio-channels=1'
 alias mpv2='\mpv --vo=vdpau' # This fixed some video playback issue when using the default --vo=gpu.
 alias jj='cd "$(fd . -t d -d 4 | fzf)"'
 for i in $(seq 1 4); do
-  alias ims$i="find . -maxdepth $i | grep -iE \"gif|png|jpg|jpeg|webp|avif\" | sort | im -i"
+  alias ims$i="find . -maxdepth $i | grep -iE \"gif|png|jpg|jpeg|webp|avif|heic\" | sort | im -i"
   alias vids$i="find . -maxdepth $i | grep -iE \"gif|png|jpg|jpeg|mkv|mp4|avi|mov|webm\" | sort | mpv --playlist=-"
   alias j$i='cd "$(fd . -t d -d $i | fzf)"'
 done
