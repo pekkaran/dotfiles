@@ -644,7 +644,10 @@ vim.api.nvim_set_keymap('n', '<leader>9', '<cmd>lua _G.navigate_files("previous"
 vim.api.nvim_set_keymap('n', '<leader>0', '<cmd>lua _G.navigate_files("next")<CR>', { noremap = true, silent = true, desc = "Go to next file" })
 
 -- Enable spellcheck.
--- Use `zg` to add word to the library.
+-- * `,se` to show all misspellings
+-- * `]s` and `[s` to navigate to next and previous misspelling
+-- * `z=` for fix suggestions
+-- * `zg` to add word to the library.
 vim.keymap.set('n', '<leader>se', function()
   vim.opt_local.spell = not vim.opt_local.spell:get()
   vim.opt_local.spelllang = 'en'
@@ -817,6 +820,55 @@ vim.api.nvim_create_autocmd({ "BufReadPost", "BufNewFile" }, {
     if vim.bo.filetype == "" or vim.bo.filetype == "conf" then
       vim.bo.filetype = "markdown"
     end
+  end,
+})
+
+-- Override markdown syntax highlighting to use more colors.
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "markdown",
+  callback = function()
+    vim.opt_local.conceallevel = 0
+
+    -- Error or ErrorMsg - usually red
+    -- Function or Identifier - usually cyan/blue
+    -- Statement or Special - usually magenta/purple
+    -- String - usually green
+    -- Type - usually yellow
+    -- Comment - usually gray/dim
+
+    vim.api.nvim_set_hl(0, 'markdownBold', { link = 'String' })
+    -- vim.api.nvim_set_hl(0, 'markdownBoldDelimiter', { link = 'Normal' })
+    vim.api.nvim_set_hl(0, 'markdownItalic', { link = 'Function' })
+    -- vim.api.nvim_set_hl(0, 'markdownItalicDelimiter', { link = 'Normal' })
+    vim.api.nvim_set_hl(0, 'markdownBoldItalic', { link = 'Statement' })
+
+    -- Inline code (`code`)
+    vim.api.nvim_set_hl(0, 'markdownCode', { link = 'Type' })
+    vim.api.nvim_set_hl(0, 'markdownCodeDelimiter', { link = 'Error' })
+
+    -- Headings (# Header)
+    -- vim.api.nvim_set_hl(0, 'markdownH1', { link = 'Function' })
+    -- vim.api.nvim_set_hl(0, 'markdownH2', { link = 'Function' })
+    -- vim.api.nvim_set_hl(0, 'markdownH3', { link = 'Function' })
+    -- vim.api.nvim_set_hl(0, 'markdownHeadingDelimiter', { link = 'Comment' })
+
+    -- Angle bracket links <url>
+    -- ???
+
+    -- Links [text](url)
+    -- vim.api.nvim_set_hl(0, 'markdownUrl', { link = 'Identifier' })
+    -- vim.api.nvim_set_hl(0, 'markdownLinkText', { link = 'Type' })
+    -- vim.api.nvim_set_hl(0, 'markdownLinkDelimiter', { link = 'Comment' })
+
+    -- Strikethrough (~~text~~)
+    vim.api.nvim_set_hl(0, 'markdownStrike', { link = 'Error' })
+    -- vim.api.nvim_set_hl(0, 'markdownStrikeDelimiter', { link = 'Comment' })
+
+    -- List markers (-, *, +, 1.)
+    -- vim.api.nvim_set_hl(0, 'markdownListMarker', { link = 'Statement' })
+
+    -- Blockquotes (> quote)
+    -- vim.api.nvim_set_hl(0, 'markdownBlockquote', { link = 'Comment' })
   end,
 })
 
