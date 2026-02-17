@@ -8,11 +8,13 @@ typeset -gU cdpath fpath mailpath path
 # Set the list of directories that Zsh searches for programs.
 path=(
   /usr/local/{bin,sbin}
+  $HOME/.local/bin
   $HOME/dotfiles/bin
   $HOME/secrets/bin
   $HOME/bin
   $path
 )
+# export PATH="$HOME/.local/bin:$PATH"
 
 # Set the Less input preprocessor.
 # Try both `lesspipe` and `lesspipe.sh` as either might exist on a system.
