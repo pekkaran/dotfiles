@@ -1,0 +1,48 @@
+{
+    "layer": "top",
+    "position": "bottom",
+    "exclusive": false,
+    "ipc": true,
+    "modules-left": ["sway/workspaces", "sway/mode"],
+    "modules-center": ["mpd"],
+    "modules-right": ["custom/disk", "wireplumber", "battery", "clock", "tray"],
+
+    "sway/workspaces": {
+        "disable-scroll": true
+    },
+
+    "mpd": {
+        "format": "{title} - {artist}",
+        "format-stopped": "",
+        "format-disconnected": ""
+    },
+
+    "custom/disk": {
+        "exec": "df -h --output=pcent,avail / | tail -1 | awk '{if(int($1) > 90) printf \"low space on /: %s\", $2}'",
+        "interval": 30
+    },
+
+    "wireplumber": {
+        "format": "vol {volume}%",
+        "format-muted": "vol muted"
+    },
+
+    "battery": {
+        "format": "{capacity}%",
+        "format-charging": "{capacity}%+",
+        "states": {
+            "warning": 30,
+            "critical": 15
+        }
+    },
+
+    "clock": {
+        "format": "{:%Y-%m-%d %H:%M:%S}",
+        "interval": 1
+    },
+
+    "tray": {
+        "spacing": 10,
+        "icon-size": 28
+    }
+}

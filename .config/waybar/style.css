@@ -1,0 +1,46 @@
+* {
+    font-family: "DejaVu Sans Mono";
+    font-size: 28px;
+}
+
+window#waybar {
+    background-color: #2f334d;
+    color: #828bb8;
+}
+
+#workspaces button {
+    color: #828bb8;
+    background-color: #2f334d;
+    border: none;
+    border-radius: 0;
+    padding: 0 8px;
+}
+
+#workspaces button.focused {
+    color: #2f334d;
+    background-color: #82aaff;
+}
+
+#workspaces button.visible {
+    color: #2f334d;
+    background-color: #82aaff;
+}
+
+#mpd,
+#custom-disk,
+#wireplumber,
+#battery,
+#clock,
+#tray {
+    padding: 0 18px 0 10px;
+    margin-right: 8px;
+    border-right: 1px solid #839496;
+}
+
+#tray {
+    border-right: none;
+}
+
+#custom-disk {
+    color: #ffc777;
+}
