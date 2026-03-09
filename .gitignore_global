@@ -9,3 +9,8 @@ Session.vim
 .errorlines
 **/target
 .wall.sh
+.claude
+
+AGENTS.md
+CLAUDE.md
+GEMINI.md
