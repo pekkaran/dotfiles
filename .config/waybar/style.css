@@ -1,6 +1,6 @@
 * {
     font-family: "DejaVu Sans Mono";
-    font-size: 28px;
+    font-size: 36px;
 }
 
 window#waybar {
@@ -24,6 +24,11 @@ window#waybar {
 #workspaces button.visible {
     color: #2f334d;
     background-color: #82aaff;
+}
+
+#workspaces button.urgent {
+    color: #2f334d;
+    background-color: #ffc777;
 }
 
 #mpd,

@@ -261,14 +261,15 @@ assign [class="firefox"] 1
 
 exec --no-startup-id i3-msg 'workspace 2; exec alacritty -e daily'
 
-# exec dunst
 exec swaync
-
 exec mpd
 exec unclutter
 exec devmon
 exec gammastep
 exec discord --start-minimized
-exec thunderbird
+# exec thunderbird
 exec blueman-manager
-exec bash -c 'until host -W1 store.steampowered.com >/dev/null 2>&1; do sleep 1; done; steam'
+
+# Wait until network becomes available (test actual HTTPS, not just DNS).
+exec bash -c 'until curl -sf --max-time 3 -o /dev/null https://client-update.steamstatic.com/steam_client_ubuntu12; do sleep 2; done; DBUS_FATAL_WARNINGS=0 steam'
+exec bash -c 'until curl -sf --max-time 3 -o /dev/null https://client-update.steamstatic.com/steam_client_ubuntu12; do sleep 2; done; thunderbird'

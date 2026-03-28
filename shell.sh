@@ -161,6 +161,9 @@ alias recent='git branch -a --sort=-committerdate | grep -v remotes/ | head -n 2
 alias recent-remote='git branch -a --sort=-committerdate | grep remotes/ | head -n 20'
 # alias recent-alt='git for-each-ref --sort=-committerdate refs/heads/ | head -n 20'
 
+# `last-edited path/to/file` shows latest changes applied to the given file.
+alias last-edited='git log -p --'
+
 # Change git repository HTTPS links to SSH.
 # Use when you want to push to your own public repositories (cloned with HTTPS or using such submodule addresses).
 alias gitssh='git config url."git@github.com:".insteadOf "https://github.com/"'
@@ -392,4 +395,14 @@ function roll() {
 # in it to make the GUI program independent and get rid of terminal window. (Tip: `fg` reverts Ctrl-Z)
 diso() {
   bg %1 && disown %1 && exit
+}
+
+# Try prefix command with this if the UI scale is too small.
+hidpi() {
+  GDK_SCALE=2 \
+  QT_SCALE_FACTOR=2 \
+  GDK_DPI_SCALE=1 \
+  QT_AUTO_SCREEN_SCALE_FACTOR=0 \
+  QT_ENABLE_HIGHDPI_SCALING=1 \
+  "$@"
 }
