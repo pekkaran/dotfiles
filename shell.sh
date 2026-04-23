@@ -106,10 +106,7 @@ alias rom='git rebase -i origin/main'
 alias romaster='git rebase -i origin/master'
 alias remote='git remote'
 alias revert='git revert'
-alias show='git show'
-alias sta='git diff --stat HEAD~1 | head -n -1' # Summary of file line changes for corresponding `show`.
-alias recentf="git diff --stat HEAD~1 | head -n -1" # Same as `sta`, but see the variants below.
-# show0 == show, sta0 == sta, recentf0 == recentf
+
 for i in $(seq 0 9); do
   alias show$i="git show HEAD~$i"
   # Files changed in the last i:th commit.
@@ -117,6 +114,10 @@ for i in $(seq 0 9); do
   # Files changed in the last i commits together.
   alias recentf$i="git diff --stat HEAD~$(($i + 1)) HEAD | head -n -1"
 done
+alias show="show0"
+alias sta="sta0"
+alias recentf="recentf0"
+
 alias stash='git stash'
 alias status='git status'
 alias s='git status -sb'
@@ -157,9 +158,13 @@ function smr() {
   # And then commit the changes.
 }
 # List branches recently committed to.
-alias recent='git branch -a --sort=-committerdate | grep -v remotes/ | head -n 20'
-alias recent-remote='git branch -a --sort=-committerdate | grep remotes/ | head -n 20'
-# alias recent-alt='git for-each-ref --sort=-committerdate refs/heads/ | head -n 20'
+for i in $(seq 20 20 100); do
+  alias recent$i="git branch -a --sort=-committerdate | grep -v remotes/ | head -n $i"
+  alias recent-remote$i="git branch -a --sort=-committerdate | grep remotes/ | head -n $i"
+  # alias recent-alt$i='git for-each-ref --sort=-committerdate refs/heads/ | head -n $i'
+done
+alias recent="recent20"
+alias recent-remote="recent-remote20"
 
 # `last-edited path/to/file` shows latest changes applied to the given file.
 alias last-edited='git log -p --'
