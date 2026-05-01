@@ -37,6 +37,7 @@ bindsym $mod+Shift+l move right
 
 # switch workspace to other monitor. same keybinding works for both sides
 bindsym $mod+q move workspace to output right
+bindsym $mod+a move workspace to output down
 
 # enter fullscreen mode for the focused container
 # bindsym $mod+f fullscreen
@@ -56,7 +57,7 @@ bindsym $mod+space floating toggle
 # change focus between tiling / floating windows
 
 # focus the parent container
-bindsym $mod+a focus parent
+# bindsym $mod+a focus parent
 
 # focus the child container
 #bindsym $mod+d focus child
@@ -139,6 +140,7 @@ for_window [class=".*Steam.*"] floating enable
 for_window [class="mpv"] floating enable
 for_window [class=".*Wine.*"] floating enable
 for_window [class="Matplotlib"] floating enable
+for_window [class=".*float.*"] floating enable
 
 bar {
     swaybar_command waybar

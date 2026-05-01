@@ -18,7 +18,7 @@
     },
 
     "custom/disk": {
-        "exec": "df -h --output=pcent,avail / | tail -1 | awk '{if(int($1) > 90) printf \"low space on /: %s\", $2}'",
+        "exec": "df -h --output=pcent,avail / | tail -1 | awk '{if(int($1) > 95) printf \"low space on /: %s\", $2}'",
         "interval": 30
     },
 
