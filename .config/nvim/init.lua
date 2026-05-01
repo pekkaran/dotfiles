@@ -406,10 +406,19 @@ vim.keymap.set("i", "JK", "<esc>", map_args)
 vim.keymap.set("i", "jjk", "<esc>", map_args)
 -- vim.keymap.set("i", "<esc>", "<nop>", map_args)
 -- New line in insert mode.
-vim.keymap.set("i", "<cr>", "<nop>", map_args)
 vim.keymap.set("i", "<C-l>", "<C-j>", map_args)
 vim.keymap.set("n", "<C-l>", "o", map_args)
 vim.keymap.set("i", "jf", "<C-j>", map_args)
+
+-- Create "new paragraph" with return.
+-- vim.keymap.set("i", "<cr>", "<esc>o<esc>o", map_args)
+-- vim.keymap.set("n", "<cr>", "o<esc>o", map_args)
+-- vim.keymap.set('n', '<cr>', function()
+--   if vim.bo.buftype == 'quickfix' then
+--     return '<cr>'
+--   end
+--   return "o<esc>o"
+-- end, map_args)
 
 -- Quick save.
 vim.keymap.set("n", "<leader>m", ":w<cr>", map_args)
