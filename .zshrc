@@ -60,6 +60,11 @@
 # +----------------+-----------+-----------+------+
 #
 
+# Custom prompt (based on "steeef"). Before `init.zsh` source.
+export VIRTUAL_ENV_DISABLE_PROMPT=1
+fpath=(~/dotfiles $fpath)
+zstyle ':prezto:module:prompt' theme 'maximal'
+
 # Source Prezto.
 if [[ -s "$HOME/dotfiles/.zprezto/init.zsh" ]]; then
   source "$HOME/dotfiles/.zprezto/init.zsh"
