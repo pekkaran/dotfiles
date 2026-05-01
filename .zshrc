@@ -65,6 +65,12 @@ if [[ -s "$HOME/dotfiles/.zprezto/init.zsh" ]]; then
   source "$HOME/dotfiles/.zprezto/init.zsh"
 fi
 
+# Eg for activating a Python venv, see below.
+if [[ -n $SOURCE && -f "$SOURCE" ]]; then
+  source "$SOURCE"
+  unset SOURCE
+fi
+
 # Own setopts, after prezto config.
 
 # See <https://github.com/kana/config/blob/master/sh/dot.zshrc>
@@ -147,8 +153,11 @@ zle -N cd-parent
 bindkey '^O' cd-parent
 
 duplicate-terminal() {
-  (pwd | $TERM_CMD &)
-  # zle .reset-prompt && zle -R
+  if [[ -n $VIRTUAL_ENV ]]; then
+    pwd | SOURCE="$VIRTUAL_ENV/bin/activate" $TERM_CMD
+  else
+    pwd | $TERM_CMD
+  fi
 }
 zle -N duplicate-terminal
 bindkey '^U' duplicate-terminal
