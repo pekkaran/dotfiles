@@ -58,7 +58,6 @@
 # +----------------+-----------+-----------+------+
 # |~/.zlogout      |    E      |           |      |
 # +----------------+-----------+-----------+------+
-#
 
 # Custom prompt (based on "steeef"). Before `init.zsh` source.
 export VIRTUAL_ENV_DISABLE_PROMPT=1
@@ -192,5 +191,6 @@ if [ -f "$HOME/.zshrc_local" ]; then
 fi
 
 if [[ "$(hostname)" == "suuankou" ]]; then
-  . /usr/share/nvm/init-nvm.sh
+  # --no-use makes it much faster.
+  . /usr/share/nvm/init-nvm.sh --no-use
 fi
