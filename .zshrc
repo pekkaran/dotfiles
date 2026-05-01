@@ -158,16 +158,15 @@ zle -N cd-parent
 bindkey '^O' cd-parent
 
 duplicate-terminal() {
+  # `&!` spawns the window so that the parent terminal can be closed without closing the child.
   if [[ -n $VIRTUAL_ENV ]]; then
-    pwd | SOURCE="$VIRTUAL_ENV/bin/activate" $TERM_CMD
+    pwd | SOURCE="$VIRTUAL_ENV/bin/activate" $TERM_CMD &!
   else
-    pwd | $TERM_CMD
+    pwd | $TERM_CMD &!
   fi
 }
 zle -N duplicate-terminal
 bindkey '^U' duplicate-terminal
-
-# eval $(dircolors -b $HOME/dotfiles/shell/LS_COLORS)
 
 # `autojump`, `z` and `fasd` are programs that help navigate directories quickly.
 # I found `autojump` to be a bit slow and `z` buggy. Settled on the former for now.
