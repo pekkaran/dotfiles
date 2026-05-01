@@ -1,16 +1,15 @@
 # Global .gitignore file.
 # Setup with `git config --global core.excludesfile ~/dotfiles/.gitignore_global`
 
-.claude
-
+__pycache__
 Session.vim
 .DS_Store
 *.tags
 .errorlines
 **/target
 .wall.sh
-.claude
 
+.claude
 AGENTS.md
 CLAUDE.md
 GEMINI.md
