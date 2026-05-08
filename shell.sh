@@ -80,13 +80,8 @@ alias vids='vids1'
 #   Git has its own alias functionality but I don't want to type the "git " prefix to use it.
 alias add='git add'
 alias branch='git branch -v'
-# TODO Start use the new `switch` and `restore` commands instead of `checkout`:
-# <https://www.banterly.net/2021/07/31/new-in-git-switch-and-restore/>
 alias ch='git checkout'
 alias chb='git checkout -b'
-# alias cs='git switch' # Same as eg `git checkout old-branch`
-# alias csc='git switch -c' # Same as eg `git checkout -b new-branch`
-# alias cre='git restore` # Same as eg `git checkout -- file`. I think `restore` doesn't need `--`.
 alias cherry-pick='git cherry-pick'
 alias clone='git clone'
 alias commit='git commit'
@@ -117,6 +112,8 @@ done
 alias show="show0"
 alias sta="sta0"
 alias recentf="recentf0"
+# Interactive checkout. The `sed` command strips a leading '*' on the current branch.
+alias chr="recent | sed 's/^[* ]*//' | dmenu -p 'checkout:' | xargs -r git checkout"
 
 alias stash='git stash'
 alias status='git status'
