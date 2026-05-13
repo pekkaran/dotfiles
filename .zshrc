@@ -168,9 +168,15 @@ zle -N duplicate-terminal
 bindkey '^U' duplicate-terminal
 
 # `autojump`, `z` and `fasd` are programs that help navigate directories quickly.
-# I found `autojump` to be a bit slow and `z` buggy. Settled on the former for now.
-# Link to `z` because it seems difficult to google: <https://github.com/rupa/z>
-if type autojump > /dev/null 2>&1; then
+# Earlier, I found `autojump` to be a bit slow and `z` buggy. Trying out `z` again now.
+#
+# Links to `z` because it seems difficult to google:
+# * <https://archlinux.org/packages/extra/any/z/>
+# * <https://github.com/rupa/z>
+if [[ -f /usr/share/z/z.sh ]]; then
+  source /usr/share/z/z.sh
+  alias j='z'
+elif type autojump > /dev/null 2>&1; then
   source "$HOME/secrets/autojump.zsh"
 fi
 
