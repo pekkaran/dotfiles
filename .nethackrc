@@ -85,3 +85,6 @@ OPTIONS=hilite_status:hitpoints/<60%/yellow
 OPTIONS=hilite_status:hitpoints/<40%/red
 
 OPTIONS=hilite_status:carrying-capacity/burdened/yellow/stressed/orange
+
+# v5.0.0
+OPTIONS=!tutorial
