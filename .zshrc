@@ -91,6 +91,8 @@ unsetopt menu_complete # unsetopt default
 unsetopt auto_cd # unsetopt default
 unsetopt beep
 unsetopt correct # don't correct command spelling
+unsetopt auto_name_dirs # stops shell variables from auto-becoming named dirs
+unsetopt cdable_vars # stops `cd foo` from expanding to named dirs without ~
 
 # Allow autocompletion directly after `=`, which is used by some programs to set parameters.
 setopt magic_equal_subst
