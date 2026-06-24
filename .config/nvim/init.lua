@@ -794,9 +794,9 @@ augroup('Abbreviations', function(g)
       elseif vim.bo.filetype == "cpp" or vim.bo.filetype == "hpp" then
         vim.cmd[[
           iabbrev cout std::cout << << std::endl
-          iabbrev printf printf("%\n");
-          iabbrev logx log_debug("%");
-          iabbrev warnx log_warn("%");
+          iabbrev printf printf("\n");
+          iabbrev logx log_debug("");
+          iabbrev warnx log_warn("");
           iabbrev forx for (size_t i = 0; i < ; ++i)
           iabbrev forax for (const auto &y : ys)
           iabbrev forsx for (const std::string &y : ys)
