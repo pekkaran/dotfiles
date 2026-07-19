@@ -2,6 +2,20 @@
 #
 # Run this in a git repo to get some vanity statistics.
 
+since_6am=$(date -d 'today 06:00' +%s)
+now=$(date +%s)
+if [ "$now" -lt "$since_6am" ]; then
+    since_6am=$(date -d 'yesterday 06:00' '+%Y-%m-%d 06:00')
+else
+    since_6am=$(date -d 'today 06:00' '+%Y-%m-%d 06:00')
+fi
+
+echo "Lines changed today:"
+git log --since="$since_6am" --numstat --pretty="%H" | awk '
+   NF==3 {plus+=$1; minus+=$2;}
+   END   {printf("+%d, -%d, total %d\n", plus, minus, plus - minus)}'
+
+echo ""
 echo "Lines changed since first commit:"
 git log --numstat --pretty="%H" | awk '
    NF==3 {plus+=$1; minus+=$2;}
