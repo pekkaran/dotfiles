@@ -8,4 +8,13 @@ s) # Save using GUI
     dest=$(zenity --file-selection --save --confirm-overwrite --filename="$(basename "$file")")
     [ -n "$dest" ] && magick convert "$file" "$dest"
   done ;;
+d) # Delete file
+  while read file; do
+    if zenity --question --title="Delete file" --text="Delete '$file'?"; then
+      rm -f "$file"
+      # nsxiv has no exec-protocol way to drop a file from its list, so
+      # simulate its own "D" keybinding (remove current image, go to next).
+      [ -n "$wid" ] && xdotool key --window "$wid" D
+    fi
+  done ;;
 esac
