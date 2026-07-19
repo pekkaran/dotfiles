@@ -169,17 +169,17 @@ duplicate-terminal() {
 zle -N duplicate-terminal
 bindkey '^U' duplicate-terminal
 
-# `autojump`, `z` and `fasd` are programs that help navigate directories quickly.
-# Earlier, I found `autojump` to be a bit slow and `z` buggy. Trying out `z` again now.
+# `autojump`, `autojump-rs` `z` and `fasd` are programs that help navigate directories quickly.
 #
-# Links to `z` because it seems difficult to google:
-# * <https://archlinux.org/packages/extra/any/z/>
-# * <https://github.com/rupa/z>
-if [[ -f /usr/share/z/z.sh ]]; then
+# My experiences so far:
+# * autojump: A bit slow and does not work properly inside Python virtual environments.
+# * automjump-rs: Testing currently. Drop-in replacement for autojump.
+# * z: Does not seem to remember some directories at all. Do not use.
+if type autojump > /dev/null 2>&1; then
+  source "$HOME/secrets/autojump.zsh"
+elif [[ -f /usr/share/z/z.sh ]]; then
   source /usr/share/z/z.sh
   alias j='z'
-elif type autojump > /dev/null 2>&1; then
-  source "$HOME/secrets/autojump.zsh"
 fi
 
 # Once `ssh-agent` is running, run `ssh-add` once before you need your keys.
@@ -199,6 +199,6 @@ if [ -f "$HOME/.zshrc_local" ]; then
 fi
 
 if [[ "$(hostname)" == "suuankou" ]]; then
-  # --no-use makes it much faster.
+  # --no-use makes it much faster, but some binaries will not be found.
   . /usr/share/nvm/init-nvm.sh --no-use
 fi
