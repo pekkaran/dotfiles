@@ -28,6 +28,8 @@ xkb_keymap {
 
     // The ö vowel. In altgr-intl these are on the `p` key, which I found hard to use.
     key <AD03> { [e, E, odiaeresis, Odiaeresis] };
+    // The õ vowel.
+    key <AD04> { [r, R, otilde, Otilde] };
     // The “” quote symbols.
     key <AC01> { [a, A, leftdoublequotemark, aacute ] };
     key <AC02> { [s, S, rightdoublequotemark, section ] };
