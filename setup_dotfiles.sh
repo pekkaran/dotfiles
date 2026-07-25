@@ -35,7 +35,6 @@ files=(
   .tmux
   .vim
   .xkb
-  .alacritty.yml
   .editorconfig
   .i3status.conf
   .lldbinit
@@ -49,7 +48,6 @@ files=(
   .zshenv
   .zshrc
 )
-# Not included: .Xresources .xinitrc .i3
 
 for file in ${files[@]}; do
   if [ -f "$file" ]; then

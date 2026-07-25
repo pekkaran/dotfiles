@@ -9,7 +9,7 @@ import shutil
 CONFIGURATION_PATH = pathlib.Path.home() / ".theme.json"
 THEMES_PATH = pathlib.Path.home() / "dotfiles" / "themes"
 
-ALACRITTY_PATH = pathlib.Path.home() / ".alacritty.toml"
+ALACRITTY_PATH = pathlib.Path.home() / ".config" / "alacritty" / ".alacritty.toml"
 
 ALACRITTY_THEMES = {
     "light": ".alacritty-tokyo-day.toml",
