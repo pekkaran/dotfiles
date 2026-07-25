@@ -1,0 +1,134 @@
+#!/usr/bin/env python3
+"""Format JSON files in place, pretty-printed but with short arrays on one line."""
+
+from __future__ import annotations
+
+import argparse
+import json
+import os
+
+DEFAULT_WIDTH = 80
+DEFAULT_INDENT = 2
+
+class Formatter:
+  def __init__(self, indent: str, width: int):
+    self.indent = indent
+    self.width = width
+
+  def format(self, data) -> str:
+    out: list[str] = []
+    self._render(data, 0, "", "", out)
+    return "\n".join(out)
+
+  def _scalar(self, value) -> str:
+    return json.dumps(value, ensure_ascii=False)
+
+  def _collapsible(self, value: list) -> bool:
+    for item in value:
+      if isinstance(item, dict):
+        if item:
+          return False
+      elif isinstance(item, list):
+        if not self._collapsible(item):
+          return False
+    return True
+
+  def _inline(self, value) -> str:
+    if isinstance(value, list):
+      return "[" + ", ".join(self._inline(item) for item in value) + "]"
+    if isinstance(value, dict):
+      return "{}"
+    return self._scalar(value)
+
+  def _render(self, value, depth: int, prefix: str, suffix: str, out: list[str]) -> None:
+    if isinstance(value, list):
+      self._render_list(value, depth, prefix, suffix, out)
+    elif isinstance(value, dict):
+      self._render_dict(value, depth, prefix, suffix, out)
+    else:
+      out.append(prefix + self._scalar(value) + suffix)
+
+  def _render_list(self, value: list, depth: int, prefix: str, suffix: str, out: list[str]) -> None:
+    if not value:
+      out.append(prefix + "[]" + suffix)
+      return
+
+    if self._collapsible(value):
+      line = prefix + self._inline(value) + suffix
+      if len(line) < self.width:
+        out.append(line)
+        return
+
+    out.append(prefix + "[")
+    last = len(value) - 1
+    for i, item in enumerate(value):
+      self._render(item, depth + 1, self.indent * (depth + 1), "" if i == last else ",", out)
+    out.append(self.indent * depth + "]" + suffix)
+
+  def _render_dict(self, value: dict, depth: int, prefix: str, suffix: str, out: list[str]) -> None:
+    if not value:
+      out.append(prefix + "{}" + suffix)
+      return
+
+    out.append(prefix + "{")
+    last = len(value) - 1
+    for i, (key, item) in enumerate(value.items()):
+      key_prefix = self.indent * (depth + 1) + self._scalar(str(key)) + ": "
+      self._render(item, depth + 1, key_prefix, "" if i == last else ",", out)
+    out.append(self.indent * depth + "}" + suffix)
+
+def detect_indent(text: str, fallback: str) -> str:
+  best: str | None = None
+  for line in text.splitlines():
+    stripped = line.lstrip(" \t")
+    if not stripped or stripped == line:
+      continue
+    lead = line[: len(line) - len(stripped)]
+    if "\t" in lead:
+      return "\t"
+    if best is None or len(lead) < len(best):
+      best = lead
+  return best if best else fallback
+
+def format_text(text: str, args) -> str:
+  indent = " " * args.indent if args.indent is not None else detect_indent(text, " " * DEFAULT_INDENT)
+  result = Formatter(indent, args.width).format(json.loads(text))
+  if text.endswith("\n"):
+    result += "\n"
+  return result
+
+def process_file(path: str, args) -> None:
+  with open(path, encoding="utf-8") as fh:
+    original = fh.read()
+
+  formatted = format_text(original, args)
+  if formatted == original:
+    return
+
+  with open(path, "w", encoding="utf-8", newline="\n") as fh:
+    fh.write(formatted)
+  print(f"formatted {path}")
+
+def iter_json_files(path: str):
+  if os.path.isfile(path):
+    yield path
+    return
+  for root, dirs, files in os.walk(path):
+    dirs.sort()
+    for name in sorted(files):
+      if name.lower().endswith(".json"):
+        yield os.path.join(root, name)
+
+def main(argv=None) -> None:
+  parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+  parser.add_argument("paths", nargs="+")
+  parser.add_argument("--width", type=int, default=DEFAULT_WIDTH)
+  parser.add_argument("--indent", type=int)
+  args = parser.parse_args(argv)
+
+  for path in args.paths:
+    for file_path in iter_json_files(path):
+      process_file(file_path, args)
+
+if __name__ == "__main__":
+  main()
