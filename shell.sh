@@ -109,7 +109,13 @@ for i in $(seq 0 9); do
   # Files changed in the last i commits together.
   alias recentf$i="git diff --stat HEAD~$(($i + 1)) HEAD | head -n -1"
 done
-alias show="show0"
+function show() {
+  if [ $# -ge 1 ]; then
+    git show "$@"
+  else
+    git show HEAD
+  fi
+}
 alias sta="sta0"
 alias recentf="recentf0"
 # Interactive checkout. The `sed` command strips a leading '*' on the current branch.
