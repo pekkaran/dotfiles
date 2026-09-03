@@ -1,10 +1,10 @@
 FROM docker.io/library/archlinux:base
 
 RUN pacman -Syu --noconfirm --needed \
-        nodejs npm git ripgrep jq less procps-ng openssh curl opencode \
+        nodejs npm git ripgrep jq less procps-ng openssh curl opencode imagemagick \
         which diffutils patch unzip zip wget rsync tree bc nano python sudo \
         python-yaml \
-        rust \
+        rust pandoc \
     && pacman -Scc --noconfirm
 
 # `git` and friends fall back to `vi`, which is not installed.

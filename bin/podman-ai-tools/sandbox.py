@@ -13,7 +13,13 @@ path inside the sandbox; otherwise podman's host:container[:opts] syntax
 applies. The container path must be absolute.
 
 Ports are published with -p, using podman's syntax. A bare port number is
-published on the same port on the host, bound to localhost.
+published on the same port on the host, bound to localhost. To go the other
+way — reach a server on the host from inside the sandbox — pass
+--host-network: the sandbox then shares the host's network and host servers
+are reachable at localhost:port, even loopback-only ones, from any number
+of sandboxes at once. (Without it, they are reachable as
+host.containers.internal as long as they listen on 0.0.0.0 — services
+bound to the host's loopback alone stay unreachable from the sandbox.)
 
 Usage:
     cd path/to/my-project
@@ -29,6 +35,7 @@ Usage:
     sandbox.py -p 8000 claude               # 127.0.0.1:8000 -> container 8000
     sandbox.py -p 3000:80 claude            # 127.0.0.1:3000 -> container 80
     sandbox.py -p 0.0.0.0:8000:8000 claude  # ... reachable from the network
+    sandbox.py --host-network claude        # host's servers at localhost:port
 """
 import argparse
 import os
@@ -65,6 +72,10 @@ def parse_args():
                         help="publish a port: a bare port number (bound to "
                              "localhost), or podman's [host:]hostport:ctrport "
                              "syntax; repeatable")
+    parser.add_argument("--host-network", action="store_true",
+                        help="use the host's network: reach servers on the "
+                             "host via localhost:port from inside the sandbox "
+                             "(many sandboxes can share one host server)")
     parser.add_argument("command", nargs=argparse.REMAINDER,
                         help="command to run in the sandbox (default: bash)")
     return parser.parse_args()
@@ -138,6 +149,9 @@ def main():
 
     mounts = [arg for spec in args.volume for arg in ("-v", mount_arg(spec))]
     ports = [arg for spec in args.publish for arg in ("-p", publish_arg(spec))]
+    if args.host_network and ports:
+        die("The sandbox shares the host's network, so there is no port to "
+            "publish; drop the -p arguments.")
     if ports:
         print(">> Note: a server in the sandbox must listen on 0.0.0.0, not "
               "127.0.0.1,\n   or the published port will refuse connections.",
@@ -147,6 +161,7 @@ def main():
     # keep-id:uid=1000 maps the host user onto the image's "node" user, so
     # files created under /work end up owned by you on the host.
     run = ["podman", "run", "--rm", "-it",
+           *(["--network=host"] if args.host_network else []),
            "--userns=keep-id:uid=1000,gid=1000",
            "--user", "1000:1000",
            "-e", "HOME=/home/node",
