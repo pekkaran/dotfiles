@@ -1,0 +1,38 @@
+FROM docker.io/library/archlinux:base
+
+RUN pacman -Syu --noconfirm --needed \
+        nodejs npm git ripgrep jq less procps-ng openssh curl opencode \
+        which diffutils patch unzip zip wget rsync tree bc nano python sudo \
+        python-yaml \
+        rust \
+    && pacman -Scc --noconfirm
+
+# `git` and friends fall back to `vi`, which is not installed.
+ENV EDITOR=nano VISUAL=nano
+
+# npm >= 12 blocks install scripts unless allowlisted, and claude-code needs its
+# postinstall to fetch the native binary.
+RUN npm install -g --allow-scripts=@anthropic-ai/claude-code @anthropic-ai/claude-code
+
+RUN HOME=/opt/grok GROK_BIN_DIR=/usr/local/bin \
+        bash -c 'curl -fsSL https://x.ai/cli/install.sh | bash' \
+    && chmod -R a+rX /opt/grok
+
+# uid 1000 with home /home/node, matching what sandbox.py maps onto
+# (--userns=keep-id:uid=1000), so the script works unchanged with this image.
+RUN useradd -m -u 1000 -d /home/node -s /bin/bash node \
+    && printf 'node ALL=(ALL:ALL) NOPASSWD: ALL\n' > /etc/sudoers.d/node \
+    && chmod 0440 /etc/sudoers.d/node
+
+# "Orientation" files.
+COPY README-for-agent-in-sandbox.md /opt/sandbox/README.md
+COPY Containerfile /opt/sandbox/Containerfile
+COPY entrypoint.sh /usr/local/bin/sandbox-entrypoint
+RUN chmod 0755 /usr/local/bin/sandbox-entrypoint
+
+USER node
+ENV HOME=/home/node
+WORKDIR /work
+
+ENTRYPOINT ["/usr/local/bin/sandbox-entrypoint"]
+CMD ["bash"]
