@@ -1,0 +1,58 @@
+FROM docker.io/library/ubuntu:24.04
+
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        nodejs npm git ripgrep jq less procps openssh-client curl ca-certificates \
+        imagemagick debianutils diffutils patch unzip zip wget rsync tree bc nano \
+        python3 python-is-python3 python3-yaml python3-dev \
+        sudo pandoc \
+        build-essential make cmake ninja-build ccache \
+        clang-20 clang-tools-20 clang-format-20 clang-tidy-20 \
+        lld-20 lldb-20 libc++-20-dev libc++abi-20-dev \
+        libgl-dev libglu1-mesa-dev libglfw3-dev libglew-dev libgtk2.0-dev \
+        libavformat-dev libavcodec-dev libavutil-dev libswscale-dev ffmpeg \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set up Clang 20 as default clang, clang++, and system C/C++ compiler.
+RUN update-alternatives --install /usr/bin/clang clang /usr/bin/clang-20 100 \
+        --slave /usr/bin/clang++ clang++ /usr/bin/clang++-20 \
+        --slave /usr/bin/clang-format clang-format /usr/bin/clang-format-20 \
+        --slave /usr/bin/clang-tidy clang-tidy /usr/bin/clang-tidy-20 \
+        --slave /usr/bin/lld lld /usr/bin/lld-20 \
+        --slave /usr/bin/ld.lld ld.lld /usr/bin/ld.lld-20 \
+        --slave /usr/bin/lldb lldb /usr/bin/lldb-20 \
+    && update-alternatives --install /usr/bin/cc cc /usr/bin/clang-20 100 \
+    && update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++-20 100
+
+# `git` and friends fall back to `vi`, which is not installed.
+ENV EDITOR=nano VISUAL=nano CC=clang CXX=clang++
+
+# npm >= 12 blocks install scripts unless allowlisted, and opencode needs its
+# postinstall to fetch the native binary.
+RUN npm install -g --allow-scripts=opencode-ai opencode-ai
+
+# uid 1000 with home /home/node, matching what sandbox.py maps onto
+# (--userns=keep-id:uid=1000), so the script works unchanged with this image.
+# Ubuntu 24.04 includes a default 'ubuntu' user with UID 1000; remove it first.
+RUN if id ubuntu >/dev/null 2>&1; then \
+        userdel -r -f ubuntu 2>/dev/null || true; \
+    fi \
+    && if getent group ubuntu >/dev/null 2>&1; then \
+        groupdel ubuntu 2>/dev/null || true; \
+    fi \
+    && useradd -m -u 1000 -d /home/node -s /bin/bash node \
+    && printf 'node ALL=(ALL:ALL) NOPASSWD: ALL\n' > /etc/sudoers.d/node \
+    && chmod 0440 /etc/sudoers.d/node
+
+# "Orientation" files.
+COPY README-for-agent-in-sandbox.md /opt/sandbox/README.md
+RUN sed -i 's/Arch Linux/Ubuntu/g' /opt/sandbox/README.md
+COPY Containerfile.ubuntu /opt/sandbox/Containerfile
+COPY entrypoint.sh /usr/local/bin/sandbox-entrypoint
+RUN chmod 0755 /usr/local/bin/sandbox-entrypoint
+
+USER node
+ENV HOME=/home/node
+WORKDIR /work
+
+ENTRYPOINT ["/usr/local/bin/sandbox-entrypoint"]
+CMD ["bash"]

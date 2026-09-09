@@ -2,8 +2,9 @@
 """Run an AI coding agent (claude, opencode, ...) in a minimal podman sandbox.
 
 The current working directory is mounted read-write at /work. The container
-home lives in the named volume "agent-sandbox-home" so agent logins/settings
-persist across runs (log in interactively once inside each agent).
+home lives in the named volume "agent-sandbox-home" (or
+"agent-sandbox-ubuntu-home" for Ubuntu) so agent logins/settings persist
+across runs (log in interactively once inside each agent).
 
 The shell starts in /home/node, where a README.md and a copy of the
 Containerfile explain the layout and point on to /work.
@@ -30,6 +31,8 @@ Usage:
                                             # (picks up Containerfile changes)
     sandbox.py --fresh                      # rebuild from scratch and exit
                                             # (picks up latest package versions)
+    sandbox.py --arch                       # force Arch Linux image
+    sandbox.py --ubuntu                     # force Ubuntu image
     sandbox.py -v ~/notes claude            # also at /home/toki/notes inside
     sandbox.py -v ~/notes:/notes:ro claude  # ... at /notes, read-only
     sandbox.py -p 8000 claude               # 127.0.0.1:8000 -> container 8000
@@ -43,10 +46,14 @@ import subprocess
 import sys
 from pathlib import Path
 
-IMAGE = "agent-sandbox"
-# This is a "named volume" that becomes something like
-#   `~/.local/share/containers/storage/volumes/agent-sandbox-home/`.
-HOME_VOLUME = "agent-sandbox-home"
+ARCH_IMAGE = "agent-sandbox:arch"
+UBUNTU_IMAGE = "agent-sandbox:ubuntu"
+ARCH_CONTAINERFILE = "Containerfile"
+UBUNTU_CONTAINERFILE = "Containerfile.ubuntu"
+ARCH_HOME_VOLUME = "agent-sandbox-home"
+UBUNTU_HOME_VOLUME = "agent-sandbox-ubuntu-home"
+IMAGE = ARCH_IMAGE
+HOME_VOLUME = ARCH_HOME_VOLUME
 SCRIPT_DIR = Path(__file__).resolve().parent
 
 
@@ -65,6 +72,11 @@ def parse_args():
     parser.add_argument("--fresh", action="store_true",
                         help="rebuild the image from scratch (no cache, pull "
                              "latest base) and exit")
+    distro_group = parser.add_mutually_exclusive_group()
+    distro_group.add_argument("--arch", action="store_true",
+                              help="force using the Arch Linux image")
+    distro_group.add_argument("--ubuntu", action="store_true",
+                              help="force using the Ubuntu image")
     parser.add_argument("-v", "--volume", action="append", default=[], metavar="MOUNT",
                         help="extra mount: a host path, or podman's "
                              "host:container[:opts] syntax; repeatable")
@@ -131,20 +143,61 @@ def publish_arg(spec):
     return spec
 
 
-def ensure_image(build, fresh=False):
-    if fresh or build or subprocess.run(["podman", "image", "exists", IMAGE]).returncode != 0:
+def select_distro(args):
+    """Determine whether to use the Arch Linux or Ubuntu image."""
+    if args.ubuntu:
+        return "ubuntu"
+    if args.arch:
+        return "arch"
+    try:
+        proc = subprocess.run(["uname", "-a"], capture_output=True, text=True)
+        if "Ubuntu" in proc.stdout:
+            return "ubuntu"
+    except Exception:
+        pass
+    return "arch"
+
+
+def ensure_image(image, containerfile, build, fresh=False):
+    exists = subprocess.run(["podman", "image", "exists", image]).returncode == 0
+    if not exists and not build and not fresh:
+        fallbacks = (["agent-sandbox", "agent-sandbox-arch"] if image == ARCH_IMAGE
+                     else ["agent-sandbox-ubuntu"])
+        for fb in fallbacks:
+            if subprocess.run(["podman", "image", "exists", fb]).returncode == 0:
+                subprocess.run(["podman", "tag", fb, image], check=True)
+                exists = True
+                break
+
+    if fresh or build or not exists:
         extra = ["--pull", "--no-cache"] if fresh else []
-        print(f">> Building {IMAGE}{' from scratch' if fresh else ''} ...")
-        subprocess.run(["podman", "build", *extra, "-t", IMAGE, str(SCRIPT_DIR)], check=True)
+        print(f">> Building {image}{' from scratch' if fresh else ''} ...")
+        cmd = ["podman", "build", *extra, "-f", str(SCRIPT_DIR / containerfile), "-t", image]
+        if image == ARCH_IMAGE:
+            cmd.extend(["-t", "agent-sandbox", "-t", "agent-sandbox-arch"])
+        elif image == UBUNTU_IMAGE:
+            cmd.extend(["-t", "agent-sandbox-ubuntu"])
+        cmd.append(str(SCRIPT_DIR))
+        subprocess.run(cmd, check=True)
 
 
 def main():
     args = parse_args()
+    distro = select_distro(args)
+    if distro == "ubuntu":
+        image = UBUNTU_IMAGE
+        containerfile = UBUNTU_CONTAINERFILE
+        home_volume = UBUNTU_HOME_VOLUME
+    else:
+        image = ARCH_IMAGE
+        containerfile = ARCH_CONTAINERFILE
+        home_volume = ARCH_HOME_VOLUME
+
     if args.build or args.fresh:
         flag = "--fresh" if args.fresh else "--build"
         if args.command:
             die(f"{flag} only rebuilds the image; do not pass a command.")
-        ensure_image(args.build, args.fresh)
+        ensure_image(image, containerfile, args.build, args.fresh)
         return
 
     mounts = [arg for spec in args.volume for arg in ("-v", mount_arg(spec))]
@@ -156,7 +209,7 @@ def main():
         print(">> Note: a server in the sandbox must listen on 0.0.0.0, not "
               "127.0.0.1,\n   or the published port will refuse connections.",
               file=sys.stderr)
-    ensure_image(False)
+    ensure_image(image, containerfile, False)
 
     # keep-id:uid=1000 maps the host user onto the image's "node" user, so
     # files created under /work end up owned by you on the host.
@@ -165,10 +218,10 @@ def main():
            "--userns=keep-id:uid=1000,gid=1000",
            "--user", "1000:1000",
            "-e", "HOME=/home/node",
-           "-v", f"{HOME_VOLUME}:/home/node",
+           "-v", f"{home_volume}:/home/node",
            "-v", f"{Path.cwd()}:/work",
            *mounts, *ports,
-           IMAGE, *args.command]
+           image, *args.command]
     os.execvp(run[0], run)
 
 
