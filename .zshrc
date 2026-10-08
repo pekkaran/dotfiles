@@ -115,7 +115,9 @@ if [[ -s "$HOME/secrets/shell.sh" ]]; then
 fi
 
 if type fzf > /dev/null 2>&1; then
-  if [[ -f "/usr/share/doc/fzf/examples/completion.zsh" ]]; then
+  if fzf --zsh > /dev/null 2>&1; then
+    source <(fzf --zsh)
+  elif [[ -f "/usr/share/doc/fzf/examples/completion.zsh" ]]; then
     # Ubuntu.
     source /usr/share/doc/fzf/examples/key-bindings.zsh
     source /usr/share/doc/fzf/examples/completion.zsh
@@ -124,6 +126,7 @@ if type fzf > /dev/null 2>&1; then
     source /usr/share/fzf/key-bindings.zsh
     source /usr/share/fzf/completion.zsh
   fi
+  export FZF_CTRL_R_OPTS="--wrap-word"
 else
   bindkey '^R' history-incremental-search-backward
   bindkey '^S' history-incremental-search-forward
@@ -202,3 +205,6 @@ if [[ "$(hostname)" == "suuankou" ]]; then
   # --no-use makes it much faster, but some binaries will not be found.
   . /usr/share/nvm/init-nvm.sh --no-use
 fi
+
+# opencode
+export PATH=/home/toki/.opencode/bin:$PATH
