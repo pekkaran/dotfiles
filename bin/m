@@ -6,7 +6,7 @@
 
 set -euo pipefail
 
-THREADS=$(($(nproc) / 2))
+THREADS=$(($(nproc) * 2 / 3))
 
 if [[ ! $(git rev-parse --is-inside-work-tree) = true ]]; then
   make -j "$THREADS"
