@@ -29,6 +29,8 @@ else
 fi
 alias cp='\cp -i' # prompt before overwriting
 alias mv='\mv -i' # prompt before overwriting
+alias cpl='rsync -ah --info=progress2'
+alias mvl='rsync -ah --info=progress2 --remove-source-files'
 alias chx='chmod +x' # make file executable
 alias fs='du -shD' # size of file or folder. s:summarize, h:human_readable, D=dereference_links
 alias df='df -hT' # Show file system space usage in human readabale format.
