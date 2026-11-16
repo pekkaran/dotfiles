@@ -102,6 +102,7 @@ require("lazy").setup({
           fullscreen = true,
           border = "single",
           preview = {
+            hidden = 'hidden',
             horizontal = 'right:50%',
             winopts = {
               number = false,
@@ -530,7 +531,27 @@ vim.keymap.set("i", "<C-j>", "<nop>", map_args)
 vim.keymap.set("i", "<C-k>", "<nop>", map_args)
 
 -- Grep-like search plugin.
-vim.keymap.set("n", "<C-f>", "<plug>(esearch)", map_args)
+-- vim.keymap.set("n", "<C-f>", "<plug>(esearch)", map_args)
+vim.keymap.set({ "n", "v" }, "<C-f>", function()
+  local git_root = vim.fn.systemlist("git rev-parse --show-toplevel")[1]
+  local in_git = vim.v.shell_error == 0
+  local cwd = in_git and git_root or nil
+  local cmd = in_git and 'git -c color.grep.separator="" grep --line-number --column --color=always -I -i --untracked -e' or nil
+  local query = nil
+  if vim.fn.mode():find("[vV\22]") then
+    query = require("fzf-lua.utils").get_visual_selection()
+  elseif vim.v.hlsearch == 1 then
+    query = vim.fn.getreg("/"):gsub("\\[<>vVmMcC]", ""):gsub("\\/", "/")
+  end
+  require("fzf-lua").grep_project({
+    cwd = cwd,
+    cmd = cmd,
+    query = query,
+    -- Require each space-separated search term to match as a contiguous substring
+    -- (prefix a term with `'` in the prompt, e.g. `'foo`, to make that term fuzzy).
+    fzf_opts = { ["--exact"] = true },
+  })
+end, map_args)
 
 -- Substitute text.
 vim.keymap.set("n", "<C-e>", ":%s/", map_args)
