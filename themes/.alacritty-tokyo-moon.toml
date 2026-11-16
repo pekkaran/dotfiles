@@ -40,9 +40,20 @@ index = 17
 color = '#c53b53'
 
 [font]
-size = 20
+size = 14
 
 [[keyboard.bindings]]
 key = "Return"
 mods = "Shift"
 chars = "\n"
+
+# Scroll buffer without Shift when not in full-screen/alternate screen apps (e.g. vim, less)
+[[keyboard.bindings]]
+key = "PageUp"
+mode = "~Alt"
+action = "ScrollPageUp"
+
+[[keyboard.bindings]]
+key = "PageDown"
+mode = "~Alt"
+action = "ScrollPageDown"

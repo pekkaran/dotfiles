@@ -21,3 +21,19 @@ yellow = "0xf4c876"
 [colors.primary]
 background = "0xc09fb4"
 foreground = "0x57658c"
+
+[[keyboard.bindings]]
+key = "Return"
+mods = "Shift"
+chars = "\n"
+
+# Scroll buffer without Shift when not in full-screen/alternate screen apps (e.g. vim, less)
+[[keyboard.bindings]]
+key = "PageUp"
+mode = "~Alt"
+action = "ScrollPageUp"
+
+[[keyboard.bindings]]
+key = "PageDown"
+mode = "~Alt"
+action = "ScrollPageDown"
