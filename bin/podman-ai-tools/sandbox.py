@@ -39,6 +39,8 @@ Usage:
     sandbox.py -p 3000:80 claude            # 127.0.0.1:3000 -> container 80
     sandbox.py -p 0.0.0.0:8000:8000 claude  # ... reachable from the network
     sandbox.py --host-network claude        # host's servers at localhost:port
+    sandbox.py -e MY_TOKEN=123 claude       # set environment variable
+    sandbox.py -e MY_TOKEN claude           # forward MY_TOKEN from the host
 """
 import argparse
 import os
@@ -84,6 +86,9 @@ def parse_args():
                         help="publish a port: a bare port number (bound to "
                              "localhost), or podman's [host:]hostport:ctrport "
                              "syntax; repeatable")
+    parser.add_argument("-e", "--env", action="append", default=[], metavar="VAR",
+                        help="set an environment variable: KEY=VALUE, or a "
+                             "bare KEY to forward from the host; repeatable")
     parser.add_argument("--host-network", action="store_true",
                         help="use the host's network: reach servers on the "
                              "host via localhost:port from inside the sandbox "
@@ -140,6 +145,15 @@ def publish_arg(spec):
     if not spec.partition("/")[0].rpartition(":")[2].isdigit():
         die(f"Malformed port in -p {spec!r} (use 8000, 3000:80, "
             f"or 0.0.0.0:8000:8000).")
+    return spec
+
+
+def env_arg(spec):
+    """Turn an env spec into the value of a podman -e flag."""
+    name, _, _ = spec.partition("=")
+    if not name:
+        die(f"Malformed environment variable in -e {spec!r} "
+            f"(use KEY=VALUE or KEY).")
     return spec
 
 
@@ -202,6 +216,7 @@ def main():
 
     mounts = [arg for spec in args.volume for arg in ("-v", mount_arg(spec))]
     ports = [arg for spec in args.publish for arg in ("-p", publish_arg(spec))]
+    envs = [arg for spec in args.env for arg in ("-e", env_arg(spec))]
     if args.host_network and ports:
         die("The sandbox shares the host's network, so there is no port to "
             "publish; drop the -p arguments.")
@@ -220,7 +235,7 @@ def main():
            "-e", "HOME=/home/node",
            "-v", f"{home_volume}:/home/node",
            "-v", f"{Path.cwd()}:/work",
-           *mounts, *ports,
+           *mounts, *ports, *envs,
            image, *args.command]
     os.execvp(run[0], run)
 
