@@ -48,7 +48,8 @@ COPY README-for-agent-in-sandbox.md /opt/sandbox/README.md
 RUN sed -i 's/Arch Linux/Ubuntu/g' /opt/sandbox/README.md
 COPY Containerfile.ubuntu /opt/sandbox/Containerfile
 COPY entrypoint.sh /usr/local/bin/sandbox-entrypoint
-RUN chmod 0755 /usr/local/bin/sandbox-entrypoint
+RUN chmod 0755 /usr/local/bin/sandbox-entrypoint \
+    && chmod 1777 /tmp
 
 USER node
 ENV HOME=/home/node
