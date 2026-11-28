@@ -10,9 +10,16 @@ RUN pacman -Syu --noconfirm --needed \
 # `git` and friends fall back to `vi`, which is not installed.
 ENV EDITOR=nano VISUAL=nano
 
-# npm >= 12 blocks install scripts unless allowlisted, and claude-code needs its
-# postinstall to fetch the native binary.
-RUN npm install -g --allow-scripts=@anthropic-ai/claude-code @anthropic-ai/claude-code
+# Native installer is the recommended method:
+# https://code.claude.com/docs/en/setup#install-claude-code
+# It installs under $HOME (~/.local/bin/claude). /home/node is a runtime
+# volume, so that copy would be hidden; put the binary on PATH instead.
+# cwd must not be / or the installer scans the filesystem and can hang.
+RUN cd /tmp \
+    && curl -fsSL https://claude.ai/install.sh | bash \
+    && install -m 0755 "$(readlink -f /root/.local/bin/claude)" /usr/local/bin/claude \
+    && rm -rf /root/.local /root/.claude /root/.claude.json /root/.cache/claude /root/.npm \
+    && claude --version
 
 RUN HOME=/opt/grok GROK_BIN_DIR=/usr/local/bin \
         bash -c 'curl -fsSL https://x.ai/cli/install.sh | bash' \

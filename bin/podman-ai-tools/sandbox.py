@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Run an AI coding agent (claude, opencode, ...) in a minimal podman sandbox.
 
-The current working directory is mounted read-write at /work. The container
+The current working directory is mounted read-write at /work (or at
+/<folder name> with --pwd-name, or not at all with --no-pwd). The container
 home lives in the named volume "agent-sandbox-home" (or
 "agent-sandbox-ubuntu-home" for Ubuntu) so agent logins/settings persist
 across runs (log in interactively once inside each agent).
@@ -41,6 +42,8 @@ Usage:
     sandbox.py --host-network claude        # host's servers at localhost:port
     sandbox.py -e MY_TOKEN=123 claude       # set environment variable
     sandbox.py -e MY_TOKEN claude           # forward MY_TOKEN from the host
+    sandbox.py --pwd-name claude            # cwd at /my-project, not /work
+    sandbox.py --no-pwd claude              # no cwd mount; start in home
 """
 import argparse
 import os
@@ -93,6 +96,13 @@ def parse_args():
                         help="use the host's network: reach servers on the "
                              "host via localhost:port from inside the sandbox "
                              "(many sandboxes can share one host server)")
+    pwd_group = parser.add_mutually_exclusive_group()
+    pwd_group.add_argument("--pwd-name", action="store_true",
+                           help="mount the current directory at /<its folder "
+                                "name> instead of /work")
+    pwd_group.add_argument("--no-pwd", action="store_true",
+                           help="do not mount the current directory; start "
+                                "in the home directory")
     parser.add_argument("command", nargs=argparse.REMAINDER,
                         help="command to run in the sandbox (default: bash)")
     return parser.parse_args()
@@ -226,6 +236,17 @@ def main():
               file=sys.stderr)
     ensure_image(image, containerfile, False)
 
+    # The image's WORKDIR is /work; point it elsewhere when the cwd goes elsewhere.
+    if args.no_pwd:
+        pwd = ["-w", "/home/node"]
+    elif args.pwd_name:
+        target = f"/{Path.cwd().name}"
+        if target == "/":
+            die("--pwd-name needs a current directory other than /.")
+        pwd = ["-v", f"{Path.cwd()}:{target}", "-w", target]
+    else:
+        pwd = ["-v", f"{Path.cwd()}:/work"]
+
     # keep-id:uid=1000 maps the host user onto the image's "node" user, so
     # files created under /work end up owned by you on the host.
     run = ["podman", "run", "--rm", "-it",
@@ -234,7 +255,7 @@ def main():
            "--user", "1000:1000",
            "-e", "HOME=/home/node",
            "-v", f"{home_volume}:/home/node",
-           "-v", f"{Path.cwd()}:/work",
+           *pwd,
            *mounts, *ports, *envs,
            image, *args.command]
     os.execvp(run[0], run)
