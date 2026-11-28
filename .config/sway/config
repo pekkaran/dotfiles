@@ -269,8 +269,7 @@ exec unclutter
 exec devmon
 exec gammastep
 exec discord --start-minimized
-# exec thunderbird
-exec blueman-manager
+exec blueman-applet
 
 # Wait until network becomes available (test actual HTTPS, not just DNS).
 exec bash -c 'until curl -sf --max-time 3 -o /dev/null https://client-update.steamstatic.com/steam_client_ubuntu12; do sleep 2; done; DBUS_FATAL_WARNINGS=0 steam'
